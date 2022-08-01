@@ -1,0 +1,228 @@
+<!-- {% extends "_base.html" %} -->
+{% load static %}
+{% load verbose_names %}
+{% block content %}
+
+    {% if ultima_persona %}
+        <div id="beneficiarios_list_app">
+            <div class="row" v-cloak>
+
+                <div class="col-md-6 col-lg-3" v-for="persona in displayBeneficiarios">
+                    <div class="card wow fadeIn" data-wow-duration="2s"
+                         style="box-shadow: 0px 0px 23px -2px rgba(186,186,186,1);">
+                        <div class="card-body">
+                            <div class="mx-auto d-block text-center">
+
+
+                                <img v-if="persona.sexo == 'hombre'" class="rounded-circle mx-auto d-block"
+                                     src="{% static 'images/chico.png' %}"
+                                     alt="Card image cap" width="70" height="70">
+
+                                <img v-else class="rounded-circle mx-auto d-block"
+                                     src="{% static 'images/girl.png' %}"
+                                     alt="Card image cap" width="70" height="70">
+
+
+                                <h5 class="text-sm-center mt-2 mb-1 text-truncate">[persona.nombre ]</h5>
+                                <div class="location text-sm-center">[ persona.numero_adra ]</div>
+                                <div class="card-text text-sm-center">
+
+                                    <i class="large material-icons" v-if="persona.acte"
+                                       style="color:green;font-size: 34px;">verified_user</i>
+
+                                    <i v-else class="large material-icons"
+                                       style="color:red;font-size: 34px;">verified_user</i>
+
+                                    <i class="large material-icons" v-if="persona.discapacidad"
+                                       style="font-size: 34px;">accessible</i>
+                                    <i class="large material-icons" v-if="persona.covid" title="covid "
+                                       style="font-size: 34px;color: #370617">grain</i>
+                                    <div v-if="persona.baby" style="display: inline-block !important;">
+                                        <div style="display:flex;justify-content: center;align-items: center+">
+                                            <i class="large material-icons" title="covid "
+                                               style="font-size: 34px;color: #168ae2">child_friendly</i> <span
+                                                style="margin-left: 2px;"> x [persona.baby]</span>
+                                        </div>
+
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <p class="card-text text-center p-2" style="box-shadow: inset 1px 0px 6px 0px #00000014;
+    border-radius: 13px; margin: 10px;">
+                                Total: [persona.hijos + 1] [ (persona.hijos + 1) == 1 ? 'familiar': 'familiares']
+                            </p>
+                            <div class="card-text text-center">
+                                <a :href="persona.detail_url" class="mr-2">
+                                    <i class="large material-icons"
+                                       style="font-size: 34px;color: darkslategrey">remove_red_eye</i>
+                                </a>
+                                <a :href="persona.update" class="mr-2">
+                                    <i class="large material-icons" style="font-size: 34px;">settings</i>
+
+                                </a>
+                                {% if user.is_staff %}
+                                    <a :href="persona.delete">
+                                        <i class="large material-icons"
+                                           style="font-size: 34px; color: red">delete</i>
+                                    </a>
+
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <strong class="card-title mb-3">
+                                <p class="text-center" v-if="persona.ultima_entrega" style="color: #484848">Recogido:
+                                    <span>[persona.ultima_entrega.month]</span>
+                                    <br>
+                                    <span>[persona.ultima_entrega.month_ve]</span>
+
+                                </p>
+                                <p v-else class=" text-center text-danger">Sin entrega</p>
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div style="display: flex;justify-content: center;align-items: center">
+                <v-pagination v-model="page" :classes="bootstrapPaginationClasses" :labels="paginationAnchorTexts"
+                              :page-count="totalPages"></v-pagination>
+            </div>
+        </div>
+
+
+
+        {% comment %}        {% if is_paginated %}
+
+            <div class="pagination" style="display: flex;justify-content: center">
+              <span class="step-links " style="display:flex;">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}" style="margin-right: 20px;"><i
+                            class=" large material-icons ">chevron_left</i> </a>
+                {% endif %}
+                  <span class="current">
+                  Pagina {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+                </span>
+                  {% if page_obj.has_next %}
+                      <a href="?page={{ page_obj.next_page_number }}" style="margin-left: 20px;">  <i
+                              class=" large material-icons ">chevron_right</i></a>
+                  {% endif %}
+              </span>
+            </div>
+
+
+        {% endif %}{% endcomment %}
+
+
+    {% else %}
+        <p>No hay personas!!!</p>
+    {% endif %}
+
+
+{% endblock %}
+{% block script %}
+    <script>
+        Vue.component('v-pagination', window['vue-plain-pagination'])
+        var beneficiarios_list_app = new Vue({
+            el: '#beneficiarios_list_app',
+            delimiters: ['[', ']'],
+            data: {
+                message: 'Hello Vue!',
+                page: 1,
+                perPage: 12,
+                data_lst: [],
+                lst_child: [],
+                bootstrapPaginationClasses: {
+                    ul: 'pagination',
+                    li: 'page-item',
+                    liActive: 'active',
+                    liDisable: 'disabled',
+                    button: 'page-link'
+                },
+                paginationAnchorTexts: {
+                    first: false,
+                    prev: 'Previo',
+                    next: 'Próximo',
+                    last: false
+                }
+
+            },
+            created() {
+                this.get_data();
+            },
+            computed: {
+                displayBeneficiarios() {
+                    return this.paginate(this.data_lst)
+                },
+                totalPages() {
+                    return Math.ceil(this.data_lst.length / this.perPage);
+                }
+            },
+            methods: {
+                get_data: function () {
+                    let vm = this;
+                    this.page = 1;
+                    {% if ultima_persona %}
+                        {% for persona in ultima_persona %}
+
+                            {% if persona.active %}
+                                vm.lst_child = [];
+                                {% for per in persona.hijo.all %}
+                                    {% if per.age  < 3 %}
+                                        vm.lst_child.push("{{ per }}")
+                                    {% endif %}
+
+                                {% endfor %}
+
+                                vm.data_lst.push(
+                                    {
+                                        nombre: "{{ persona.nombre_apellido }}",
+                                        numero_adra: {{ persona.numero_adra }},
+                                        sexo: "{{  persona.sexo }}",
+                                        acte: {{ persona.are_acte|lower }},
+                                        discapacidad: {{ persona.discapacidad |lower }},
+                                        covid: {{ persona.covid|lower }},
+                                        hijos:  {{ persona.hijo.count }},
+                                        detail_url: "{{ persona.get_absolute_url }}",
+                                        id: {{  persona.id }},
+                                        ultima_entrega: {% if persona.alimentos.all %}
+
+                                            {% for al in persona.alimentos.all %}
+                                                {% if forloop.first %}
+                                                    {
+                                                        month: "{{ al.fecha_recogida|date:"d-m-Y" }}",
+                                                        month_ve: "{{ al.fecha_recogida|timesince }}"
+                                                    }
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            null
+                                        {% endif %},
+                                        update: "{% url 'adra:persona-update' persona.id %}",
+                                        delete: "{% url 'adra:persona-delete' persona.id %}",
+                                        baby: vm.lst_child.length
+
+
+                                    }
+                                )
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                    {#console.log(vm.data_lst)#}
+                },
+                paginate: function (data) {
+                    let page = this.page;
+                    let perPage = this.perPage;
+                    let from = (page * perPage) - perPage;
+                    let to = (page * perPage);
+                    return data.slice(from, to);
+
+                }
+            }
+
+        })
+    </script>
+{% endblock %}

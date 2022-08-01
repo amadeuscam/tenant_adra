@@ -1,0 +1,83 @@
+{% extends "_base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block script %} {{ form.media }} {% endblock %}
+
+<div class="row">
+    {% block content %}
+        <div
+                class="col-md-12 p-3"
+                style="box-shadow: 0px 0px 23px -2px rgba(186, 186, 186, 1)"
+        >
+            <h2 class="display-5 pb-4 text-center">Añadir alimentos beneficiario</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group col-md-4 mb-0">
+                        {{ form.alimento_1|as_crispy_field }}
+                    </div>
+                    <div class="form-group col-md-4 mb-0">
+                        {{ form.alimento_2|as_crispy_field }}
+                    </div>
+                    <div class="form-group col-md-4 mb-0">
+                        {{ form.alimento_3|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-4 mb-0">
+                        {{ form.alimento_4|as_crispy_field }}
+                    </div>
+                    <div class="form-group col-md-4 mb-0">
+                        {{ form.alimento_5|as_crispy_field }}
+                    </div>
+                    <div class="form-group col-md-4 mb-0">
+                        {{ form.alimento_6|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-4 mb-0">
+                        {{ form.alimento_7|as_crispy_field }}
+                    </div>
+                    <div class="form-group col-md-4 mb-0">
+                        {{ form.alimento_8|as_crispy_field }}
+                    </div>
+                    <div class="form-group col-md-4 mb-0">
+                        {{ form.alimento_9|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-4 mb-0">
+                        {{ form.alimento_10|as_crispy_field }}
+                    </div>
+                    <div class="form-group col-md-4 mb-0">
+                        {{ form.alimento_11|as_crispy_field }}
+                    </div>
+                    <div class="form-group col-md-4 mb-0">
+                        {{ form.alimento_12|as_crispy_field }}
+                    </div>
+                    <div class="form-group col-md-4 mb-0">
+                        {{ form.alimento_13|as_crispy_field }}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-12 mb-0">
+                        {{ form.fecha_recogida|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6 col-sm-12 mb-3">
+                        <h2>Firma beneficiario</h2>
+                        {{ form.signature }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button class="btn btn-info btn-block btn-lg" type="submit">
+                        Añadir
+                    </button>
+                </div>
+            </form>
+        </div>
+    {% endblock %}
+</div>
