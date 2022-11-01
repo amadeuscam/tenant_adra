@@ -4,7 +4,7 @@ from .base import *  # noqa
 
 DEBUG = False
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["https://repartoalimentos.com/","http://repartoalimentos.com/","repartoalimentos.com"]
 
 
 DATABASES = {
