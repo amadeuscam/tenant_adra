@@ -1,9 +1,10 @@
 from django import forms
-from .models import Persona, Alimentos, Hijo, Profile
 from django.contrib.auth.models import User
-from django.forms import ModelForm, DateInput, EmailInput, Form
+from django.forms import DateInput, EmailInput, Form, ModelForm
 from jsignature.forms import JSignatureField
 from jsignature.widgets import JSignatureWidget
+
+from .models import Alimentos, Hijo, Persona, Profile
 
 
 class AlimentosFrom(ModelForm):
@@ -30,7 +31,9 @@ class AlimentosFrom(ModelForm):
         )
         widgets = {
             "fecha_recogida": DateInput(attrs={"type": "datetime-local"}),
-            "signature": JSignatureWidget(jsignature_attrs={'color': '#405e9d'}),
+            "signature": JSignatureWidget(
+                jsignature_attrs={"color": "#405e9d"}
+            ),
         }
 
 
@@ -61,6 +64,7 @@ class PersonaForm(ModelForm):
             "recibos",
             "email",
             "covid",
+            "codigo_postal",
             "otros_documentos",
         ]
         widgets = {
@@ -110,6 +114,7 @@ class HijoForm(ModelForm):
             "dni",
             "otros_documentos",
             "fecha_nacimiento",
+            "discapacidad",
         ]
         widgets = {
             "fecha_nacimiento": forms.DateInput(

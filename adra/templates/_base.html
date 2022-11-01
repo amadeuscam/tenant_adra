@@ -23,10 +23,10 @@
     <link href="{% static 'vendor/css-hamburgers/hamburgers.min.css' %}" rel="stylesheet" media="all">
     <!-- Main CSS-->
     <link href="{% static 'css/theme.css' %}" rel="stylesheet" media="all"/>
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/favicon/apple-touch-icon.png' %}">
+    <!-- <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/favicon/apple-touch-icon.png' %}">
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon/favicon-32x32.png' %}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon/favicon-16x16.png' %}">
-    <link rel="manifest" href="{% static 'images/favicon/site.webmanifest' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon/favicon-16x16.png' %}"> -->
+    <!-- <link rel="manifest" href="{% static 'images/favicon/site.webmanifest' %}"> -->
     <style>
         [v-cloak] {
             display: none;
@@ -44,7 +44,7 @@
             <div class="container-fluid">
                 <div class="header-mobile-inner">
                     <a class="logo" href="{% url 'adra:persona-home' %}">
-                        <h1>Adra Torrejon</h1>
+                        <h1>{{tenant_name}}</h1>
                     </a>
                     <button class="hamburger hamburger--slider" type="button">
                             <span class="hamburger-box">
@@ -118,7 +118,7 @@
     <aside class="menu-sidebar d-none d-lg-block">
         <div class="logo">
             <a href="{% url 'adra:persona-home' %}">
-                <h4>Adra Torrejon</h4>
+                <h4> {{tenant_name}}</h4>
             </a>
         </div>
         <div class="menu-sidebar__content js-scrollbar1">
@@ -303,246 +303,6 @@
         <!-- END MAIN CONTENT-->
         <!-- END PAGE CONTAINER-->
     </div>
-    {# modals section #}
-    <div class="modal fade" tabindex="-1" style="position: absolute;" role="dialog" id="exampleModal">
-        <div class="modal-dialog " role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title text-center">Paples</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p>Empadronamiento: {% if object.empadronamiento %}
-                                <span style="color:#ACEB98;">Si</span> {% else %}
-                                <span style="color: red">No</span> {% endif %}</p>
-                            <p>Libro de familia: {% if object.libro_familia %}
-                                <span style="color:#ACEB98;">Si</span> {% else %}
-                                <span style="color: red">No</span> {% endif %}</p>
-                            <p>Prestaciones: {% if object.prestaciones %}
-                                <span style="color:#ACEB98;">Si</span> {% else %}
-                                <span style="color: red">No</span> {% endif %}</p>
-                            <p>Aquiler o Hipoteca: {% if object.aquiler_hipoteca %}
-                                <span style="color:#ACEB98;">Si</span> {% else %}
-                                <span style="color: red">No</span> {% endif %}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <p>Fotocopias dnis: {% if object.fotocopia_dni %}
-                                <span style="color:#ACEB98;">Si</span> {% else %}
-                                <span style="color: red">No</span> {% endif %}</p>
-                            <p>Nomia: {% if object.nomnia %}
-                                <span style="color:#ACEB98;">Si</span> {% else %}
-                                <span style="color: red">No</span> {% endif %}</p>
-                            <p>Certificado Negativo:{% if object.cert_negativo %}
-                                <span style="color:#ACEB98;">Si</span> {% else %}
-                                <span style="color: red">No</span> {% endif %}</p>
-                            <p>Recibos: {% if object.recibos %}
-                                <span style="color:#ACEB98;">Si</span> {% else %}
-                                <span style="color: red">No</span> {% endif %}</p>
-                        </div>
-
-                    </div>
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn  btn-block btn-dark" data-dismiss="modal">Cerrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="modalListadoAlimentos" tabindex="-1" role="dialog"
-         aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">Alimentos Entegados</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <ul class="list-group">
-                        {% for alimento in persona.alimentos.all %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Se ha recogido
-                                <span class="badge badge-primary badge-pill">{{ alimento.fecha_recogida }}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                {% get_verbose_field_name alimento "alimento_1" %}
-                                <span class="badge badge-primary badge-pill">{{ alimento.alimento_1 }}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                {% get_verbose_field_name alimento "alimento_2" %}
-                                <span class="badge badge-primary badge-pill">{{ alimento.alimento_2 }}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                {% get_verbose_field_name alimento "alimento_3" %}
-                                <span class="badge badge-primary badge-pill">{{ alimento.alimento_3 }}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                {% get_verbose_field_name alimento "alimento_4" %}
-                                <span class="badge badge-primary badge-pill">{{ alimento.alimento_4 }}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                {% get_verbose_field_name alimento "alimento_5" %}
-                                <span class="badge badge-primary badge-pill">{{ alimento.alimento_5 }}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                {% get_verbose_field_name alimento "alimento_6" %}
-                                <span class="badge badge-primary badge-pill">{{ alimento.alimento_6 }}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                {% get_verbose_field_name alimento "alimento_7" %}
-                                <span class="badge badge-primary badge-pill">{{ alimento.alimento_7 }}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                {% get_verbose_field_name alimento "alimento_8" %}
-                                <span class="badge badge-primary badge-pill">{{ alimento.alimento_8 }}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                {% get_verbose_field_name alimento "alimento_9" %}
-                                <span class="badge badge-primary badge-pill">{{ alimento.alimento_9 }}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                {% get_verbose_field_name alimento "alimento_10" %}
-                                <span class="badge badge-primary badge-pill">{{ alimento.alimento_10 }}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                {% get_verbose_field_name alimento "alimento_11" %}
-                                <span class="badge badge-primary badge-pill">{{ alimento.alimento_11 }}</span>
-                            </li>
-
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                {% get_verbose_field_name alimento "alimento_12" %}
-                                <span class="badge badge-primary badge-pill">{{ alimento.alimento_12 }}</span>
-                            </li>
-
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                {% get_verbose_field_name alimento "alimento_13" %}
-                                <span class="badge badge-primary badge-pill">{{ alimento.alimento_13 }}</span>
-                            </li>
-
-                            <li class="list-group-item d-flex ">
-                                {% if  alimento.signature %}
-                                    <img src="{{ alimento.signature|signature_base64 }}"  alt="{{ alimento }}"/>
-                                {% endif %}
-                                
-                            </li>
-
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Modificado por
-                                <span class="badge badge-primary badge-pill">{{ alimento.modificado_por }}</span>
-                            </li>
-
-                            <li class="list-group-item d-flex justify-content-center  align-items-center"
-                                style="background: #e4e4e4;padding: 0">
-                                <a class="btn " role="button"
-                                   href="{% url 'adra:persona-update-alimentos' alimento.id %}">
-                                    <i class="large material-icons" title=""
-                                       style="font-size: 36px;color: darkslategrey">mode_edit</i>
-                                </a>
-                                <a class="btn " role="button"
-                                   href="{% url 'adra:persona-alimentos-delete' alimento.id %}">
-                                    <i class="large material-icons" style="font-size: 34px; color: red">delete</i>
-                                </a>
-                            </li>
-
-                        {% empty %}
-                            <div class="alert alert-primary" role="alert">
-                                Nu sa dat alimente acestei personane :(
-                            </div>
-                        {% endfor %}
-
-
-                    </ul>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn" style="background: darkslategrey;color: #fff"
-                            data-dismiss="modal">Cerrar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Modal -->
-    <div class="modal fade" id="modalListadoFamiliares" tabindex="-1" role="dialog"
-         aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog  modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">Listado familiares</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    {% with persona.hijo.count as total_hijos %}
-                        <h3>{{ total_hijos }} familiare{{ total_hijos|pluralize }}</h3>
-                    {% endwith %}
-
-                    <div class="row">
-                        {% for hijo in persona.hijo.all %}
-                            <div class="col-md-6 col-sm-12 col-xs-12">
-                                <div class="card text-dark  mt-2"
-                                     style="border: none;box-shadow:  20px 20px 40px #b1b8bb,-20px -20px 40px #eff8fd;   {% if hijo.age <= 3 %}
-                                         background-image: linear-gradient(to right bottom, #d9e2e3, #bbe5e8, #99e7eb, #6de9ec, #12ebeb);
-                                     {% endif %}">
-                                    <div class="card-body" id="evens">
-
-                                        <h2 class="text-dark text-truncate" title="{{ hijo.nombre_apellido }}">
-                                            {{ hijo.nombre_apellido }}</h2>
-                                        <p class="card-text  ">Parentesco:<span
-                                                class="text-warning">{{ hijo.parentesco|upper }}</span></p>
-                                        <p class="card-text">Dni:
-                                            {% if hijo.dni %}
-                                                {{ hijo.dni }}
-                                            {% else %}
-                                                {{ hijo.otros_documentos }}
-                                            {% endif %} 
-                                        </p>
-                                        <p class="card-text">Sexo: {{ hijo.sexo }}</p>
-                                        <p class="card-text">Edad: {{ hijo.age }}</p>
-                                        <p class="card-text">Nacido: {{ hijo.fecha_nacimiento|date:"m-d-Y" }}</p>
-                                        <p class="card-text">Modificado por: <b>{{ hijo.modificado_por }}</b></p>
-                                        <hr>
-                                        <a class="btn " role="button"
-                                           href="{% url 'adra:hijo-update' hijo.id %}">
-                                            <i class="large material-icons" title=""
-                                               style="font-size: 36px;color: darkslategrey">portrait</i>
-                                        </a>
-                                        {% if user.is_staff %}
-                                            <a class="btn " role="button"
-                                               href="{% url 'adra:hijo-delete' hijo.id %}">
-                                                <i class="large material-icons" style="font-size: 34px; color: red">delete</i>
-                                            </a>
-                                        {% endif %}
-                                    </div>
-                                </div>
-
-                            </div>
-
-                        {% empty %}
-
-                            <div class="alert alert-primary" role="alert">
-                                No tiene hijos
-                            </div>
-                        {% endfor %}
-                    </div>
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn " style="background: darkslategrey;color: #fff"
-                            data-dismiss="modal">Cerrar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 
 </div>
 <script src="{% static 'vendor/jquery-3.2.1.min.js' %}"></script>

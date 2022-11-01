@@ -1,20 +1,12 @@
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
+from rest_framework_simplejwt import views as jwt_views
 
 from . import views
-from .views import (
-    PersonaDetailView,
-    PersonaCreateView,
-    PersonaUpdateView,
-    PersonaDeleteView,
-    PersonaAlimentosDeleteView,
-    AlmacenListView,
-    HijoUpdateView,
-    HijoDeleteView,
-    PersonaListView,
-    PersonaAlimentosUpdateView,
-)
-from rest_framework_simplejwt import views as jwt_views
+from .views import (AlmacenListView, HijoDeleteView, HijoUpdateView,
+                    PersonaAlimentosDeleteView, PersonaAlimentosUpdateView,
+                    PersonaCreateView, PersonaDeleteView, PersonaDetailView,
+                    PersonaListView, PersonaUpdateView)
 
 app_name = "adra"
 # Create a router and register our viewsets with it.
@@ -106,11 +98,11 @@ urlpatterns = [
     # end hijos url
     path("edit/", views.edit, name="edit-profile"),
     path("get-data/", views.get_data, name="get_data"),
-    path(
-        "get-beneficiarios-activos/<int:number>",
-        views.get_beneficiarios_activos,
-        name="get_beneficiarios_activos",
-    ),
+    # path(
+    #     "get-beneficiarios-activos/<int:number>",
+    #     views.get_beneficiarios_activos,
+    #     name="get_beneficiarios_activos",
+    # ),
     path("adra-anuncios/", views.anuncios, name="anuncio"),
     path("reset-papeles/", views.reset_papeles, name="reset-papeles"),
 ]

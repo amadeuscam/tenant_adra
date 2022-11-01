@@ -1,4 +1,5 @@
 from datetime import date
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.core.validators import validate_email
@@ -44,10 +45,11 @@ class Persona(models.Model):
     )
     discapacidad = models.BooleanField(default=False)
     categoria = models.CharField(max_length=30, choices=DOMINGO)
+    codigo_postal = models.IntegerField(default=0)
     empadronamiento = models.BooleanField(
         default=False,
         verbose_name="Certificado de empadronamiento actualizado "
-                     "con fecha de menos de tres meses ",
+        "con fecha de menos de tres meses ",
     )
     libro_familia = models.BooleanField(
         default=False, verbose_name="Fotocopia del Libro de Familia "
@@ -55,12 +57,12 @@ class Persona(models.Model):
     fotocopia_dni = models.BooleanField(
         default=False,
         verbose_name="Fotocopia del DNI/NIE o pasaporte de todos los "
-                     "miembros del núcleo familiar",
+        "miembros del núcleo familiar",
     )
     prestaciones = models.BooleanField(
         default=False,
         verbose_name="Fotocopia de la documentación que acredite de"
-                     " prestación, pensión, paro, etc",
+        " prestación, pensión, paro, etc",
     )
     nomnia = models.BooleanField(
         default=False,
@@ -69,17 +71,17 @@ class Persona(models.Model):
     cert_negativo = models.BooleanField(
         default=False,
         verbose_name="En caso de no tener ingresos: certificado"
-                     " negativo de rentas, de la Agencia Tributaria.",
+        " negativo de rentas, de la Agencia Tributaria.",
     )
     aquiler_hipoteca = models.BooleanField(
         default=False,
         verbose_name="Ultimo recibo alquiler o  hipoteca de"
-                     " vivienda familiar en la que están empadronados",
+        " vivienda familiar en la que están empadronados",
     )
     recibos = models.BooleanField(
         default=False,
         verbose_name="Recibo de gastos básicos: luz, agua, gas, "
-                     "calefacción, comunidad y  comedor escolar.",
+        "calefacción, comunidad y  comedor escolar.",
     )
 
     class Meta:
@@ -97,12 +99,12 @@ class Persona(models.Model):
     def age(self):
         today = date.today()
         return (
-                today.year
-                - self.fecha_nacimiento.year
-                - (
-                        (today.month, today.day)
-                        < (self.fecha_nacimiento.month, self.fecha_nacimiento.day)
-                )
+            today.year
+            - self.fecha_nacimiento.year
+            - (
+                (today.month, today.day)
+                < (self.fecha_nacimiento.month, self.fecha_nacimiento.day)
+            )
         )
 
 
@@ -140,6 +142,7 @@ class Hijo(models.Model):
     modificado_por = models.ForeignKey(
         User, on_delete=models.CASCADE, null=True
     )
+    discapacidad = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if self.parentesco == "esposa":
@@ -163,12 +166,12 @@ class Hijo(models.Model):
     def age(self):
         today = date.today()
         return (
-                today.year
-                - self.fecha_nacimiento.year
-                - (
-                        (today.month, today.day)
-                        < (self.fecha_nacimiento.month, self.fecha_nacimiento.day)
-                )
+            today.year
+            - self.fecha_nacimiento.year
+            - (
+                (today.month, today.day)
+                < (self.fecha_nacimiento.month, self.fecha_nacimiento.day)
+            )
         )
 
 

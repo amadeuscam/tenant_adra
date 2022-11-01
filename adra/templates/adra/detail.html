@@ -1,13 +1,442 @@
 <!-- {% extends "_base.html" %} -->
 {% load static %}
+{% load verbose_names %}
 {% load crispy_forms_tags %}
+{% load jsignature_filters %}
 {% block title %}
-  {{ persona.nombre_apellido }}
+{{ persona.nombre_apellido }}
 {% endblock %}
 
 {% block content %}
 
-  <div class="profile-container" style="box-shadow: 0px 0px 23px -2px rgba(186,186,186,1);">
+<div class="profile-container" style="box-shadow: 0px 0px 23px -2px rgba(186,186,186,1);">
+  <div class="row">
+    <div class="col-12 col-md-12 col-lg-12 col-xl-5">
+      <div class="row">
+
+        <div class="col-md-12 col-xs-12 d-flex pt-3 justify-content-center">
+          {% if object.sexo == "hombre" %}
+          <img src="{% static 'images/chico.png' %}" class="img-responsive" width="100" height="100" />
+          {% else %}
+          <img src="{% static 'images/girl.png' %}" class="img-responsive" width="100" height="100" />
+          {% endif %}
+        </div>
+        <div class="col-md-12 col-xs-12  profile-info mb-5 p-xs-1 pt-md-3   text-center">
+          <h2 class="user-name mb-2" title="nombre del beneficiario">
+            {{ object.nombre_apellido }}</h2>
+          <h3 class="user-mail" title="fecha de nacimiento">{{ object.fecha_nacimiento }} ( {{ persona.age }} años)
+          </h3>
+          <h5 class="user-company " title="numero adra" style="font-size: 32px;">
+            {{ object.numero_adra }}</h5>
+        </div>
+
+      </div>
+      <div class="row " style="border-bottom: 2px solid darkslategrey;margin-bottom: 20px;">
+        <ul class="list-group list-group-flush ">
+          <li class="list-group-item ">
+
+            <a class="btn " data-toggle="tooltip" data-placement="top" title="Editar la informacion del beneficiario"
+              role="button" href="{% url 'adra:persona-update' persona.id %}">
+              <i class="large material-icons" title="" style="font-size: 36px;color: darkslategrey">portrait</i>
+            </a>
+            {% comment %} <a class="btn" data-toggle="modal" data-target="#modalListadoAlimentos" role="button"
+              style="color: white">
+              <i class="large material-icons" title="ver alimentos entregados"
+                style="font-size: 36px;color: darkslategrey">assignment</i>
+            </a> {% endcomment %}
+            {% comment %} <a class="btn " data-toggle="modal" data-target="#modalListadoFamiliares" role="button"
+              style="color: white">
+              <i class="large material-icons" title="ver familiares beneficiario"
+                style="font-size: 36px;color: darkslategrey">people</i>
+            </a> {% endcomment %}
+            <a class="btn" data-toggle="tooltip" data-placement="top" title="Añadir alimentos beneficiario"
+              role="button" href="{% url 'adra:alimentos-create' persona.id %}">
+              <i class="large material-icons" style="font-size: 36px;color: darkslategrey">local_dining</i>
+            </a>
+            <a class="btn" data-toggle="tooltip" data-placement="top" title="Añadir familiares" role="button"
+              href="{% url 'adra:hijo-create' persona.id %}">
+              <i class="large material-icons" style="font-size: 36px;color: darkslategrey">group_add</i>
+            </a>
+
+            <div class="btn-group">
+              <button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                Generar hoja de entrega
+              </button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" style="color: darkslategrey"
+                  href="{% url 'adra:pdf_form' persona.id 'sin' %}">Sin
+                  firma</a>
+                <a class="dropdown-item" href="{% url 'adra:pdf_form' persona.id 'con' %}">Con firma</a>
+              </div>
+            </div>
+            <a class="btn" data-toggle="tooltip" data-placement="top" title="Generar hoja de valoracion social"
+              role="button" href="{% url 'adra:docx_form' persona.id %}">
+              <i class="large material-icons" style="font-size: 36px;color: darkslategrey">file_download</i>
+            </a>
+
+          </li>
+        </ul>
+      </div>
+
+
+    </div>
+    <div class="col-12 col-md-12 col-lg-12 col-xl-7">
+
+      <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active center-all" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab"
+            aria-controls="pills-home" aria-selected="true">Info</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="pills-document-tab" data-toggle="pill" href="#pills-document" role="tab"
+            aria-controls="pills-document" aria-selected="true">Documentación</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab"
+            aria-controls="pills-profile" aria-selected="false">
+            {% with persona.hijo.count as total_hijos %}
+            {{ total_hijos }} familiare{{ total_hijos|pluralize }}
+            {% endwith %}</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab"
+            aria-controls="pills-contact" aria-selected="false">Alimentos Entregados ({{ persona.alimentos.count }})</a>
+        </li>
+
+      </ul>
+      <div class="tab-content" id="pills-tabContent">
+
+        <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+          <div class="row more-info p-2">
+            <div class="col-md-3 mb-3">
+              <h5>
+                <b>Documento de identidad</b>
+              </h5>
+              <p>
+                {% if object.dni %}
+                {{ object.dni }}
+                {% else %}
+                {{ object.otros_documentos }}
+                {% endif %}
+              </p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <h5>
+                <b>Sexo</b>
+              </h5>
+              <p>{{ object.sexo|capfirst }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <h5>
+                <b>Categoria</b>
+              </h5>
+              <p>{{ object.get_categoria_display  }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <h5>
+                <b>Nacionalidad</b>
+              </h5>
+              <p>{{ object.nacionalidad }}</p>
+            </div>
+
+            <div class="col-md-3 mb-3">
+              <h5>
+                <b>Telefono</b>
+              </h5>
+              <p>
+                <a href="tel:{{ object.telefono }}">
+                  {{ object.telefono }}</a>
+              </p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <h5>
+                <b>Modificado por</b>
+              </h5>
+              <p>{{ object.modificado_por|capfirst }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <h5>
+                <b>Ciudad</b>
+              </h5>
+              <p>
+                {{ object.ciudad }}</p>
+            </div>
+             <div class="col-md-3 mb-3">
+              <h5>
+                <b>Codigo postal</b>
+              </h5>
+               
+                <a target="_blank" href="https://www.codigospostales.com/{{ object.codigo_postal }}">{{ object.codigo_postal }}</a>
+                 
+            </div>
+            <div class="col-md-4 mb-3">
+              <h5>
+                <b>Domicilio</b>
+              </h5>
+              <p>{{ object.domicilio }}</p>
+            </div>
+
+          </div>
+
+
+
+          <div class="row p-2">
+            <div class="col-md-12 bg-warning p-2">
+              <h5>
+                <b>Mensaje</b>
+              </h5>
+              <p style="word-wrap: break-word;">
+                {{ persona.mensaje }}</p>
+            </div>
+
+          </div>
+
+
+        </div>
+        <div class="tab-pane fade" id="pills-document" role="tabpanel" aria-labelledby="pills-document-tab">
+          <div class="row more-info p-2">
+            <div class="col-md-4 center-all mb-3">
+              <h5><b>Empadronamiento</b></h5>
+              <p>{% if persona.empadronamiento %}
+                <i class="large material-icons" style="font-size: 36px;color: green">check_circle</i>
+                {% else %}
+                <i class="large material-icons" style="font-size: 36px;color: red">cancel</i>
+                {% endif %}
+              </p>
+            </div>
+            <div class="col-md-4 center-all mb-3">
+              <h5><b>Libro de familia</b></h5>
+              <p>{% if persona.libro_familia %}
+                <i class="large material-icons" style="font-size: 36px;color: green">check_circle</i>
+                {% else %}
+                <i class="large material-icons" style="font-size: 36px;color: red">cancel</i>
+                {% endif %}
+              </p>
+            </div>
+            <div class="col-md-4 center-all mb-3">
+              <h5><b>Prestaciones</b></h5>
+              <p>{% if persona.prestaciones %}
+                <i class="large material-icons" style="font-size: 36px;color: green">check_circle</i>
+                {% else %}
+                <i class="large material-icons" style="font-size: 36px;color: red">cancel</i>
+                {% endif %}
+              </p>
+            </div>
+
+            <div class="col-md-4 center-all mb-3">
+              <h5><b>Aquiler o Hipoteca</b></h5>
+              <p>{% if persona.aquiler_hipoteca %}
+                <i class="large material-icons" style="font-size: 36px;color: green">check_circle</i>
+                {% else %}
+                <i class="large material-icons" style="font-size: 36px;color: red">cancel</i>
+                {% endif %}
+              </p>
+            </div>
+
+            <div class="col-md-4 center-all mb-3">
+              <h5><b>Fotocopias dnis</b></h5>
+              <p>{% if persona.fotocopia_dni %}
+                <i class="large material-icons" style="font-size: 36px;color: green">check_circle</i>
+                {% else %}
+                <i class="large material-icons" style="font-size: 36px;color: red">cancel</i>
+                {% endif %}
+              </p>
+            </div>
+
+            <div class="col-md-4 center-all mb-3">
+              <h5><b>Nomia</b></h5>
+              <p>{% if persona.nomnia %}
+                <i class="large material-icons" style="font-size: 36px;color: green">check_circle</i>
+                {% else %}
+                <i class="large material-icons" style="font-size: 36px;color: red">cancel</i>
+                {% endif %}
+              </p>
+            </div>
+
+            <div class="col-md-4 center-all mb-3">
+              <h5><b>Certificado Negativo</b></h5>
+              <p>{% if persona.cert_negativo %}
+                <i class="large material-icons" style="font-size: 36px;color: green">check_circle</i>
+                {% else %}
+                <i class="large material-icons" style="font-size: 36px;color: red">cancel</i>
+                {% endif %}
+              </p>
+            </div>
+
+            <div class="col-md-4 center-all mb-3">
+              <h5><b>Recibos</b></h5>
+              <p>{% if persona.recibos %}
+                <i class="large material-icons" style="font-size: 36px;color: green">check_circle</i>
+                {% else %}
+                <i class="large material-icons" style="font-size: 36px;color: red">cancel</i>
+                {% endif %}
+              </p>
+            </div>
+
+          </div>
+
+
+        </div>
+        <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+          <div class="row">
+            {% for hijo in persona.hijo.all %}
+            <div class="col-md-6 col-sm-12 col-xs-12">
+              <div class="card text-dark  mt-2" style="border: none;box-shadow:  20px 20px 40px #b1b8bb,-20px -20px 40px #eff8fd;{% if hijo.age <= 3 %}background-image: linear-gradient(to right bottom, #d9e2e3, #bbe5e8, #99e7eb, #6de9ec, #12ebeb);{% endif %}">
+                <div class="card-body" id="evens">
+
+                  <h2 class="text-dark text-truncate" title="{{ hijo.nombre_apellido }}">
+                    {{ hijo.nombre_apellido }}</h2>
+                  <p class="card-text  ">Parentesco:<span class="text-warning">{{ hijo.parentesco|upper }}</span></p>
+                  <p class="card-text">Dni:
+                    {% if hijo.dni %}
+                    {{ hijo.dni }}
+                    {% else %}
+                    {{ hijo.otros_documentos }}
+                    {% endif %}
+                  </p>
+                  <p class="card-text">Sexo: {{ hijo.sexo }}
+
+                  </p>
+
+                  {% if hijo.discapacidad%}
+                  <i class="large material-icons"
+                    style="font-size: 4em;position: absolute;right:0;padding-right: 0.4em;">accessible</i>
+                  {% endif %}
+
+                  <p class="card-text">Edad: {{ hijo.age }}</p>
+                  <p class="card-text">Discapacidad:
+                    {% if  hijo.discapacidad%}
+                    Si
+                    {% else %}
+                    No
+                    {% endif %}
+
+                  </p>
+                  <p class="card-text">Nacido: {{ hijo.fecha_nacimiento|date:"m-d-Y" }}</p>
+                  <p class="card-text">Modificado por: <b>{{ hijo.modificado_por }}</b></p>
+                  <hr>
+                  <a class="btn " role="button" href="{% url 'adra:hijo-update' hijo.id %}">
+                    <i class="large material-icons" title="" style="font-size: 36px;color: darkslategrey">portrait</i>
+                  </a>
+                  {% if user.is_staff %}
+                  <a class="btn " role="button" href="{% url 'adra:hijo-delete' hijo.id %}">
+                    <i class="large material-icons" style="font-size: 34px; color: red">delete</i>
+                  </a>
+                  {% endif %}
+                </div>
+              </div>
+
+            </div>
+
+            {% empty %}
+
+            <div class="alert alert-primary" role="alert">
+              No tiene hijos
+            </div>
+            {% endfor %}
+          </div>
+
+        </div>
+        <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
+          <ul class="list-group">
+            {% for alimento in persona.alimentos.all %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Se ha recogido
+              <span class="badge badge-primary badge-pill">{{ alimento.fecha_recogida }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              {% get_verbose_field_name alimento "alimento_1" %}
+              <span class="badge badge-primary badge-pill">{{ alimento.alimento_1 }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              {% get_verbose_field_name alimento "alimento_2" %}
+              <span class="badge badge-primary badge-pill">{{ alimento.alimento_2 }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              {% get_verbose_field_name alimento "alimento_3" %}
+              <span class="badge badge-primary badge-pill">{{ alimento.alimento_3 }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              {% get_verbose_field_name alimento "alimento_4" %}
+              <span class="badge badge-primary badge-pill">{{ alimento.alimento_4 }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              {% get_verbose_field_name alimento "alimento_5" %}
+              <span class="badge badge-primary badge-pill">{{ alimento.alimento_5 }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              {% get_verbose_field_name alimento "alimento_6" %}
+              <span class="badge badge-primary badge-pill">{{ alimento.alimento_6 }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              {% get_verbose_field_name alimento "alimento_7" %}
+              <span class="badge badge-primary badge-pill">{{ alimento.alimento_7 }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              {% get_verbose_field_name alimento "alimento_8" %}
+              <span class="badge badge-primary badge-pill">{{ alimento.alimento_8 }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              {% get_verbose_field_name alimento "alimento_9" %}
+              <span class="badge badge-primary badge-pill">{{ alimento.alimento_9 }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              {% get_verbose_field_name alimento "alimento_10" %}
+              <span class="badge badge-primary badge-pill">{{ alimento.alimento_10 }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              {% get_verbose_field_name alimento "alimento_11" %}
+              <span class="badge badge-primary badge-pill">{{ alimento.alimento_11 }}</span>
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              {% get_verbose_field_name alimento "alimento_12" %}
+              <span class="badge badge-primary badge-pill">{{ alimento.alimento_12 }}</span>
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              {% get_verbose_field_name alimento "alimento_13" %}
+              <span class="badge badge-primary badge-pill">{{ alimento.alimento_13 }}</span>
+            </li>
+
+            <li class="list-group-item d-flex ">
+              {% if  alimento.signature %}
+              <img src="{{ alimento.signature|signature_base64 }}" alt="{{ alimento }}" />
+              {% endif %}
+
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Modificado por
+              <span class="badge badge-primary badge-pill">{{ alimento.modificado_por }}</span>
+            </li>
+
+            <li class="list-group-item d-flex justify-content-center  align-items-center"
+              style="background: #e4e4e4;padding: 0">
+              <a class="btn " role="button" href="{% url 'adra:persona-update-alimentos' alimento.id %}">
+                <i class="large material-icons" title="" style="font-size: 36px;color: darkslategrey">mode_edit</i>
+              </a>
+              <a class="btn " role="button" href="{% url 'adra:persona-alimentos-delete' alimento.id %}">
+                <i class="large material-icons" style="font-size: 34px; color: red">delete</i>
+              </a>
+            </li>
+
+            {% empty %}
+            <div class="alert alert-primary" role="alert">
+              No se ha entregado ningun alimento :(
+            </div>
+            {% endfor %}
+
+
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- <div class="profile-container" style="box-shadow: 0px 0px 23px -2px rgba(186,186,186,1);">
     <div class="row">
       <div class="col-md-4 col-xs-12 mb-5 d-flex pt-3 justify-content-center">
         {% if object.sexo == "hombre" %}
@@ -175,6 +604,6 @@
       </div>
 
     </div>
-  </div>
+  </div> -->
 
 {% endblock %}

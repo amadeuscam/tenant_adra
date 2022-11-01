@@ -1,7 +1,8 @@
 import os
 from pathlib import Path
-from sentry_sdk.integrations.django import DjangoIntegration
+
 import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -90,6 +91,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "adra.context_processors.add_variable_to_context",
+                "adra.context_processors.get_tenant_name",
             ],
             "loaders": [
                 "django_tenants.template.loaders.filesystem.Loader",  # Must be first

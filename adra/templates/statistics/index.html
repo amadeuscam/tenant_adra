@@ -109,7 +109,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="col-md-4">
+        <!-- <div class="col-md-4">
             <h5>Conteo con</h5>
             <form action="{% url 'adra:statistics-personas' %}" method="post">
                 {% csrf_token %}
@@ -129,9 +129,9 @@
                     </div>
                 </div>
             </form>
-        </div>
+        </div> -->
     </div>
-
+<!-- 
     <div class="col col-md-6" style="height: 25vh;min-height: 25vh;position:relative;">
         <h3 class="text-left pt-5">Usuarios activos por busqueda</h3>
         <p><b>introduce el numero de entregas</b></p>
@@ -144,7 +144,7 @@
             <h4 style="margin-top: 1vh">Beneficiarios activos: <span
                     style="font-size: 20px;color: red;margin-left: 2%;">{beneficiarios} </span></h4>
         </div>
-    </div>
+    </div> -->
 
     <div class="row">
         <div class="col">
@@ -157,46 +157,46 @@
 {% block script %}
     <script>
 
-        var app = new Vue({
-            el: '#app-activos',
-            delimiters: ['{', '}'],
-            data: {
-                number_search: 1,
-                beneficiarios: ''
-            },
-            watch: {
-                number_search: function (old) {
-                    this.get_data()
+        // var app = new Vue({
+        //     el: '#app-activos',
+        //     delimiters: ['{', '}'],
+        //     data: {
+        //         number_search: 1,
+        //         beneficiarios: ''
+        //     },
+        //     watch: {
+        //         number_search: function (old) {
+        //             this.get_data()
 
-                }
-            },
-            mounted() {
-                this.get_data()
-            },
-            methods: {
-                get_data: function () {
-                    let vm = this;
-                    if (vm.number_search) {
-                        axios.get(`/get-beneficiarios-activos/${this.number_search}`)
-                            .then(function (response) {
-                                vm.beneficiarios = response.data.num
+        //         }
+        //     },
+        //     mounted() {
+        //         this.get_data()
+        //     },
+        //     methods: {
+        //         get_data: function () {
+        //             let vm = this;
+        //             if (vm.number_search) {
+        //                 axios.get(`/get-beneficiarios-activos/${this.number_search}`)
+        //                     .then(function (response) {
+        //                         vm.beneficiarios = response.data.num
 
-                            })
-                            .catch(function (error) {
-                                console.log(error);
-                            })
-                    }
+        //                     })
+        //                     .catch(function (error) {
+        //                         console.log(error);
+        //                     })
+        //             }
 
-                }
-            }
-        })
+        //         }
+        //     }
+        // })
 
 
         // based on prepared DOM, initialize echarts instance
         var myChart = echarts.init(document.getElementById('main'));
 
 
-        option = {
+        let option = {
             tooltip: {
                 trigger: 'item',
                 formatter: '{c} registros'
@@ -213,8 +213,13 @@
 
         axios.get("{% url 'adra:get_data' %}")
             .then(function (response) {
-                {#console.log(response);#}
+                console.log(response);
+              
                 myChart.setOption({
+                    xAxis:{
+                        type: 'category',
+                        data: response.data.years
+                    },
                     series: [{
                         data: response.data.reg,
                         type: 'line'

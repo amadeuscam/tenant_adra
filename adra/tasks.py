@@ -1,26 +1,30 @@
 from datetime import datetime
+
 import sendgrid
-from django.conf import settings
+from adra_project.celery import app
 from celery.schedules import crontab
 from celery.utils.log import get_task_logger
+from django.conf import settings
 from django.contrib.auth.models import User
-
-from adra.models import AlmacenAlimentos
-from adra_project.celery import app
-from adra.api_consume.get_api_data import get_caducidades
 from django_tenants.utils import get_tenant_model, tenant_context
+
+from adra.api_consume.get_api_data import get_caducidades
+from adra.models import AlmacenAlimentos
 
 logger = get_task_logger(__name__)
 
 
-def send_email_sendgrid(producto: str, email_lst: list, tenant_info) -> int:
+def send_email_sendgrid(
+    producto: str, email_lst: list, tenant_info, subject_msg
+) -> int:
     message = sendgrid.Mail(
         from_email="admin@adra.es",
-        subject=f"El {producto} va a caducar pronto",
+        subject="Caducidad de alimentos",
         to_emails=email_lst,
     )
     message.dynamic_template_data = {
-        "alimento": f"{producto}",
+        "producto": producto,
+        "mensaje": subject_msg,
         "Sender_Name": f"{tenant_info.nombre}",
         "Sender_Address": f"{tenant_info.calle}",
         "Sender_City": f"{tenant_info.ciudad}",
@@ -41,10 +45,10 @@ def send_email_sendgrid(producto: str, email_lst: list, tenant_info) -> int:
 
 
 app.conf.beat_schedule = {
-    'add-every-30-seconds': {
-        'task': 'check_caducidad_todas_delegaciones',
+    "add-every-30-seconds": {
+        "task": "check_caducidad_todas_delegaciones",
         # 'schedule': crontab(minute=30, hour='7'),
-        'schedule': crontab(),
+        "schedule": crontab(),
     },
     # 'restart_telefram': {
     #     'task': 'restart_telefram_bot',
@@ -59,18 +63,35 @@ app.conf.beat_schedule = {
 }
 
 
-@app.task(name='check_caducidad_todas_delegaciones')
+@app.task(name="check_caducidad_todas_delegaciones")
 def check_caducidad_todas_delegaciones():
-    for tenant in get_tenant_model().objects.exclude(schema_name='public'):
+    for tenant in get_tenant_model().objects.exclude(schema_name="public"):
         with tenant_context(tenant):
-            emails = User.objects.filter(is_active=True, is_staff=True).values_list('email', flat=True)
-            list_email = [e for e in emails]
+
+            emails = User.objects.filter(
+                is_active=True, is_staff=True
+            ).values_list("email", flat=True)
+
+            list_email = [email for email in emails]
             print(tenant)
             print(list_email)
 
-            for count in range(1, 13):
-                name, days = AlmacenAlimentos.caducidad(AlmacenAlimentos, count)
-                print(name, days)
-                if days == 37:
-                    send_email_sendgrid(name, ["amadeuscam@yahoo.es"], tenant)
+            for number in range(1, 13):
+                producto, days = AlmacenAlimentos.caducidad(
+                    AlmacenAlimentos, number
+                )
+                print(producto, days)
+                if days in [37, 10, 0]:
+                    if days == 0:
+                        send_email_sendgrid(
+                            producto, list_email, tenant, "ha caducado"
+                        )
+                        return "tarea executada correctamente"
+
+                    send_email_sendgrid(
+                        producto,
+                        list_email,
+                        tenant,
+                        f"va a caducar pronto,quedan {days} dias",
+                    )
                     return "tarea executada correctamente"

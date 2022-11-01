@@ -1,10 +1,11 @@
 from django.contrib.auth import get_user_model
 from django.db import models
-from django_tenants.models import TenantMixin, DomainMixin
+from django_tenants.models import DomainMixin, TenantMixin
 
 
 class Delegaciones(TenantMixin):
     nombre = models.CharField(max_length=255)
+    oar = models.CharField(max_length=500)
     code = models.IntegerField()
     codigo_postal = models.IntegerField(default=None)
     ciudad = models.CharField(max_length=254)
@@ -31,6 +32,7 @@ class BeneficiariosGlobales(models.Model):
     provincia = models.CharField(max_length=256)
     telefono = models.IntegerField()
     delegacion_code = models.IntegerField(blank=True,null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.nombre_beneficiario
