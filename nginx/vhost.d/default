@@ -2,27 +2,7 @@ upstream web {
     server web:8000;
 }
 
-server {
-        listen 80;
-        return 301 https://$host$request_uri;
-}
-
-# Redirige de http://www.tudominio.com a https://tudominio.com
-server {
-        listen 80;
-        server_name www.repartoalimentos.com;
-        return 301 https://repartoalimentos.com$request_uri;
-}
-
-# Redirige de https://www.tudominio.com a https://tudominio.com
-server {
-        listen 443;
-        server_name www.repartoalimentos.com;
-        return 301 $scheme://repartoalimentos.com$request_uri;
-
-location = /favicon.ico { access_log off; log_not_found off; }
-
-
+ 
 location /static/ {
   alias /static/;
   add_header Access-Control-Allow-Origin *;
