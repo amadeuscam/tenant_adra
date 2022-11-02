@@ -8,7 +8,6 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django_tenants.utils import get_tenant_model, tenant_context
 
-from adra.api_consume.get_api_data import get_caducidades
 from adra.models import AlmacenAlimentos
 
 logger = get_task_logger(__name__)
@@ -44,26 +43,17 @@ def send_email_sendgrid(
         print(e.message)
 
 
-app.conf.beat_schedule = {
-    "add-every-30-seconds": {
-        "task": "check_caducidad_todas_delegaciones",
-        # 'schedule': crontab(minute=30, hour='7'),
-        "schedule": crontab(),
-    },
-    # 'restart_telefram': {
-    #     'task': 'restart_telefram_bot',
-    #     # 'schedule': crontab(minute=0, hour='6,18'),
-    #     'schedule': crontab(),
-    # },
-    # 'database_backup': {
-    #     'task': 'make_backup_database',
-    #     # 'schedule': crontab(minute=0, hour='6,18'),
-    #     'schedule': crontab(),
-    # },
-}
+@app.on_after_finalize.connect
+def setup_periodic_tasks(**kwargs):
+    # Executes every day  at 8 am
+    app.add_periodic_task(
+        crontab(minute=0, hour="8"),
+        # crontab(),
+        check_caducidad_todas_delegaciones,
+        name="comprobar las caducidades de los alimentos",
+    )
 
-
-@app.task(name="check_caducidad_todas_delegaciones")
+@app.task(bind=True)
 def check_caducidad_todas_delegaciones():
     for tenant in get_tenant_model().objects.exclude(schema_name="public"):
         with tenant_context(tenant):
