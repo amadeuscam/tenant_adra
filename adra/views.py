@@ -5,7 +5,6 @@ from xml.dom import VALIDATION_ERR
 
 import telegram
 from allauth.account.adapter import DefaultAccountAdapter
-from delegaciones.models import BeneficiariosGlobales
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -34,6 +33,7 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
 from adra.utils.adra_util import AdraUtils, DeliverySheet, ValoracionSocial
+from delegaciones.models import BeneficiariosGlobales
 
 from .filters import AlimentosFilters
 from .forms import (AlimentosFrom, HijoForm, PersonaForm, ProfileEditForm,
@@ -998,7 +998,7 @@ class CustomAllauthAdapter(DefaultAccountAdapter):
 
             sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
             message = Mail(
-                from_email="admin@adra.es",
+                from_email="admin@repartoalimentos.com",
                 subject="Activación de la cuenta",
                 to_emails=f"{user.email}",
             )
@@ -1006,6 +1006,7 @@ class CustomAllauthAdapter(DefaultAccountAdapter):
                 "activate_url": f"{context.get('activate_url')}",
                 "user": f"{context.get('user')}",
                 "Sender_Name": f"{tenant_info.nombre}",
+                "oar": f"{tenant_info.nombre}",
                 "Sender_Address": f"{tenant_info.calle}",
                 "Sender_City": f"{tenant_info.ciudad}",
                 "Sender_State": f"{tenant_info.provincia}",
@@ -1019,7 +1020,7 @@ class CustomAllauthAdapter(DefaultAccountAdapter):
             user = context.get("user")
             sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
             message = Mail(
-                from_email="admin@adra.es",
+                from_email="admin@repartoalimentos.com",
                 subject="Cambio de contraseña",
                 to_emails=f"{user.email}",
             )

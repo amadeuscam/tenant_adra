@@ -1,7 +1,6 @@
 from datetime import datetime
 
 import sendgrid
-from adra_project.celery import app
 from celery.schedules import crontab
 from celery.utils.log import get_task_logger
 from django.conf import settings
@@ -9,6 +8,7 @@ from django.contrib.auth.models import User
 from django_tenants.utils import get_tenant_model, tenant_context
 
 from adra.models import AlmacenAlimentos
+from adra_project.celery import app
 
 logger = get_task_logger(__name__)
 
@@ -17,7 +17,7 @@ def send_email_sendgrid(
     producto: str, email_lst: list, tenant_info, subject_msg
 ) -> int:
     message = sendgrid.Mail(
-        from_email="admin@adra.es",
+        from_email="admin@repartoalimentos.com",
         subject="Caducidad de alimentos",
         to_emails=email_lst,
     )
@@ -25,6 +25,7 @@ def send_email_sendgrid(
         "producto": producto,
         "mensaje": subject_msg,
         "Sender_Name": f"{tenant_info.nombre}",
+        "oar": f"{tenant_info.nombre}",
         "Sender_Address": f"{tenant_info.calle}",
         "Sender_City": f"{tenant_info.ciudad}",
         "Sender_State": f"{tenant_info.provincia}",
