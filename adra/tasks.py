@@ -55,7 +55,7 @@ def setup_periodic_tasks(**kwargs):
     )
 
 @app.task(bind=True)
-def check_caducidad_todas_delegaciones():
+def check_caducidad_todas_delegaciones(self) -> str:
     for tenant in get_tenant_model().objects.exclude(schema_name="public"):
         with tenant_context(tenant):
 

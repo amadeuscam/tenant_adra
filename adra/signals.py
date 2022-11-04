@@ -1,4 +1,3 @@
-from delegaciones.models import BeneficiariosGlobales
 from django.contrib.auth.models import User
 from django.db import connection
 from django.db.models.signals import post_delete, post_save
@@ -6,6 +5,8 @@ from django.dispatch import receiver
 from django.shortcuts import get_object_or_404
 from django_tenants.utils import get_tenant_model
 from rest_framework.authtoken.models import Token
+
+from delegaciones.models import BeneficiariosGlobales
 
 from .models import Persona, Profile
 

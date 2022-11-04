@@ -35,7 +35,7 @@ class Persona(models.Model):
     mensaje = models.TextField(blank=True)
     active = models.BooleanField(default=True, verbose_name="Activo?")
     modificado_por = models.ForeignKey(
-        User, on_delete=models.CASCADE, null=True
+        User, on_delete=models.DO_NOTHING, null=True
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
@@ -140,7 +140,7 @@ class Hijo(models.Model):
         Persona, on_delete=models.CASCADE, related_name="hijo"
     )
     modificado_por = models.ForeignKey(
-        User, on_delete=models.CASCADE, null=True
+        User, on_delete=models.DO_NOTHING, null=True
     )
     discapacidad = models.BooleanField(default=False)
 
@@ -214,7 +214,7 @@ class Alimentos(models.Model):
     )
 
     modificado_por = models.ForeignKey(
-        User, on_delete=models.CASCADE, null=True
+        User, on_delete=models.DO_NOTHING, null=True
     )
     persona = models.ForeignKey(
         Persona, on_delete=models.CASCADE, related_name="alimentos"
@@ -273,7 +273,7 @@ class AlmacenAlimentos(models.Model):
     )
 
     modificado_por = models.ForeignKey(
-        User, on_delete=models.CASCADE, null=True
+        User, on_delete=models.DO_NOTHING, null=True
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
