@@ -94,7 +94,7 @@
                             Estadísticas</a>
                     </li>
                      
-                    {% if tenant_code == 3 %}
+                    {% if tenant_code == 2 %}
                         <li>
                             <a href="{% url 'adra:telegram_message_view' %}"
                             class="{% if nbar == 'tel' %}text-primary{% endif %}">
@@ -168,7 +168,7 @@
                         </a>
                     </li>
                      
-                    {% if tenant_code == 3 %}
+                    {% if tenant_code == 2 %}
                         <li class="{% if nbar == 'tel' %}active{% endif %}">
                             <a href="{% url 'adra:telegram_message_view' %}"
                             class="d-flex justify-content-start align-items-center ">
