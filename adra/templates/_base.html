@@ -93,12 +93,15 @@
                             <i class="large material-icons" style="font-size: 14px;color: darkslategrey">trending_up</i>
                             Estadísticas</a>
                     </li>
-                    <li>
-                        <a href="{% url 'adra:telegram_message_view' %}"
-                           class="{% if nbar == 'tel' %}text-primary{% endif %}">
-                            <i class="large material-icons" style="font-size: 14px;color: darkslategrey">send</i>
-                            Telegram</a>
-                    </li>
+                     
+                    {% if tenant_code == 3 %}
+                        <li>
+                            <a href="{% url 'adra:telegram_message_view' %}"
+                            class="{% if nbar == 'tel' %}text-primary{% endif %}">
+                                <i class="large material-icons" style="font-size: 14px;color: darkslategrey">send</i>
+                                Telegram</a>
+                        </li>
+                    {%endif%}
                     {% if user.is_staff %}
                         <li>
                             <a href="{% url 'adra:reset-papeles' %}"
@@ -164,14 +167,17 @@
                             <p>Estadísticas</p>
                         </a>
                     </li>
+                     
+                    {% if tenant_code == 3 %}
+                        <li class="{% if nbar == 'tel' %}active{% endif %}">
+                            <a href="{% url 'adra:telegram_message_view' %}"
+                            class="d-flex justify-content-start align-items-center ">
+                                <i class="large material-icons" style="font-size: 36px;color: darkslategrey">send</i>
+                                <p>Telegram</p>
+                            </a>
+                        </li>
+                    {% endif %}
 
-                    <li class="{% if nbar == 'tel' %}active{% endif %}">
-                        <a href="{% url 'adra:telegram_message_view' %}"
-                           class="d-flex justify-content-start align-items-center ">
-                            <i class="large material-icons" style="font-size: 36px;color: darkslategrey">send</i>
-                            <p>Telegram</p>
-                        </a>
-                    </li>
                     {% if user.is_staff %}
                         <li class="{% if nbar == 'acciones' %}active{% endif %}">
                             <a href="{% url 'adra:reset-papeles' %}"
