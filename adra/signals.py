@@ -38,20 +38,20 @@ def create_beneficiarios_globales(sender, instance, created, **kwargs):
         )
 
 
-# @receiver(post_delete, sender=Persona)
-# def delete_beneficiarios_globales(sender, instance, **kwargs):
-#     print(instance.nombre_apellido)
-#     print(instance.telefono)
-#     print(instance.dni)
-#     print(instance.otros_documentos)
-#     ben = BeneficiariosGlobales.objects.get(
-#         nombre_beneficiario=instance.nombre_apellido,
-#         telefono=instance.telefono,
-#         documentacion_beneficiario=instance.dni
-#         if instance.dni
-#         else instance.otros_documentos,
-#     )
-#     ben.delete()
+@receiver(post_delete, sender=Persona)
+def delete_beneficiarios_globales(sender, instance, **kwargs):
+    print(instance.nombre_apellido)
+    print(instance.telefono)
+    print(instance.dni)
+    print(instance.otros_documentos)
+    ben = BeneficiariosGlobales.objects.get(
+        nombre_beneficiario=instance.nombre_apellido,
+        telefono=instance.telefono,
+        documentacion_beneficiario=instance.dni
+        if instance.dni
+        else instance.otros_documentos,
+    )
+    ben.delete()
 
 
 @receiver(post_save, sender=User)
