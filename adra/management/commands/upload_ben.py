@@ -33,6 +33,8 @@ class Command(BaseCommand):
                     )
                     ben_data_df = pd.read_csv(csv_ben, sep=";")
                     fam_data_df = pd.read_csv(csv_fam, sep=";")
+                    ben_data_df.fillna("", inplace=True)
+                    fam_data_df.fillna("", inplace=True)
 
                     print(ben_data_df)
                     print(fam_data_df)
