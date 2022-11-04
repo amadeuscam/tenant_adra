@@ -17,7 +17,7 @@ class Command(BaseCommand):
         # raise
         for tenant in get_tenant_model().objects.exclude(schema_name="public"):
             with tenant_context(tenant):
-                if tenant.code == 3:
+                if tenant.code == 1:
 
                     csv_ben = open(
                         os.path.join(
