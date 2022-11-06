@@ -48,6 +48,7 @@ urlpatterns = [
     # end persona url
     # almacen url
     path("almacen/", AlmacenListView.as_view(), name="almacen-home"),
+    path("almacen/<int:pk>/update/", views.AlmacenUpdateView.as_view(), name="almacen-update"),
     # end almacen url
     # statistics
     path("statistics/", views.statistics_persona, name="statistics-personas"),

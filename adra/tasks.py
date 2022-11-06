@@ -6,6 +6,7 @@ from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.contrib.auth.models import User
 from django_tenants.utils import get_tenant_model, tenant_context
+from python_http_client.exceptions import HTTPError
 
 from adra.models import AlmacenAlimentos
 from adra_project.celery import app
@@ -15,7 +16,7 @@ logger = get_task_logger(__name__)
 
 def send_email_sendgrid(
     producto: str, email_lst: list, tenant_info, subject_msg
-) -> int:
+):
     message = sendgrid.Mail(
         from_email="admin@repartoalimentos.com",
         subject="Caducidad de alimentos",
@@ -25,7 +26,7 @@ def send_email_sendgrid(
         "producto": producto,
         "mensaje": subject_msg,
         "Sender_Name": f"{tenant_info.nombre}",
-        "oar": f"{tenant_info.nombre}",
+        "oar": f"{tenant_info.oar}",
         "Sender_Address": f"{tenant_info.calle}",
         "Sender_City": f"{tenant_info.ciudad}",
         "Sender_State": f"{tenant_info.provincia}",
@@ -36,12 +37,12 @@ def send_email_sendgrid(
     try:
         sg = sendgrid.SendGridAPIClient(settings.SENDGRID_API_KEY)
         response = sg.send(message)
-        return response.status_code
-        # print(response.status_code)
+        print(response.status_code)
         # print(response.body)
         # print(response.headers)
-    except Exception as e:
-        print(e.message)
+        return response.status_code
+    except HTTPError as e:
+        print(e.to_dict)
 
 
 @app.on_after_finalize.connect

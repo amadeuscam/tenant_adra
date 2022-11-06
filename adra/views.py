@@ -36,8 +36,8 @@ from adra.utils.adra_util import AdraUtils, DeliverySheet, ValoracionSocial
 from delegaciones.models import BeneficiariosGlobales
 
 from .filters import AlimentosFilters
-from .forms import (AlimentosFrom, HijoForm, PersonaForm, ProfileEditForm,
-                    UserEditForm)
+from .forms import (AlimentosFrom, AlmacenAlimentosFrom, HijoForm, PersonaForm,
+                    ProfileEditForm, UserEditForm)
 from .models import Alimentos, AlmacenAlimentos, Hijo, Persona
 from .serializers import (AlacenAlimentosSerializer, PersonaSerializer,
                           UserSerializer)
@@ -136,7 +136,7 @@ class PersonaCreateView(LoginRequiredMixin, CreateView):
             _connector=Q.OR,
         )
         beneficario_global = BeneficiariosGlobales.objects.filter(
-            logic,nombre_beneficiario=form.cleaned_data["nombre_apellido"]
+            logic, nombre_beneficiario=form.cleaned_data["nombre_apellido"]
         )
         print(beneficario_global)
         print(beneficario_global.count())
@@ -152,7 +152,6 @@ class PersonaCreateView(LoginRequiredMixin, CreateView):
                         beneficario.nombre_beneficiario,
                         beneficario.delegacion_name,
                         beneficario.created_at.strftime("%d %B, %Y"),
-
                     ),
                 )
             return super().form_invalid(form)
@@ -182,7 +181,7 @@ class PersonaUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Persona
     form_class = PersonaForm
 
-    success_message = "Datele sau salvat cu success!!"
+    success_message = "Beneficiario actualizado satisfactoriamente!!"
 
     def form_valid(self, form):
         form.instance.modificado_por = self.request.user
@@ -461,6 +460,20 @@ class AlmacenListView(LoginRequiredMixin, ListView):
         return context
 
 
+class AlmacenUpdateView(LoginRequiredMixin, UpdateView):
+    model = AlmacenAlimentos
+    form_class = AlmacenAlimentosFrom
+
+    def form_valid(self, form):
+        form.instance.modificado_por = self.request.user
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["nbar"] = "almacen_a"
+        return context
+
+
 class HijoCreateView(LoginRequiredMixin, CreateView):
     model = Hijo
     form_class = HijoForm
@@ -567,15 +580,6 @@ def age_range(min_age, max_age, model, extra_filter: dict):
 
 @login_required
 def statistics_persona(request):
-    # mod = 2
-    # if request.POST:
-    #     if request.POST.get("mod", None):
-    #         mod = request.POST.get("mod", None)
-
-    # if int(mod) == 1:
-    #     # .prefetch_related("hijo")
-    #     beneficiar = Persona.objects.filter(active=True).exclude(covid=True)
-    # else:
 
     beneficiar = Persona.objects.filter(active=True).exclude(covid=True)
 
@@ -592,14 +596,14 @@ def statistics_persona(request):
     ben_65_100_m = age_range(65, 100, beneficiar, {"sexo": "mujer"}).count()
     ben_65_100_h = age_range(65, 100, beneficiar, {"sexo": "hombre"}).count()
 
-    fam_0_2_m = age_range(0, 3, familiares, {"sexo": "m"}).count()
-    fam_0_2_h = age_range(0, 3, familiares, {"sexo": "h"}).count()
-    fam_3_15_m = age_range(3, 16, familiares, {"sexo": "m"}).count()
-    fam_3_15_h = age_range(3, 16, familiares, {"sexo": "h"}).count()
-    fam_16_64_m = age_range(16, 65, familiares, {"sexo": "m"}).count()
-    fam_16_64_h = age_range(16, 65, familiares, {"sexo": "h"}).count()
-    fam_65_100_m = age_range(65, 100, familiares, {"sexo": "m"}).count()
-    fam_65_100_h = age_range(65, 100, familiares, {"sexo": "h"}).count()
+    fam_0_2_m = age_range(0, 3, familiares, {"sexo": "mujer"}).count()
+    fam_0_2_h = age_range(0, 3, familiares, {"sexo": "hombre"}).count()
+    fam_3_15_m = age_range(3, 16, familiares, {"sexo": "mujer"}).count()
+    fam_3_15_h = age_range(3, 16, familiares, {"sexo": "hombre"}).count()
+    fam_16_64_m = age_range(16, 65, familiares, {"sexo": "mujer"}).count()
+    fam_16_64_h = age_range(16, 65, familiares, {"sexo": "hombre"}).count()
+    fam_65_100_m = age_range(65, 100, familiares, {"sexo": "mujer"}).count()
+    fam_65_100_h = age_range(65, 100, familiares, {"sexo": "hombre"}).count()
 
     total_mujer_02 = ben_0_2_m + fam_0_2_m
     total_mujer_3_15 = ben_3_15_m + fam_3_15_m
@@ -1006,13 +1010,15 @@ class CustomAllauthAdapter(DefaultAccountAdapter):
                 "activate_url": f"{context.get('activate_url')}",
                 "user": f"{context.get('user')}",
                 "Sender_Name": f"{tenant_info.nombre}",
-                "oar": f"{tenant_info.nombre}",
+                "oar": f"{tenant_info.oar}",
                 "Sender_Address": f"{tenant_info.calle}",
                 "Sender_City": f"{tenant_info.ciudad}",
                 "Sender_State": f"{tenant_info.provincia}",
                 "Sender_Zip": f"{tenant_info.codigo_postal}",
             }
-            message.template_id = "d-8dddee085b5e4479a28b7dace0adf686"
+            message.template_id = str(
+                settings.SENDGRID_ACTIVACION_CUENTA_TEMPLATE_ID
+            )
             sg.send(message)
 
         elif context.get("password_reset_url"):
@@ -1028,13 +1034,16 @@ class CustomAllauthAdapter(DefaultAccountAdapter):
                 "url_cambiar": f"{context.get('password_reset_url')}",
                 "user": f"{user}",
                 "Sender_Name": f"{tenant_info.nombre}",
+                "oar": f"{tenant_info.oar}",
                 "Sender_Address": f"{tenant_info.calle}",
                 "Sender_City": f"{tenant_info.ciudad}",
                 "Sender_State": f"{tenant_info.provincia}",
                 "Sender_Zip": f"{tenant_info.codigo_postal}",
             }
 
-            message.template_id = "d-ab0adafe4dd14cb4b9aba688b7200830"
+            message.template_id = str(
+                settings.SENDGRID_CHANGE_PASSWORD_TEMPLATE_ID
+            )
             sg.send(message)
 
 

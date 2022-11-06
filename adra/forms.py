@@ -4,7 +4,7 @@ from django.forms import DateInput, EmailInput, Form, ModelForm
 from jsignature.forms import JSignatureField
 from jsignature.widgets import JSignatureWidget
 
-from .models import Alimentos, Hijo, Persona, Profile
+from .models import Alimentos, AlmacenAlimentos, Hijo, Persona, Profile
 
 
 class AlimentosFrom(ModelForm):
@@ -33,6 +33,147 @@ class AlimentosFrom(ModelForm):
             "fecha_recogida": DateInput(attrs={"type": "datetime-local"}),
             "signature": JSignatureWidget(
                 jsignature_attrs={"color": "#405e9d"}
+            ),
+        }
+
+
+class AlmacenAlimentosFrom(ModelForm):
+    # signature = JSignatureField()
+
+    class Meta:
+        model = AlmacenAlimentos
+        fields = (
+            "alimento_1",
+            "alimento_2",
+            "alimento_3",
+            "alimento_4",
+            "alimento_5",
+            "alimento_6",
+            "alimento_7",
+            "alimento_8",
+            "alimento_9",
+            "alimento_10",
+            "alimento_11",
+            "alimento_12",
+            "alimento_13",
+            "alimento_1_caducidad",
+            "alimento_2_caducidad",
+            "alimento_3_caducidad",
+            "alimento_4_caducidad",
+            "alimento_5_caducidad",
+            "alimento_6_caducidad",
+            "alimento_7_caducidad",
+            "alimento_8_caducidad",
+            "alimento_9_caducidad",
+            "alimento_10_caducidad",
+            "alimento_11_caducidad",
+            "alimento_12_caducidad",
+            "alimento_13_caducidad",
+        )
+        widgets = {
+            "alimento_1_caducidad": DateInput(
+                format=("%Y-%m-%d"),
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Select Date",
+                    "type": "date",
+                },
+            ),
+            "alimento_2_caducidad": DateInput(
+                format=("%Y-%m-%d"),
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Select Date",
+                    "type": "date",
+                },
+            ),
+            "alimento_3_caducidad": DateInput(
+                format=("%Y-%m-%d"),
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Select Date",
+                    "type": "date",
+                },
+            ),
+            "alimento_4_caducidad": DateInput(
+                format=("%Y-%m-%d"),
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Select Date",
+                    "type": "date",
+                },
+            ),
+            "alimento_5_caducidad": DateInput(
+                format=("%Y-%m-%d"),
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Select Date",
+                    "type": "date",
+                },
+            ),
+            "alimento_6_caducidad": DateInput(
+                format=("%Y-%m-%d"),
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Select Date",
+                    "type": "date",
+                },
+            ),
+            "alimento_7_caducidad": DateInput(
+                format=("%Y-%m-%d"),
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Select Date",
+                    "type": "date",
+                },
+            ),
+            "alimento_8_caducidad": DateInput(
+                format=("%Y-%m-%d"),
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Select Date",
+                    "type": "date",
+                },
+            ),
+            "alimento_9_caducidad": DateInput(
+                format=("%Y-%m-%d"),
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Select Date",
+                    "type": "date",
+                },
+            ),
+            "alimento_10_caducidad": DateInput(
+                format=("%Y-%m-%d"),
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Select Date",
+                    "type": "date",
+                },
+            ),
+            "alimento_11_caducidad": DateInput(
+                format=("%Y-%m-%d"),
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Select Date",
+                    "type": "date",
+                },
+            ),
+            "alimento_12_caducidad": DateInput(
+                format=("%Y-%m-%d"),
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Select Date",
+                    "type": "date",
+                },
+            ),
+            "alimento_13_caducidad": DateInput(
+                format=("%Y-%m-%d"),
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Select Date",
+                    "type": "date",
+                },
             ),
         }
 
@@ -115,6 +256,7 @@ class HijoForm(ModelForm):
             "otros_documentos",
             "fecha_nacimiento",
             "discapacidad",
+            "sexo",
         ]
         widgets = {
             "fecha_nacimiento": forms.DateInput(

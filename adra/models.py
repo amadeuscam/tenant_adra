@@ -109,25 +109,10 @@ class Persona(models.Model):
 
 
 class Hijo(models.Model):
-    class Meta:
-        verbose_name = "Familiar del Beneficiario"
-        verbose_name_plural = "Familiares del Beneficiario"
 
-    FAMILIARES = (
-        ("esposo", "Esposo"),
-        ("esposa", "Esposa"),
-        ("hijo", "Hijo"),
-        ("hija", "Hija"),
-    )
     SEXO = (("mujer", "Mujer"), ("hombre", "Hombre"))
-    parentesco = models.CharField(
-        max_length=20,
-        choices=FAMILIARES,
-    )
-    sexo = models.CharField(
-        max_length=20,
-        choices=SEXO,
-    )
+
+    parentesco = models.CharField(max_length=50)
     nombre_apellido = models.CharField(max_length=50)
     dni = models.CharField(max_length=50, blank=True)
     otros_documentos = models.CharField(max_length=50, blank=True)
@@ -143,18 +128,26 @@ class Hijo(models.Model):
         User, on_delete=models.DO_NOTHING, null=True
     )
     discapacidad = models.BooleanField(default=False)
+    sexo = models.CharField(
+        max_length=20,
+        choices=SEXO,
+    )
 
-    def save(self, *args, **kwargs):
-        if self.parentesco == "esposa":
-            self.sexo = "m"
-        if self.parentesco == "esposo":
-            self.sexo = "h"
-        if self.parentesco == "hijo":
-            self.sexo = "h"
-        if self.parentesco == "hija":
-            self.sexo = "m"
+    class Meta:
+        verbose_name = "Familiar del Beneficiario"
+        verbose_name_plural = "Familiares del Beneficiario"
 
-        super(Hijo, self).save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if self.parentesco == "esposa":
+    #         self.sexo = "m"
+    #     if self.parentesco == "esposo":
+    #         self.sexo = "h"
+    #     if self.parentesco == "hijo":
+    #         self.sexo = "h"
+    #     if self.parentesco == "hija":
+    #         self.sexo = "m"
+
+    #     super(Hijo, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse("adra:personas_detail", kwargs={"pk": self.persona.pk})
@@ -357,6 +350,9 @@ class AlmacenAlimentos(models.Model):
     class Meta:
         verbose_name = "Almacen Alimento"
         verbose_name_plural = "Almacen Alimentos"
+
+    def get_absolute_url(self):
+        return reverse("adra:almacen-home")
 
     @staticmethod
     def caducidad(self, number):

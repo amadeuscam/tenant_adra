@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = os.getenv("SECRET_KEY")
 SECRET_KEY = os.getenv("SECRET_KEY")
-ALLOWED_HOSTS = ['.localhost', '*']
+ALLOWED_HOSTS = ['*']
 # django-allauth config
 SITE_ID = 1
 SESSION_COOKIE_AGE = 86400
@@ -278,3 +278,5 @@ JSIGNATURE_HEIGHT = 200
 
 SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
 SENDGRID_ALIMENTOS_TEMPLATE_ID = os.environ.get("SENDGRID_ALIMENTOS_TEMPLATE_ID")
+SENDGRID_ACTIVACION_CUENTA_TEMPLATE_ID = os.environ.get("SENDGRID_ACTIVACION_CUENTA_TEMPLATE_ID")
+SENDGRID_CHANGE_PASSWORD_TEMPLATE_ID = os.environ.get("SENDGRID_CHANGE_PASSWORD_TEMPLATE_ID")
