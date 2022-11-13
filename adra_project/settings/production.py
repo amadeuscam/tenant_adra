@@ -2,7 +2,7 @@ import os
 
 from .base import *  # noqa
 
-DEBUG = False
+DEBUG = os.getenv("DEBUG")
 
 ALLOWED_HOSTS = ["*"]
 
