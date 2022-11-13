@@ -309,6 +309,44 @@ class ProfileEditForm(ModelForm):
         }
 
 
+class DelegacionForm(forms.Form):
+    nombre = forms.CharField(
+        label="Nombre",
+        help_text="Este nombre aparecera en la esquina izq de la plataforma",
+        max_length=100,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+    oar = forms.CharField(
+        label="Nombre Oar",
+        help_text="Este nombre aparecera en los documentos oficales",
+        max_length=100,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+    codigo_postal = forms.IntegerField(
+        label="Codigo postal",
+        help_text="Este nombre aparecera en los documentos oficales",
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+    )
+    ciudad = forms.CharField(
+        label="Ciudad",
+        max_length=254,
+        help_text="Este nombre aparecera en los documentos oficales",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+    calle = forms.CharField(
+        label="Calle",
+        max_length=200,
+        help_text="Este nombre aparecera en los documentos oficales",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+    provincia = forms.CharField(
+        label="Provincia",
+        max_length=200,
+        help_text="Este nombre aparecera en los documentos oficales",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+
+
 class SignupForm(Form):
     first_name = forms.CharField(max_length=30, label="Nume")
     last_name = forms.CharField(max_length=30, label="Prenume")

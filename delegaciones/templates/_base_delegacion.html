@@ -1,0 +1,376 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% block title %}Home{% endblock %}
+    </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        body {
+            font-size: .875rem;
+        }
+
+        .feather {
+            width: 16px;
+            height: 16px;
+            vertical-align: text-bottom;
+        }
+
+        /*
+          * Sidebar
+          */
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            /* rtl:raw:
+              right: 0;
+              */
+            bottom: 0;
+            /* rtl:remove */
+            left: 0;
+            z-index: 100;
+            /* Behind the navbar */
+            padding: 48px 0 0;
+            /* Height of navbar */
+            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+        }
+
+        @media (max-width: 767.98px) {
+            .sidebar {
+                top: 5rem;
+            }
+        }
+
+        .sidebar-sticky {
+            position: relative;
+            top: 0;
+            height: calc(100vh - 48px);
+            padding-top: .5rem;
+            overflow-x: hidden;
+            overflow-y: auto;
+            /* Scrollable contents if viewport is shorter than content. */
+        }
+
+        .sidebar .nav-link {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .sidebar .nav-link .feather {
+            margin-right: 4px;
+            color: #727272;
+        }
+
+        .sidebar .nav-link.active {
+            color: #2470dc;
+        }
+
+        .sidebar .nav-link:hover .feather,
+        .sidebar .nav-link.active .feather {
+            color: inherit;
+        }
+
+        .sidebar-heading {
+            font-size: .75rem;
+            text-transform: uppercase;
+        }
+
+        /*
+          * Navbar
+          */
+
+        .navbar-brand {
+            padding-top: .75rem;
+            padding-bottom: .75rem;
+            font-size: 1rem;
+            background-color: rgba(0, 0, 0, .25);
+            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .25);
+        }
+
+        .navbar .navbar-toggler {
+            top: .25rem;
+            right: 1rem;
+        }
+
+        .navbar .form-control {
+            padding: .75rem 1rem;
+            border-width: 0;
+            border-radius: 0;
+        }
+
+        .form-control-dark {
+            color: #fff;
+            background-color: rgba(255, 255, 255, .1);
+            border-color: rgba(255, 255, 255, .1);
+        }
+
+        .form-control-dark:focus {
+            /* color: #fff; */
+            border-color: transparent;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+
+        /* #bod-public {
+                background: url('https://images.unsplash.com/photo-1628607292260-9195108b03b7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1171&q=80') no-repeat center center fixed;
+                -webkit-background-size: cover;
+                -moz-background-size: cover;
+                -o-background-size: cover;
+                background-size: cover;
+            }
+
+            .welcome_guest {
+                display: flex;
+                height: 100vh;
+                justify-content: center;
+                align-items: center;
+            } */
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
+    </script>
+</head>
+
+<body>
+<div id="centros_repartos">
+    <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+        <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">
+            {% if user.last_name %}
+                {{ user.last_name | capfirst }}
+            {% else %}
+                {{ user.username | capfirst }}
+            {% endif %}
+        </a>
+        <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <select class="form-select form-control form-control-dark w-80" v-model="oar" @change="onChange()"
+                aria-label="Default select example">
+            {% comment %}
+                <option selected>Open this select menu</option> {% endcomment %}
+            {% for centro in centros %}
+                <option value="{{ centro.code }}">{{ centro.nombre }}</option>
+            {% endfor %}
+
+        </select>
+        <div class="navbar-nav">
+            <div class="nav-item text-nowrap">
+                {% if user.is_authenticated %}
+                    <a class="nav-link px-3" href="{% url 'account_logout' %}">Salir</a>
+                {% endif %}
+
+            </div>
+        </div>
+    </header>
+    <div class="container-fluid mt-5">
+        <div class="row">
+            <main class="col-md-12 ms-sm-auto col-lg-12 px-md-4">
+                <div class="row">
+                    <div class="col-12 col-md-12 col-lg-6">
+                        <h5>Stock alimentos</h5>
+                        <table class="table">
+                            <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">Nombre</th>
+                                <th scope="col">Unidades</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>[ get_alimento_name(oar_info.almacen_alimentos.alimento_1)]</td>
+
+                            </tr>
+
+                            </tbody>
+                        </table>
+
+                    </div>
+                    <div class="col-12 col-md-12 col-lg-6">
+                        <h2>Recuento de beneficiarios</h2>
+                        <table class="table" v-cloak>
+                            <thead class="thead-dark">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">0 a 2</th>
+                                <th scope="col">3 a 15</th>
+                                <th scope="col">16-64</th>
+                                <th scope="col">+ de 65</th>
+                                <th scope="col">Total</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <th scope="row">Mujeres</th>
+                                <td>[ oar_info.edades.total_per_mujer_02 ]</td>
+                                <td>[ oar_info.edades.total_per_mujer_03 ]</td>
+                                <td>[ oar_info.edades.total_per_mujer_16 ]</td>
+                                <td>[ oar_info.edades.total_per_mujer_65 ]</td>
+                                <td>[ oar_info.edades.total_mujeres ]</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Hombres</th>
+                                <td>[ oar_info.edades.total_per_hombre_02 ]</td>
+                                <td>[ oar_info.edades.total_per_hombre_03 ]</td>
+                                <td>[ oar_info.edades.total_per_hombre_16]</td>
+                                <td>[ oar_info.edades.total_per_hombre_65]</td>
+                                <td>[ oar_info.edades.total_hombres ]</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Total</th>
+                                <td>[ oar_info.edades.total_02 ]</td>
+                                <td>[ oar_info.edades.total_03 ]</td>
+                                <td>[ oar_info.edades.total_16 ]</td>
+                                <td>[ oar_info.edades.total_65 ]</td>
+                                <td>[ oar_info.edades.total_personas ]</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Personas con Discapacidad</h5>
+                                <table class="table">
+                                    <thead class="thead-dark">
+                                    <tr>
+                                        <th scope="col">Discapacidad</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <th scope="row">[ oar_info.edades.discapacidad ]</th>
+
+                                    </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Beneficiarios</h5>
+                                <table class="table">
+                                    <thead class="thead-dark">
+                                    <tr>
+                                        <th scope="col">Total Beneficiarios</th>
+                                        <th scope="col">Total Familiares</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <th scope="row">[ oar_info.edades.total_beneficiarios ]</th>
+                                        <th scope="row">[ oar_info.edades.total_familiares ]</th>
+
+                                    </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+            </main>
+        </div>
+    </div>
+</div>
+
+{% block content %}
+
+{% endblock %}
+
+{% if debug %}
+    <script src="{% static 'js/vue/vue2-6.js' %}">
+    </script>
+{% else %}
+    <script src="{% static 'js/vue/vue-prod.js' %}"></script>
+{% endif %}
+<script src="{% static 'js/axios.js' %}"></script>
+
+<script>
+    var centros_repartos = new Vue({
+        el: '#centros_repartos',
+        delimiters: ['[', ']'],
+        data: {
+            message: 'Hello Vue!',
+            page: 1,
+            oar: 2,
+            oar_info: {},
+            alimentos_name: {
+                alimento_1: "Arroz Blanco",
+                alimento_2: "Alubia cocida",
+                alimento_3: "Conserva de atún",
+                alimento_4: "Pasta alimenticia tipo macarron",
+                alimento_5: "Tomate frito en conserva",
+                alimento_6: "Galletas",
+                alimento_7: "Macedonia de verduras en conserva",
+                alimento_8: "Fruta en conserva",
+                alimento_9: "Cacao soluble",
+                alimento_10: "Tarritos infantiles con pollo",
+                alimento_11: "Tarritos infantiles de fruta",
+                alimento_12: "Leche entera UHT",
+                alimento_13: "Aceite de oliva",
+            },
+            perPage: 12,
+            data_lst: [],
+            lst_child: [],
+            bootstrapPaginationClasses: {
+                ul: 'pagination',
+                li: 'page-item',
+                liActive: 'active',
+                liDisable: 'disabled',
+                button: 'page-link'
+            },
+            paginationAnchorTexts: {
+                first: false,
+                prev: 'Previo',
+                next: 'Próximo',
+                last: false
+            }
+
+        },
+        mounted() {
+            //this.get_data();
+            console.log("hello world")
+            this.get_oar_info(this.oar)
+        },
+
+        methods: {
+            get_alimento_name(alimento) {
+                console.log(alimento)
+                return this.alimentos_name[alimento]
+            },
+            onChange() {
+                console.log('The new value is: ', this.oar)
+                this.get_oar_info(this.oar)
+            },
+            get_oar_info(tenant_code) {
+                let vm = this;
+                axios.get('oar-info/', {
+                    params: {
+                        tenant_code: tenant_code
+                    }
+                }).then(function (response) {
+                    console.log(response);
+                    vm.oar_info = response.data
+                }).catch(function (error) {
+                    console.warn("errors", error);
+                })
+            }
+        }
+
+    })
+</script>
+
+
+</body>
+
+</html>

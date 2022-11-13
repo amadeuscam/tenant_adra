@@ -70,7 +70,7 @@
                         <a href="{% url 'adra:persona-create' %}"
                            class="{% if nbar == 'create' %}text-primary{% endif %}">
                             <i class="large material-icons" style="font-size: 14px;color: darkslategrey">person_add</i>
-                            Añadir persona
+                            Beneficiario
                         </a>
                     </li>
                     <li>
@@ -104,11 +104,11 @@
                     {%endif%}
                     {% if user.is_staff %}
                         <li>
-                            <a href="{% url 'adra:reset-papeles' %}"
+                            <a href="{% url 'adra:configuracion' %}"
                                class="{% if nbar == 'acciones' %}text-primary{% endif %}">
                                 <i class="large material-icons"
                                    style="font-size: 14px;color: darkslategrey">settings</i>
-                                Acciones</a>
+                                Configuracion</a>
                         </li>
                     {% endif %}
 
@@ -143,7 +143,7 @@
                            class="d-flex justify-content-start align-items-center ">
                             <i class="large material-icons" style="font-size: 36px;color: darkslategrey">person_add</i>
 
-                            <p>Persona</p>
+                            <p>Beneficiario</p>
                         </a>
                     </li>
                     <li class="{% if nbar == 'almacen_a' %}active{% endif %}">
@@ -180,11 +180,11 @@
 
                     {% if user.is_staff %}
                         <li class="{% if nbar == 'acciones' %}active{% endif %}">
-                            <a href="{% url 'adra:reset-papeles' %}"
+                            <a href="{% url 'adra:configuracion' %}"
                                class="d-flex justify-content-start align-items-center ">
                                 <i class="large material-icons"
                                    style="font-size: 36px;color: darkslategrey">settings</i>
-                                <p>Acciones</p>
+                                <p>Configuracion</p>
                             </a>
                         </li>
                     {% endif %}
@@ -206,7 +206,7 @@
                     <div class="header-wrap">
                         <form class="form-header" action="{% url 'adra:buscar' %}" method="GET">
                             <input class="au-input au-input--xl" type="text" name="q"
-                                   placeholder="nr adra,nume,nie"/>
+                                   placeholder="nr beneficario,nombre,telefono"/>
                             <button class="au-btn--submit" type="submit">
                                 <i class="large material-icons" style="font-size: 36px;color: #fff">search</i>
                             </button>

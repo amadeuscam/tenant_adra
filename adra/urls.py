@@ -105,5 +105,5 @@ urlpatterns = [
     #     name="get_beneficiarios_activos",
     # ),
     path("adra-anuncios/", views.anuncios, name="anuncio"),
-    path("reset-papeles/", views.reset_papeles, name="reset-papeles"),
+    path("configuracion/", views.configuracion, name="configuracion"),
 ]

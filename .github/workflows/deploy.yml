@@ -2,7 +2,7 @@ name: Deploy to ECR
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   build:
@@ -11,32 +11,26 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_ACCESS_SECRET_KEY }}
-          aws-region: eu-west-3
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Build, tag, and push web image to Amazon ECR
+      - uses: actions/checkout@v2
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: django-tenant
+          DOCKER_USER: ${{secrets.DOCKER_USER}}
+          DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+          run: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
+
+      - name: Build, tag, and push web image to Docker hub
+        env:
+          ECR_REGISTRY: ${{secrets.DOCKER_USER}}
+          ECR_REPOSITORY: adra-tenant
           IMAGE_TAG_WEB: web
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG_WEB .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG_WEB
 
-      - name: Build, tag, and push nginx image to Amazon ECR
+      - name: Build, tag, and push nginx image to Docker hub
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: django-tenant
+          ECR_REGISTRY: ${{secrets.DOCKER_USER}}
+          ECR_REPOSITORY: adra-tenant
           IMAGE_TAG_NGINX: nginx
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG_NGINX ./nginx

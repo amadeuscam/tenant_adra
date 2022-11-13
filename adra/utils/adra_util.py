@@ -39,7 +39,7 @@ class AdraUtils:
         [f.unlink() for f in Path(path).glob("*") if f.is_file()]
 
     def split_list(self, big_list, x):
-        return [big_list[i : i + x] for i in range(0, len(big_list), x)]
+        return [big_list[i: i + x] for i in range(0, len(big_list), x)]
 
 
 class DeliverySheet:
@@ -248,9 +248,9 @@ class DeliverySheet:
 
         today = date.today()
         return (
-            today.year
-            - age.year
-            - ((today.month, today.day) < (age.month, age.day))
+                today.year
+                - age.year
+                - ((today.month, today.day) < (age.month, age.day))
         )
 
     def add_image_pdf(self, page, dict, index, alimento):
@@ -353,3 +353,93 @@ class ValoracionSocial:
         self.add_familiares_info()
         self.documentacion_check()
         return self.document
+
+
+class AgeCalculacion:
+
+    def __init__(self, beneficiario, familiares) -> None:
+        self.beneficiario = beneficiario
+        self.familiares = familiares
+
+    def age_range(self, min_age, max_age, model, extra_filter: dict):
+        current = date.today()
+        min_date = date(current.year - min_age, current.month, current.day)
+        max_date = date(current.year - max_age, current.month, current.day)
+
+        return model.filter(
+            fecha_nacimiento__gte=max_date,
+            fecha_nacimiento__lte=min_date,
+            **extra_filter,
+        )
+
+    def calculate_age(self):
+        ben_0_2_m = self.age_range(0, 3, self.beneficiario, {"sexo": "mujer"}).count()
+        ben_0_2_h = self.age_range(0, 3, self.beneficiario, {"sexo": "hombre"}).count()
+        ben_3_15_m = self.age_range(3, 16, self.beneficiario, {"sexo": "mujer"}).count()
+        ben_3_15_h = self.age_range(3, 16, self.beneficiario, {"sexo": "hombre"}).count()
+        ben_16_64_m = self.age_range(16, 65, self.beneficiario, {"sexo": "mujer"}).count()
+        ben_16_64_h = self.age_range(16, 65, self.beneficiario, {"sexo": "hombre"}).count()
+        ben_65_100_m = self.age_range(65, 100, self.beneficiario, {"sexo": "mujer"}).count()
+        ben_65_100_h = self.age_range(65, 100, self.beneficiario, {"sexo": "hombre"}).count()
+
+        fam_0_2_m = self.age_range(0, 3, self.familiares, {"sexo": "mujer"}).count()
+        fam_0_2_h = self.age_range(0, 3, self.familiares, {"sexo": "hombre"}).count()
+        fam_3_15_m = self.age_range(3, 16, self.familiares, {"sexo": "mujer"}).count()
+        fam_3_15_h = self.age_range(3, 16, self.familiares, {"sexo": "hombre"}).count()
+        fam_16_64_m = self.age_range(16, 65, self.familiares, {"sexo": "mujer"}).count()
+        fam_16_64_h = self.age_range(16, 65, self.familiares, {"sexo": "hombre"}).count()
+        fam_65_100_m = self.age_range(65, 100, self.familiares, {"sexo": "mujer"}).count()
+        fam_65_100_h = self.age_range(65, 100, self.familiares, {"sexo": "hombre"}).count()
+
+        total_mujer_02 = ben_0_2_m + fam_0_2_m
+        total_mujer_3_15 = ben_3_15_m + fam_3_15_m
+        total_mujer_16_64 = ben_16_64_m + fam_16_64_m
+        total_mujer_65_gt = ben_65_100_m + fam_65_100_m
+        total_mujeres = (
+                total_mujer_02
+                + total_mujer_3_15
+                + total_mujer_16_64
+                + total_mujer_65_gt
+        )
+
+        total_hombres_02 = ben_0_2_h + fam_0_2_h
+        total_hombres_3_15 = ben_3_15_h + fam_3_15_h
+        total_hombres_16_64 = ben_16_64_h + fam_16_64_h
+        total_hombres_65_gt = ben_65_100_h + fam_65_100_h
+        total_hombres = (
+                total_hombres_02
+                + total_hombres_3_15
+                + total_hombres_16_64
+                + total_hombres_65_gt
+        )
+
+        ben_descapacitados = self.beneficiario.filter(
+            discapacidad=True, active=True
+        ).count()
+
+        fam_descapacitados = self.familiares.filter(
+            discapacidad=True, active=True
+        ).count()
+
+        data_statistics = {
+            "total_per_mujer_02": total_mujer_02,
+            "total_per_mujer_03": total_mujer_3_15,
+            "total_per_mujer_16": total_mujer_16_64,
+            "total_per_mujer_65": total_mujer_65_gt,
+            "total_mujeres": total_mujeres,
+            "total_per_hombre_02": total_hombres_02,
+            "total_per_hombre_03": total_hombres_3_15,
+            "total_per_hombre_16": total_hombres_16_64,
+            "total_per_hombre_65": total_hombres_65_gt,
+            "total_hombres": total_hombres,
+            "total_02": total_mujer_02 + total_hombres_02,
+            "total_03": total_mujer_3_15 + total_hombres_3_15,
+            "total_16": total_mujer_16_64 + total_hombres_16_64,
+            "total_65": total_mujer_65_gt + total_hombres_65_gt,
+            "total_personas": total_mujeres + total_hombres,
+            "discapacidad": ben_descapacitados + fam_descapacitados,
+            "total_beneficiarios": self.beneficiario.count(),
+            "total_familiares": self.familiares.count(),
+
+        }
+        return data_statistics

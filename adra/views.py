@@ -32,12 +32,12 @@ from rest_framework import permissions, viewsets
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
-from adra.utils.adra_util import AdraUtils, DeliverySheet, ValoracionSocial
-from delegaciones.models import BeneficiariosGlobales
+from adra.utils.adra_util import AdraUtils, DeliverySheet, ValoracionSocial, AgeCalculacion
+from delegaciones.models import BeneficiariosGlobales, Delegaciones
 
 from .filters import AlimentosFilters
-from .forms import (AlimentosFrom, AlmacenAlimentosFrom, HijoForm, PersonaForm,
-                    ProfileEditForm, UserEditForm)
+from .forms import (AlimentosFrom, AlmacenAlimentosFrom, DelegacionForm,
+                    HijoForm, PersonaForm, ProfileEditForm, UserEditForm)
 from .models import Alimentos, AlmacenAlimentos, Hijo, Persona
 from .serializers import (AlacenAlimentosSerializer, PersonaSerializer,
                           UserSerializer)
@@ -516,10 +516,10 @@ class HijoUpdateView(LoginRequiredMixin, UpdateView):
 class HijoDeleteView(LoginRequiredMixin, DeleteView):
     model = Hijo
     persoan = Persona
+
     # success_url = reverse_lazy("adra:persona-home")
 
     def get_success_url(self):
-
         return reverse_lazy(
             "adra:personas_detail", kwargs={"pk": self.object.persona.pk}
         )
@@ -560,9 +560,9 @@ def buscar(request):
 def calculate_age(age):
     today = date.today()
     return (
-        today.year
-        - age.year
-        - ((today.month, today.day) < (age.month, age.day))
+            today.year
+            - age.year
+            - ((today.month, today.day) < (age.month, age.day))
     )
 
 
@@ -580,84 +580,17 @@ def age_range(min_age, max_age, model, extra_filter: dict):
 
 @login_required
 def statistics_persona(request):
-
     beneficiar = Persona.objects.filter(active=True).exclude(covid=True)
 
     familiares = Hijo.objects.filter(
         persona__in=Persona.objects.filter(active=True).exclude(covid=True)
     )
 
-    ben_0_2_m = age_range(0, 3, beneficiar, {"sexo": "mujer"}).count()
-    ben_0_2_h = age_range(0, 3, beneficiar, {"sexo": "hombre"}).count()
-    ben_3_15_m = age_range(3, 16, beneficiar, {"sexo": "mujer"}).count()
-    ben_3_15_h = age_range(3, 16, beneficiar, {"sexo": "hombre"}).count()
-    ben_16_64_m = age_range(16, 65, beneficiar, {"sexo": "mujer"}).count()
-    ben_16_64_h = age_range(16, 65, beneficiar, {"sexo": "hombre"}).count()
-    ben_65_100_m = age_range(65, 100, beneficiar, {"sexo": "mujer"}).count()
-    ben_65_100_h = age_range(65, 100, beneficiar, {"sexo": "hombre"}).count()
+    ages = AgeCalculacion(beneficiar, familiares).calculate_age()
 
-    fam_0_2_m = age_range(0, 3, familiares, {"sexo": "mujer"}).count()
-    fam_0_2_h = age_range(0, 3, familiares, {"sexo": "hombre"}).count()
-    fam_3_15_m = age_range(3, 16, familiares, {"sexo": "mujer"}).count()
-    fam_3_15_h = age_range(3, 16, familiares, {"sexo": "hombre"}).count()
-    fam_16_64_m = age_range(16, 65, familiares, {"sexo": "mujer"}).count()
-    fam_16_64_h = age_range(16, 65, familiares, {"sexo": "hombre"}).count()
-    fam_65_100_m = age_range(65, 100, familiares, {"sexo": "mujer"}).count()
-    fam_65_100_h = age_range(65, 100, familiares, {"sexo": "hombre"}).count()
+    ages.update({"nbar": "stat"})
 
-    total_mujer_02 = ben_0_2_m + fam_0_2_m
-    total_mujer_3_15 = ben_3_15_m + fam_3_15_m
-    total_mujer_16_64 = ben_16_64_m + fam_16_64_m
-    total_mujer_65_gt = ben_65_100_m + fam_65_100_m
-    total_mujeres = (
-        total_mujer_02
-        + total_mujer_3_15
-        + total_mujer_16_64
-        + total_mujer_65_gt
-    )
-
-    total_hombres_02 = ben_0_2_h + fam_0_2_h
-    total_hombres_3_15 = ben_3_15_h + fam_3_15_h
-    total_hombres_16_64 = ben_16_64_h + fam_16_64_h
-    total_hombres_65_gt = ben_65_100_h + fam_65_100_h
-    total_hombres = (
-        total_hombres_02
-        + total_hombres_3_15
-        + total_hombres_16_64
-        + total_hombres_65_gt
-    )
-
-    ben_descapacitados = Persona.objects.filter(
-        discapacidad=True, active=True
-    ).count()
-
-    fam_descapacitados = familiares.filter(
-        discapacidad=True, active=True
-    ).count()
-
-    data_statistics = {
-        "total_per_mujer_02": total_mujer_02,
-        "total_per_mujer_03": total_mujer_3_15,
-        "total_per_mujer_16": total_mujer_16_64,
-        "total_per_mujer_65": total_mujer_65_gt,
-        "total_mujeres": total_mujeres,
-        "total_per_hombre_02": total_hombres_02,
-        "total_per_hombre_03": total_hombres_3_15,
-        "total_per_hombre_16": total_hombres_16_64,
-        "total_per_hombre_65": total_hombres_65_gt,
-        "total_hombres": total_hombres,
-        "total_02": total_mujer_02 + total_hombres_02,
-        "total_03": total_mujer_3_15 + total_hombres_3_15,
-        "total_16": total_mujer_16_64 + total_hombres_16_64,
-        "total_65": total_mujer_65_gt + total_hombres_65_gt,
-        "total_personas": total_mujeres + total_hombres,
-        "discapacidad": ben_descapacitados + fam_descapacitados,
-        "total_beneficiarios": beneficiar.count(),
-        "total_familiares": familiares.count(),
-        "nbar": "stat",
-    }
-
-    return render(request, "statistics/index.html", data_statistics)
+    return render(request, "statistics/index.html", ages)
 
 
 def telegram_messages(request):
@@ -986,10 +919,6 @@ class CustomAllauthAdapter(DefaultAccountAdapter):
     Clase encargada de enviar emails custom
     """
 
-    # def stash_verified_email(self, request, email):
-    #     print(request)
-    #     print(request.tenant.nombre)
-
     def send_mail(self, template_prefix, email, context):
 
         tenant_info = get_tenant_model().objects.get(
@@ -1048,21 +977,65 @@ class CustomAllauthAdapter(DefaultAccountAdapter):
 
 
 @login_required
-def reset_papeles(request):
-    persona = Persona.objects.all()
-    if request.POST:
-        print("cambiar el estado de los papeles")
-        for p in persona:
-            p.empadronamiento = False
-            p.libro_familia = False
-            p.fotocopia_dni = False
-            p.prestaciones = False
-            p.nomnia = False
-            p.cert_negativo = False
-            p.aquiler_hipoteca = False
-            p.recibos = False
-            p.are_acte = False
-            p.save()
-        messages.success(request, "La tarea se ha relizado correctamente ")
+def configuracion(request):
+    if request.method == "POST":
+        if "reset_papeles" in request.POST:
+            persona = Persona.objects.all()
+            print("cambiar el estado de los papeles")
+            for p in persona:
+                p.empadronamiento = False
+                p.libro_familia = False
+                p.fotocopia_dni = False
+                p.prestaciones = False
+                p.nomnia = False
+                p.cert_negativo = False
+                p.aquiler_hipoteca = False
+                p.recibos = False
+                p.are_acte = False
+                p.save()
+            messages.success(request, "La tarea se ha relizado correctamente ")
+            return redirect("adra:configuracion")
+        else:
+            form = DelegacionForm(request.POST)
+            # check whether it's valid:
+            if form.is_valid():
+                print("es valido")
 
-    return render(request, "acciones/index.html", {"nbar": "acciones"})
+                nombre = form.cleaned_data["nombre"]
+                oar = form.cleaned_data["oar"]
+                codigo_postal = form.cleaned_data["codigo_postal"]
+                ciudad = form.cleaned_data["ciudad"]
+                calle = form.cleaned_data["calle"]
+                provincia = form.cleaned_data["provincia"]
+                print(nombre, oar, codigo_postal, ciudad, calle, provincia)
+                Delegaciones.objects.filter(pk=request.tenant.pk).update(
+                    nombre=nombre,
+                    oar=oar,
+                    codigo_postal=codigo_postal,
+                    ciudad=ciudad,
+                    calle=calle,
+                    provincia=provincia,
+                )
+                messages.success(
+                    request, "La informacion se actualizado correctamente"
+                )
+                return redirect("adra:configuracion")
+
+    else:
+        delegaciones = Delegaciones.objects.get(pk=request.tenant.pk)
+        delegacion_form = DelegacionForm(
+            initial={
+                "nombre": delegaciones.nombre,
+                "oar": delegaciones.oar,
+                "codigo_postal": delegaciones.codigo_postal,
+                "ciudad": delegaciones.ciudad,
+                "calle": delegaciones.calle,
+                "provincia": delegaciones.provincia,
+            }
+        )
+        # print(delegaciones)
+        return render(
+            request,
+            "acciones/index.html",
+            {"nbar": "acciones", "delegacion_form": delegacion_form},
+        )

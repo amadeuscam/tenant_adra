@@ -3,33 +3,67 @@
 
 
 {% block title %}
-    Adra-acciones
+Configuracion del centro de reparto
 {% endblock %}
 
 {% block content %}
-    <div class="row">
-        <div class="col-md-6 col-sm-12  ">
-            <a class="btn btn-warning mb-3" data-toggle="collapse" href="#collapseExample" role="button"
-               aria-expanded="false"
-               aria-controls="collapseExample">Resetear papeles beneficiarios</a>
-            <div class="collapse" id="collapseExample">
-                <div class="card card-body">
-
-                    <div class="row">
-                        <div class="col-md-12 col-sm-12  ">
-                            <form action="{% url 'adra:reset-papeles' %}" method="post">
-                                {% csrf_token %}
-                                <h3>¿Estas seguro?</h3>
-                                <input type="submit" value="Si,haz tu trabajo" class="btn btn-outline btn-success mt-4">
-                            </form>
-                        </div>
-                    </div>
-
+<div class="row">
+    <div class="col-md-6 col-sm-12 ">
+        <form action="{% url 'adra:configuracion' %}" method="post">
+            {% csrf_token %}
+            <h2 class="mb-3">Editar Informacion del centro de reparto</h2>
+            <div class="form-row">
+                <div class="form-group col-md-4 mb-0">
+                    {{ delegacion_form.nombre |as_crispy_field }}
+                </div>
+                <div class="form-group col-md-4 mb-0">
+                    {{ delegacion_form.oar |as_crispy_field}}
+                </div>
+                 
+                <div class="form-group col-md-4 mb-0">
+                    {{ delegacion_form.codigo_postal |as_crispy_field }}
+                </div> 
+                <div class="form-group col-md-4 mb-0">
+                    {{ delegacion_form.ciudad |as_crispy_field }}
+                </div>
+                <div class="form-group col-md-4 mb-0">
+                    {{ delegacion_form.calle |as_crispy_field }}
+                </div>
+                <div class="form-group col-md-4 mb-0">
+                    {{ delegacion_form.provincia |as_crispy_field }}
                 </div>
             </div>
-
-        </div>
+       
+            
+               
+          
+            <input type="submit" class="btn btn-primary btn-block mt-3" value="Enviar">
+        </form>
     </div>
+    <div class="col-md-6 col-sm-12  ">
+        <h2>Resetear papeles beneficiarios</h2>
+        <a class="btn btn-warning mb-3 mt-3" data-toggle="collapse" href="#collapseExample" role="button"
+            aria-expanded="false" aria-controls="collapseExample">Confirmar</a>
+        <div class="collapse" id="collapseExample">
+            <div class="card card-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <form action="{% url 'adra:configuracion' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="reset_papeles" value="si" id="">
+                            <h3>¿Estas seguro?</h3>
+                            <input type="submit" value="Si,adelante" class="btn btn-outline btn-success mt-4">
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+   
+
+</div>
 
 
 {% endblock content %}
