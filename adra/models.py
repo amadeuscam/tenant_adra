@@ -365,8 +365,14 @@ class AlmacenAlimentos(models.Model):
 
 
 class Profile(models.Model):
+    SEXO = (("mujer", "Mujer"), ("hombre", "Hombre"))
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
     date_of_birth = models.DateField(blank=True, null=True)
+    sexo = models.CharField(
+        max_length=20,
+        choices=SEXO,
+        default="mujer"
+    )
 
     # photo = models.ImageField(upload_to='profile_pics',\
     # default='profile_pics/default.png', blank=True)

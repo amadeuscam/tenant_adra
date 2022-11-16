@@ -22,7 +22,7 @@ from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
 from django_tenants.utils import get_tenant_model
 from jsignature.utils import draw_signature
 from mailmerge import MailMerge
-from openpyxl import Workbook
+from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Alignment, PatternFill
 from PyPDF2 import PdfFileReader, PdfFileWriter
 from PyPDF2.generic import (BooleanObject, IndirectObject, NameObject,
@@ -656,7 +656,9 @@ def export_users_csv(request):
             spreadsheetml.sheet",
     )
     response["Content-Disposition"] = "attachment; filename=beneficiarios.xlsx"
-    workbook = Workbook()
+
+    # workbook = Workbook()
+    workbook = load_workbook(filename='source_files/Listado_beneficiarios.xlsx')
 
     # Get active worksheet/tab
     worksheet = workbook.active
@@ -668,20 +670,22 @@ def export_users_csv(request):
     worksheet.column_dimensions["C"].width = 40
     worksheet.column_dimensions["C"].width = 30
     worksheet.column_dimensions["E"].width = 40
-    columns = [
-        "Numar adra",
-        "Nombre",
-        "Representante familiar",
-        "Dni",
-        "Pasaporte",
-        "Fecha de nacimiento",
-    ]
-    row_num = 1
+    # columns = [
+    #     "Numar adra",
+    #     "Nombre",
+    #     "Representante familiar",
+    #     "Dni",
+    #     "Pasaporte",
+    #     "Fecha de nacimiento",
+    # ]
+    row_num = 6
     fill = PatternFill(start_color="43fb32", fill_type="solid")
     # Assign the titles for each cell of the header
-    for col_num, column_title in enumerate(columns, 1):
-        cell = worksheet.cell(row=row_num, column=col_num)
-        cell.value = column_title
+    # for col_num, column_title in enumerate(columns, 1):
+    #     cell = worksheet.cell(row=row_num, column=col_num)
+    #     cell.value = column_title
+    from openpyxl.styles import Font
+    fontStyle = Font(size="12")
     count = 0
     for ben in beneficiarios_queryset:
         row_num += 1
@@ -698,10 +702,11 @@ def export_users_csv(request):
         ]
         # Assign the data for each cell of the row
         for col_num, cell_value in enumerate(row, 1):
-            cell = worksheet.cell(row=row_num, column=col_num)
-            cell.value = cell_value
+            cell = worksheet.cell(row=row_num, column=col_num,value=cell_value)
+            # cell.value = cell_value
             cell.fill = fill
             cell.alignment = Alignment(horizontal="center")
+            cell.font = fontStyle
 
         for d in ben.hijo.filter(active=True):
             count += 1
@@ -720,6 +725,7 @@ def export_users_csv(request):
                 cell = worksheet.cell(row=row_num, column=col_num)
                 cell.value = cell_value
                 cell.alignment = Alignment(horizontal="center")
+                cell.font = fontStyle
 
     workbook.save(response)
 

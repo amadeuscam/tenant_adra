@@ -311,6 +311,7 @@ class ValoracionSocial:
             nacionalidad=f"{self.persona.nacionalidad}",
             domicilio=f"{self.persona.domicilio}",
             ciudad=f"{self.persona.ciudad}",
+            provincia=f"{self.persona.codigo_postal}",
             numar_telefon=f"{self.persona.telefono}",
             fecha_hoy="",
         )
@@ -322,7 +323,8 @@ class ValoracionSocial:
             hijo_dict = {}
             hijo_dict["parentesco"] = f"{h.parentesco}"
             hijo_dict["nombre_apellido_hijo"] = f"{h.nombre_apellido}"
-            hijo_dict["dni_hijo"] = f"{h.dni if h.dni else h.otros_documentos}"
+            hijo_dict["dni_hijo"] = f"{h.dni}"
+            hijo_dict["pasaporte"] = f"{h.otros_documentos}"
             hijo_dict[
                 "fecha_nacimiento_hijo"
             ] = f"{'{:%d-%m-%Y}'.format(h.fecha_nacimiento)}"

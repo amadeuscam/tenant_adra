@@ -8,7 +8,7 @@
     <!-- Required meta tags-->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="Plataforma de ayuda al reparto de alimentos>
+    <meta name="description" content="Plataforma de ayuda al reparto de alimentos">
     <meta name="author" content="Lucian cati">
     <!-- <meta name="keywords" content="adra ,omg"> -->
     <META NAME="robots" CONTENT="noindex,nofollow">
@@ -45,7 +45,7 @@
             <div class="container-fluid">
                 <div class="header-mobile-inner">
                     <a class="logo" href="{% url 'adra:persona-home' %}">
-                        <h1>{{tenant_name}}</h1>
+                        <h1>{{ tenant_name }}</h1>
                     </a>
                     <button class="hamburger hamburger--slider" type="button">
                             <span class="hamburger-box">
@@ -93,15 +93,15 @@
                             <i class="large material-icons" style="font-size: 14px;color: darkslategrey">trending_up</i>
                             Estadísticas</a>
                     </li>
-                     
+
                     {% if tenant_code == 2 %}
                         <li>
                             <a href="{% url 'adra:telegram_message_view' %}"
-                            class="{% if nbar == 'tel' %}text-primary{% endif %}">
+                               class="{% if nbar == 'tel' %}text-primary{% endif %}">
                                 <i class="large material-icons" style="font-size: 14px;color: darkslategrey">send</i>
                                 Telegram</a>
                         </li>
-                    {%endif%}
+                    {% endif %}
                     {% if user.is_staff %}
                         <li>
                             <a href="{% url 'adra:configuracion' %}"
@@ -122,7 +122,7 @@
     <aside class="menu-sidebar d-none d-lg-block">
         <div class="logo">
             <a href="{% url 'adra:persona-home' %}">
-                <h4> {{tenant_name}}</h4>
+                <h4> {{ tenant_name }}</h4>
             </a>
         </div>
         <div class="menu-sidebar__content js-scrollbar1">
@@ -167,11 +167,11 @@
                             <p>Estadísticas</p>
                         </a>
                     </li>
-                     
+
                     {% if tenant_code == 2 %}
                         <li class="{% if nbar == 'tel' %}active{% endif %}">
                             <a href="{% url 'adra:telegram_message_view' %}"
-                            class="d-flex justify-content-start align-items-center ">
+                               class="d-flex justify-content-start align-items-center ">
                                 <i class="large material-icons" style="font-size: 36px;color: darkslategrey">send</i>
                                 <p>Telegram</p>
                             </a>
@@ -221,7 +221,12 @@
                                         <img width="80" height="80" class="rounded-circle mx-auto d-block"
                                              src="{{ user.profile.photo.url }}" alt="">
                                     {% else %}
-                                        <img src="{% static 'images/chico.png' %}" alt="John Doe"/>
+                                        {% if user.profile.sexo  == "mujer" %}
+                                            <img src="{% static 'images/girl.png' %}" alt="John Doe"/>
+                                        {% else %}
+                                            <img src="{% static 'images/chico.png' %}" alt="John Doe"/>
+                                        {% endif %}
+
                                     {% endif %}
 
                                 </div>
@@ -243,7 +248,11 @@
                                                     <img width="80" height="80" class="rounded-circle mx-auto d-block"
                                                          src="{{ user.profile.photo.url }}" alt="">
                                                 {% else %}
-                                                    <img src="{% static 'images/chico.png' %}" alt="John Doe"/>
+                                                    {% if user.profile.sexo  == "mujer" %}
+                                                        <img src="{% static 'images/girl.png' %}" alt="John Doe"/>
+                                                    {% else %}
+                                                        <img src="{% static 'images/chico.png' %}" alt="John Doe"/>
+                                                    {% endif %}
                                                 {% endif %}
 
                                             </a>
@@ -334,10 +343,7 @@
 
 <script src="{% static 'js/axios.js' %}"></script>
 <script src="{% static 'js/pagination.js' %}"></script>
-
-<script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/95368/echarts.min-v3110-english.js"></script>
-<script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/95368/world.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.0/dist/echarts.js"></script>
 {% block script %}
 
 {% endblock %}

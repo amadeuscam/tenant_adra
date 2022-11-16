@@ -303,7 +303,7 @@ class UserEditForm(ModelForm):
 class ProfileEditForm(ModelForm):
     class Meta:
         model = Profile
-        fields = ("date_of_birth",)
+        fields = ("date_of_birth","sexo")
         widgets = {
             "date_of_birth": DateInput(attrs={"type": "text"}),
         }

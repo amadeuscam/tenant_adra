@@ -137,16 +137,26 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
     </script>
+
+    {% if debug %}
+        <script src="{% static 'js/vue/vue2-6.js' %}">
+        </script>
+    {% else %}
+        <script src="{% static 'js/vue/vue-prod.js' %}"></script>
+    {% endif %}
+    <script src="{% static 'js/axios.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.0/dist/echarts.js"></script>
+
 </head>
 
 <body>
 <div id="centros_repartos">
     <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
         <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">
-            {% if user.last_name %}
-                {{ user.last_name | capfirst }}
+            {% if user.last_name and user.first_name  %}
+               {{ user.first_name  | capfirst}} {{ user.last_name | capfirst }}
             {% else %}
-                {{ user.username | capfirst }}
+                {{ user.username  }}
             {% endif %}
         </a>
         <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse"
@@ -177,27 +187,37 @@
             <main class="col-md-12 ms-sm-auto col-lg-12 px-md-4">
                 <div class="row">
                     <div class="col-12 col-md-12 col-lg-6">
-                        <h5>Stock alimentos</h5>
-                        <table class="table">
-                            <thead class="thead-dark">
-                            <tr>
-                                <th scope="col">Nombre</th>
-                                <th scope="col">Unidades</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td>[ get_alimento_name(oar_info.almacen_alimentos.alimento_1)]</td>
+                        <div class="col-12 col-md-12 col-lg-12">
+                            <h2>Reservas Alimentos</h2>
+                            <div id="main" ref="alm" style="width: 100%;height:300px;"></div>
+                        </div>
+                        {#                        <div class="col-12 col-md-12 col-lg-12">#}
+                        {#                            <h5>Stock alimentos</h5>#}
+                        {#                            <table class="table" v-cloak>#}
+                        {#                                <thead class="thead-dark">#}
+                        {#                                <tr>#}
+                        {#                                    <th scope="col">Nombre</th>#}
+                        {#                                    <th scope="col">Unidades</th>#}
+                        {#                                </tr>#}
+                        {#                                </thead>#}
+                        {#                                <tbody>#}
+                        {#                                <tr v-for=" product in oar_info.almacen_stock">#}
+                        {##}
+                        {#                                    <td>[product.name]</td>#}
+                        {#                                    <td>[product.quantity]</td>#}
+                        {##}
+                        {#                                </tr>#}
+                        {##}
+                        {#                                </tbody>#}
+                        {#                            </table>#}
+                        {##}
+                        {#                        </div>#}
 
-                            </tr>
-
-                            </tbody>
-                        </table>
 
                     </div>
                     <div class="col-12 col-md-12 col-lg-6">
                         <h2>Recuento de beneficiarios</h2>
-                        <table class="table" v-cloak>
+                        <table class="table" v-if="isLoading">
                             <thead class="thead-dark">
                             <tr>
                                 <th scope="col"></th>
@@ -238,7 +258,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <h5>Personas con Discapacidad</h5>
-                                <table class="table">
+                                <table class="table" v-if="isLoading">
                                     <thead class="thead-dark">
                                     <tr>
                                         <th scope="col">Discapacidad</th>
@@ -255,7 +275,7 @@
                             </div>
                             <div class="col-md-6">
                                 <h5>Beneficiarios</h5>
-                                <table class="table">
+                                <table class="table" v-if="isLoading">
                                     <thead class="thead-dark">
                                     <tr>
                                         <th scope="col">Total Beneficiarios</th>
@@ -264,7 +284,7 @@
                                     </thead>
                                     <tbody>
                                     <tr>
-                                        <th scope="row">[ oar_info.edades.total_beneficiarios ]</th>
+                                        <td scope="row">[ oar_info.edades.total_beneficiarios ]</td>
                                         <th scope="row">[ oar_info.edades.total_familiares ]</th>
 
                                     </tr>
@@ -287,13 +307,7 @@
 
 {% endblock %}
 
-{% if debug %}
-    <script src="{% static 'js/vue/vue2-6.js' %}">
-    </script>
-{% else %}
-    <script src="{% static 'js/vue/vue-prod.js' %}"></script>
-{% endif %}
-<script src="{% static 'js/axios.js' %}"></script>
+
 
 <script>
     var centros_repartos = new Vue({
@@ -304,22 +318,11 @@
             page: 1,
             oar: 2,
             oar_info: {},
-            alimentos_name: {
-                alimento_1: "Arroz Blanco",
-                alimento_2: "Alubia cocida",
-                alimento_3: "Conserva de atún",
-                alimento_4: "Pasta alimenticia tipo macarron",
-                alimento_5: "Tomate frito en conserva",
-                alimento_6: "Galletas",
-                alimento_7: "Macedonia de verduras en conserva",
-                alimento_8: "Fruta en conserva",
-                alimento_9: "Cacao soluble",
-                alimento_10: "Tarritos infantiles con pollo",
-                alimento_11: "Tarritos infantiles de fruta",
-                alimento_12: "Leche entera UHT",
-                alimento_13: "Aceite de oliva",
-            },
+            isLoading: false,
+            chartDom: null,
+            myChart: null,
             perPage: 12,
+            aliemntos_echat: [],
             data_lst: [],
             lst_child: [],
             bootstrapPaginationClasses: {
@@ -337,15 +340,22 @@
             }
 
         },
-        mounted() {
-            //this.get_data();
-            console.log("hello world")
+        created() {
             this.get_oar_info(this.oar)
+            window.addEventListener("resize", this.myEventHandler);
+        },
+
+        mounted() {
+
+
+        },
+        destroyed() {
+            window.removeEventListener("resize", this.myEventHandler);
         },
 
         methods: {
-            get_alimento_name(alimento) {
-                return this.alimentos_name[alimento]
+            myEventHandler(e) {
+              this.myChart.resize()
             },
             onChange() {
                 console.log('The new value is: ', this.oar)
@@ -360,10 +370,69 @@
                 }).then(function (response) {
                     console.log(response);
                     vm.oar_info = response.data
+                    vm.isLoading = true;
+                    vm.aliemntos_echat = []
+                    for (const product of vm.oar_info["almacen_stock"]) {
+                        {#console.log(product)#}
+                        vm.aliemntos_echat.push({value: product.quantity, name: product.name},)
+                    }
+                    vm.build_echarts()
+
                 }).catch(function (error) {
                     console.warn("errors", error);
                 })
+            },
+            build_echarts() {
+
+                const vm = this
+                console.log(vm.aliemntos_echat)
+
+                this.myChart = echarts.init(this.$refs["alm"]);
+
+                this.myChart.setOption(
+                    {
+                        tooltip: {
+                            trigger: 'item'
+                        },
+                        /*
+                        legend: {
+
+                            orient: 'horizontal',
+                            left: 'right'
+                        },
+                         */
+
+                        series: [
+                            {
+                                name: 'Stock Alimentos',
+                                type: 'pie',
+                                {#radius: '50%',#}
+                                data: vm.aliemntos_echat,
+                                itemStyle: {
+                                    normal: {
+                                        label: {
+                                            show: true, position: 'outside',
+                                            formatter: function (params) {
+                                                console.log(params)
+                                                return params.name + ' ' + params.value
+                                            },
+                                        },
+                                        labelLine: {
+                                            show: true
+                                        }
+                                    },
+
+                                },
+
+
+                            }
+                        ]
+                    }
+                );
+
+
             }
+
         }
 
     })
