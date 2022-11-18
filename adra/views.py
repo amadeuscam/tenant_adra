@@ -672,7 +672,7 @@ def export_users_csv(request):
     worksheet.column_dimensions["E"].width = 40
     # columns = [
     #     "Numar adra",
-    #     "Nombre",
+    #     "Nombre
     #     "Representante familiar",
     #     "Dni",
     #     "Pasaporte",

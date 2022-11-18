@@ -15,7 +15,7 @@ logger = get_task_logger(__name__)
 
 
 def send_email_sendgrid(
-    producto: str, email_lst: list, tenant_info, subject_msg
+        producto: str, email_lst: list, tenant_info, subject_msg
 ):
     message = sendgrid.Mail(
         from_email="admin@repartoalimentos.com",
@@ -46,17 +46,18 @@ def send_email_sendgrid(
 
 
 @app.on_after_finalize.connect
-def setup_periodic_tasks(**kwargs):
+def setup_periodic_tasks(sender, **kwargs):
     # Executes every day  at 8 am
-    app.add_periodic_task(
+    sender.add_periodic_task(
         crontab(minute=0, hour="8"),
         # crontab(),
         check_caducidad_todas_delegaciones,
         name="comprobar las caducidades de los alimentos",
     )
 
-@app.task(bind=True)
-def check_caducidad_todas_delegaciones(self) -> str:
+
+@app.task(name="check_caducidad_todas_delegaciones")
+def check_caducidad_todas_delegaciones() -> str:
     for tenant in get_tenant_model().objects.exclude(schema_name="public"):
         with tenant_context(tenant):
 
