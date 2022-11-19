@@ -1,6 +1,6 @@
 from .base import *  # noqa
 
-DEBUG = os.getenv("DEBUG", False)
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
