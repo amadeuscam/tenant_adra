@@ -3,6 +3,27 @@ from rest_framework import serializers
 from .models import Persona, Hijo, Alimentos, AlmacenAlimentos
 
 
+def timesince(dt, default="now"):
+    from datetime import datetime
+    from django.utils import timezone
+    now = timezone.now()
+    diff = now - dt
+    # print(diff.days)
+    periods = (
+        (diff.days / 365, "year", "years"),
+        (diff.days / 30, "month", "months"),
+        (diff.days / 7, "week", "weeks"),
+        (diff.days, "day", "days"),
+        (diff.seconds / 3600, "hour", "hours"),
+        (diff.seconds / 60, "minute", "minutes"),
+        (diff.seconds, "second", "seconds"),
+    )
+    for period, singular, plural in periods:
+        if period >= 1:
+            return "%d %s ago" % (period, singular if period == 1 else plural)
+    return default
+
+
 class AlimentosSerializer(serializers.ModelSerializer):
     class Meta:
         model = Alimentos
@@ -67,8 +88,6 @@ class AlacenAlimentosSerializer(serializers.ModelSerializer):
 
 
 class HijosSerializer(serializers.ModelSerializer):
-    edads = serializers.ReadOnlyField(source="edad_dos")
-
     class Meta:
         model = Hijo
         fields = (
@@ -76,7 +95,7 @@ class HijosSerializer(serializers.ModelSerializer):
             "dni",
             "fecha_nacimiento",
             "parentesco",
-            "edads",
+            "age",
         )
 
 
@@ -87,6 +106,24 @@ class PersonaSerializer(serializers.HyperlinkedModelSerializer):
     covids = serializers.ReadOnlyField(source="covid")
     alimentos = AlimentosSerializer(many=True, read_only=True)
     hijo = HijosSerializer(many=True, read_only=True)
+
+    # def get_full_name(self, obj):
+    #     return len([fam for fam in obj.hijo.all() if fam.age <= 3])
+    #
+    # def get_family_number(self, obj):
+    #     return obj.hijo.all().count() + 1
+    #
+    # def get_last_date_alimentos(self, obj):
+    #     try:
+    #         return timesince(obj.alimentos.latest('fecha_recogida').fecha_recogida)
+    #     except Exception:
+    #         return None
+    #
+    # def get_last_date_alimentos_format(self, obj):
+    #     try:
+    #         return obj.alimentos.latest('fecha_recogida').fecha_recogida.strftime("%d-%m-%Y")
+    #     except Exception:
+    #         return None
 
     class Meta:
         model = Persona
@@ -102,6 +139,7 @@ class PersonaSerializer(serializers.HyperlinkedModelSerializer):
             "categoria",
             "are_acte",
             "sexo",
+            "age",
             "discapacidad",
             "covids",
             "modificado_por",

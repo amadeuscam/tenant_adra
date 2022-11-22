@@ -28,6 +28,14 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon/favicon-32x32.png' %}">
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon/favicon-16x16.png' %}"> -->
     <!-- <link rel="manifest" href="{% static 'images/favicon/site.webmanifest' %}"> -->
+    {% if debug %}
+        <script src="{% static 'js/vue/vue2-6.js' %}"></script>
+    {% else %}
+        <script src="{% static 'js/vue/vue-prod.js' %}"></script>
+    {% endif %}
+
+    <script src="{% static 'js/axios.js' %}"></script>
+    <script src="{% static 'js/pagination.js' %}"></script>
     <style>
         [v-cloak] {
             display: none;
@@ -335,14 +343,6 @@
 <script src="{% static 'js/base.js' %}"></script>
 
 
-{% if debug %}
-    <script src="{% static 'js/vue/vue2-6.js' %}"></script>
-{% else %}
-    <script src="{% static 'js/vue/vue-prod.js' %}"></script>
-{% endif %}
-
-<script src="{% static 'js/axios.js' %}"></script>
-<script src="{% static 'js/pagination.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.0/dist/echarts.js"></script>
 {% block script %}
 

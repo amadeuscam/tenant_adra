@@ -3,7 +3,8 @@
 
 {% block content %}
     <div class="col-md-12">
-        <h3 class="lead"><span class="text-danger  ">El beneficiario no existe </span>, quizas esta en esta lista de usuarios que ya no estan activos en nuestra plataforma </h3>
+        <h3 class="lead"><span class="text-danger  ">El beneficiario no existe </span>, quizas esta en esta lista de
+            usuarios que ya no estan activos en nuestra plataforma </h3>
         <table class="table mt-4 table-striped">
             <thead class="thead-dark">
             <tr>
@@ -17,7 +18,11 @@
             {% for b in ben %}
                 <tr>
                     <th scope="row">{{ b.numero_adra }}</th>
-                    <td>{{ b.nombre_apellido }}</td>
+                    {% if user.is_staff %}
+                        <td><a href="{% url 'adra:persona-update' b.id %}" class="mr-2">{{ b.nombre_apellido }}</a></td>
+                    {% else %}
+                        <td>{{ b.nombre_apellido }}</td>
+                    {% endif %}
                     <td>{{ b.dni }}</td>
                 </tr>
             {% endfor %}

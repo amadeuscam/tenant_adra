@@ -77,9 +77,11 @@ def edit(request):
 
 class PersonaListView(LoginRequiredMixin, ListView):
     template_name = "adra/index.html"
-    context_object_name = "ultima_persona"
+    context_object_name = "beneficiarios"
     model = Persona
     login_url = "account_login"
+    paginate_by = 12
+    queryset = Persona.objects.filter(active=True).exclude(covid=True)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -542,7 +544,7 @@ def buscar(request):
             return render(
                 request,
                 "adra/index.html",
-                {"ultima_persona": ultima_persona, "query": q},
+                {"beneficiarios": ultima_persona, "query": q},
             )
         else:
             beneficiarios_no_activos = Persona.objects.filter(
@@ -555,27 +557,6 @@ def buscar(request):
             )
     else:
         return HttpResponse("<h1>Por favor buscar con otro criterio</h1>")
-
-
-def calculate_age(age):
-    today = date.today()
-    return (
-            today.year
-            - age.year
-            - ((today.month, today.day) < (age.month, age.day))
-    )
-
-
-def age_range(min_age, max_age, model, extra_filter: dict):
-    current = date.today()
-    min_date = date(current.year - min_age, current.month, current.day)
-    max_date = date(current.year - max_age, current.month, current.day)
-
-    return model.filter(
-        fecha_nacimiento__gte=max_date,
-        fecha_nacimiento__lte=min_date,
-        **extra_filter,
-    )
 
 
 @login_required
@@ -702,7 +683,7 @@ def export_users_csv(request):
         ]
         # Assign the data for each cell of the row
         for col_num, cell_value in enumerate(row, 1):
-            cell = worksheet.cell(row=row_num, column=col_num,value=cell_value)
+            cell = worksheet.cell(row=row_num, column=col_num, value=cell_value)
             # cell.value = cell_value
             cell.fill = fill
             cell.alignment = Alignment(horizontal="center")
@@ -890,6 +871,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
 
+@login_required
 def get_data(request):
     """ " manda datos a los graficos de echats"""
     count_altas = []

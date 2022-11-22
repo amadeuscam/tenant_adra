@@ -207,6 +207,7 @@ class PersonaForm(ModelForm):
             "covid",
             "codigo_postal",
             "otros_documentos",
+            "active"
         ]
         widgets = {
             "fecha_nacimiento": forms.DateInput(
@@ -303,7 +304,7 @@ class UserEditForm(ModelForm):
 class ProfileEditForm(ModelForm):
     class Meta:
         model = Profile
-        fields = ("date_of_birth","sexo")
+        fields = ("date_of_birth", "sexo")
         widgets = {
             "date_of_birth": DateInput(attrs={"type": "text"}),
         }

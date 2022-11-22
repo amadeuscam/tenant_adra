@@ -1,4 +1,7 @@
-location /static/ {
-  alias /static/;
-  add_header Access-Control-Allow-Origin *;
+location /static {
+    autoindex on;
+    alias /static/;
+    add_header Access-Control-Allow-Origin *;
 }
+
+

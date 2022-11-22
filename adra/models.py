@@ -49,7 +49,7 @@ class Persona(models.Model):
     empadronamiento = models.BooleanField(
         default=False,
         verbose_name="Certificado de empadronamiento actualizado "
-        "con fecha de menos de tres meses ",
+                     "con fecha de menos de tres meses ",
     )
     libro_familia = models.BooleanField(
         default=False, verbose_name="Fotocopia del Libro de Familia "
@@ -57,12 +57,12 @@ class Persona(models.Model):
     fotocopia_dni = models.BooleanField(
         default=False,
         verbose_name="Fotocopia del DNI/NIE o pasaporte de todos los "
-        "miembros del núcleo familiar",
+                     "miembros del núcleo familiar",
     )
     prestaciones = models.BooleanField(
         default=False,
         verbose_name="Fotocopia de la documentación que acredite de"
-        " prestación, pensión, paro, etc",
+                     " prestación, pensión, paro, etc",
     )
     nomnia = models.BooleanField(
         default=False,
@@ -71,17 +71,17 @@ class Persona(models.Model):
     cert_negativo = models.BooleanField(
         default=False,
         verbose_name="En caso de no tener ingresos: certificado"
-        " negativo de rentas, de la Agencia Tributaria.",
+                     " negativo de rentas, de la Agencia Tributaria.",
     )
     aquiler_hipoteca = models.BooleanField(
         default=False,
         verbose_name="Ultimo recibo alquiler o  hipoteca de"
-        " vivienda familiar en la que están empadronados",
+                     " vivienda familiar en la que están empadronados",
     )
     recibos = models.BooleanField(
         default=False,
         verbose_name="Recibo de gastos básicos: luz, agua, gas, "
-        "calefacción, comunidad y  comedor escolar.",
+                     "calefacción, comunidad y  comedor escolar.",
     )
 
     class Meta:
@@ -96,20 +96,26 @@ class Persona(models.Model):
         return reverse("adra:personas_detail", args=[str(self.id)])
 
     @property
+    def numero_beneficiarios(self):
+        return self.hijo.count() + 1
+
+    def get_babys_number(self):
+        return len([fam for fam in self.hijo.all() if fam.age <= 3])
+
+    @property
     def age(self):
         today = date.today()
         return (
-            today.year
-            - self.fecha_nacimiento.year
-            - (
-                (today.month, today.day)
-                < (self.fecha_nacimiento.month, self.fecha_nacimiento.day)
-            )
+                today.year
+                - self.fecha_nacimiento.year
+                - (
+                        (today.month, today.day)
+                        < (self.fecha_nacimiento.month, self.fecha_nacimiento.day)
+                )
         )
 
 
 class Hijo(models.Model):
-
     SEXO = (("mujer", "Mujer"), ("hombre", "Hombre"))
 
     parentesco = models.CharField(max_length=50)
@@ -137,18 +143,6 @@ class Hijo(models.Model):
         verbose_name = "Familiar del Beneficiario"
         verbose_name_plural = "Familiares del Beneficiario"
 
-    # def save(self, *args, **kwargs):
-    #     if self.parentesco == "esposa":
-    #         self.sexo = "m"
-    #     if self.parentesco == "esposo":
-    #         self.sexo = "h"
-    #     if self.parentesco == "hijo":
-    #         self.sexo = "h"
-    #     if self.parentesco == "hija":
-    #         self.sexo = "m"
-
-    #     super(Hijo, self).save(*args, **kwargs)
-
     def get_absolute_url(self):
         return reverse("adra:personas_detail", kwargs={"pk": self.persona.pk})
 
@@ -159,12 +153,12 @@ class Hijo(models.Model):
     def age(self):
         today = date.today()
         return (
-            today.year
-            - self.fecha_nacimiento.year
-            - (
-                (today.month, today.day)
-                < (self.fecha_nacimiento.month, self.fecha_nacimiento.day)
-            )
+                today.year
+                - self.fecha_nacimiento.year
+                - (
+                        (today.month, today.day)
+                        < (self.fecha_nacimiento.month, self.fecha_nacimiento.day)
+                )
         )
 
 
