@@ -15,8 +15,8 @@ class Persona(models.Model):
     nombre_apellido = models.CharField(
         max_length=100, verbose_name="Nombre del beneficiario", unique=True
     )
-    dni = models.CharField(max_length=20, blank=True)
-    otros_documentos = models.CharField(max_length=20, blank=True)
+    dni = models.CharField(max_length=20, blank=True, unique=True)
+    otros_documentos = models.CharField(max_length=20, blank=True, unique=True)
     fecha_nacimiento = models.DateField(auto_now_add=False)
     numero_adra = models.IntegerField(unique=True)
     nacionalidad = models.CharField(max_length=20)
@@ -24,7 +24,7 @@ class Persona(models.Model):
     domicilio = models.TextField()
     are_acte = models.BooleanField(default=False, verbose_name="Tiene papeles")
     ciudad = models.CharField(max_length=350)
-    telefono = models.IntegerField()
+    telefono = models.IntegerField(unique=True)
     email = models.CharField(
         max_length=100,
         blank=True,

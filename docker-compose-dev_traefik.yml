@@ -37,7 +37,7 @@ services:
     expose:
       - 8000
     command: >
-      sh -c "gunicorn adra_project.wsgi --bind  0.0.0.0:8000"
+      sh -c "python manage.py runserver 0.0.0.0:8000"
     #      python manage.py migrate --no-input &&
     #python manage.py runserver 0.0.0.0:8000 "
     #gunicorn adra_project.wsgi --bind  0.0.0.0:8000"
@@ -50,7 +50,7 @@ services:
       - db
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.web.rule=Host(`localhost`,`madrid-torrejon.localhost`,`madrid-arganda.localhost`)"
+      - "traefik.http.routers.web.rule=Host(`localhost`,`madrid-torrejon.localhost`,`madrid-arganda.localhost`,`madrid-vallecas.localhost`)"
 
   traefik:
     image: traefik:v2.9.5
@@ -83,18 +83,6 @@ services:
     env_file:
       - ./.env
     depends_on:
-      - redis
-  flower:
-    build: ./
-    command: celery --app=adra_project flower
-    volumes:
-      - .:/app
-    ports:
-      - 5555:5555
-    env_file:
-      - ./.env
-    depends_on:
-      - celery
       - redis
 
 volumes:

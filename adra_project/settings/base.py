@@ -19,7 +19,7 @@ SESSION_COOKIE_AGE = 86400
 DATABASE_ROUTERS = (
     'django_tenants.routers.TenantSyncRouter',
 )
-
+TENANT_LIMIT_SET_CALLS = True
 TOKEN_KEY_USER = os.getenv("Token_KEY_USER")
 # Application definition
 list_apps = [
@@ -149,7 +149,7 @@ MULTITENANT_TEMPLATE_DIRS = [
     os.path.join(BASE_DIR, "adra/tenants/%s/templates"),
 ]
 
-STATICFILES_STORAGE = "django_tenants.staticfiles.storage.TenantStaticFilesStorage"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MULTITENANT_RELATIVE_STATIC_ROOT = ""  # (default: create sub-directory for each tenant)
 

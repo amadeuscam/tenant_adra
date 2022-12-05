@@ -9,6 +9,7 @@ from rest_framework.authtoken.models import Token
 from delegaciones.models import BeneficiariosGlobales
 
 from .models import Persona, Profile
+from django.db.models import Q, Sum
 
 
 @receiver(post_save, sender=User)
@@ -36,6 +37,31 @@ def create_beneficiarios_globales(sender, instance, created, **kwargs):
             telefono=instance.telefono,
             delegacion_code=tenant_info.code,
         )
+    else:
+        # update user global
+        tenant_info = get_tenant_model().objects.get(
+            schema_name=connection.get_schema()
+        )
+        print(tenant_info)
+        documentacion = instance.dni if instance.dni else instance.otros_documentos
+        print(documentacion)
+        logic = Q(
+            documentacion_beneficiario=documentacion,
+            telefono=instance.telefono,
+            nombre_beneficiario=instance.nombre_apellido,
+            _connector=Q.OR,
+        )
+        BeneficiariosGlobales.objects.filter(logic, delegacion_code=tenant_info.code).update(
+            delegacion_name=tenant_info.oar,
+            nombre_beneficiario=instance.nombre_apellido,
+            documentacion_beneficiario=documentacion,
+            ciudad=tenant_info.ciudad,
+            provincia=tenant_info.provincia,
+            telefono=instance.telefono,
+            delegacion_code=tenant_info.code,
+        )
+        print("updated")
+        print(instance)
 
 
 @receiver(post_delete, sender=Persona)

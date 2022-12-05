@@ -5,7 +5,9 @@ import zipfile
 from datetime import date
 from pathlib import Path
 
-from adra.models import Persona
+from django.db.models import Q
+
+from adra.models import Persona, Hijo
 from jsignature.utils import draw_signature
 from mailmerge import MailMerge
 from openpyxl import Workbook
@@ -14,6 +16,11 @@ from PyPDF2 import PdfFileReader, PdfFileWriter
 from PyPDF2.generic import (BooleanObject, IndirectObject, NameObject,
                             NumberObject)
 from reportlab.pdfgen import canvas
+import pandas as pd
+import numpy as np
+
+from delegaciones.models import BeneficiariosGlobales
+from random import randrange
 
 
 class AdraUtils:
@@ -445,3 +452,142 @@ class AgeCalculacion:
 
         }
         return data_statistics
+
+
+class UploadExcelUsers:
+    def __init__(self, file, current_user):
+        self.file = file
+        self.current_user = current_user
+        self.miembros_uf = None
+        self.main_df = None
+        self.relacion_beneficiarios = None
+        self.beneficarios_fraudulentos = []
+        self.load_sheet()
+        self.join_information()
+        self.beneficiario = None
+        self.number = None
+
+    def load_sheet(self):
+        self.relacion_beneficiarios = pd.read_excel(self.file, sheet_name='Relacion Beneficiarios')
+        self.miembros_uf = pd.read_excel(self.file, sheet_name='Miembros UF', skiprows=1)
+        self.rename_columns()
+
+    def rename_columns(self):
+        col_rename_relacion = {
+            'Marcar con una X el representante de la unidad familiar ': "representate_familiar",
+            'NOMBRE DEL BENEFICIARIO\n(Apellidos y Nombre)': "nombre_appelido",
+            'NIF/NIE': "nie",
+            'PASAPORTE': "pasaporte",
+            'FECHA DE NACIMIENTO\n(dd/mm/aaaa)': "fecha_nacimiento"
+
+        }
+        self.relacion_beneficiarios.rename(columns=col_rename_relacion, inplace=True)
+
+    def join_information(self):
+        print(self.relacion_beneficiarios["pasaporte"])
+        print(self.relacion_beneficiarios["nie"])
+        self.relacion_beneficiarios['nie_juntos'] = self.relacion_beneficiarios.apply(
+            lambda row: row['pasaporte'] if pd.isna(str(row['nie'])) else row['nie'],
+            axis=1
+        )
+        self.relacion_beneficiarios.fillna(value=0, inplace=True)
+
+        self.main_df = self.relacion_beneficiarios.merge(
+            self.miembros_uf,
+            left_on=['nie_juntos'],
+            right_on=["DNI/NIE/Pasaporte"],
+            how="left"
+        )
+        self.main_df = self.main_df.fillna({'Teléfono': 0})
+        print(self.main_df)
+
+    def check_fraudulent_payees(self, data) -> bool:
+        print(data)
+        logic = Q(
+            documentacion_beneficiario=data["nie_juntos"],
+            telefono=data["Teléfono"],
+            _connector=Q.OR,
+        )
+        beneficario_global = BeneficiariosGlobales.objects.filter(
+            logic, nombre_beneficiario=data["nombre_appelido"]
+        )
+        print(beneficario_global.count())
+        if beneficario_global.count() > 0:
+
+            for beneficario in beneficario_global:
+                self.beneficarios_fraudulentos.append(
+                    {"nombre": beneficario.nombre_beneficiario,
+                     "oar": beneficario.delegacion_name
+                     }
+                )
+            print(self.beneficarios_fraudulentos)
+            print("cogen de otro sitio")
+            return True
+        else:
+            return False
+
+    def groub_familiares(self, row):
+        try:
+            if str(row.lower()) == "x":
+                self.number = randrange(10000)
+                return self.number
+        except AttributeError:
+            return self.number
+
+    def upload_payees(self):
+        self.main_df['dss'] = self.main_df["representate_familiar"].apply(self.groub_familiares)
+        gkk = self.main_df.groupby(['dss'])
+        for name, group in gkk:
+            print(name, group)
+            print(group[group["representate_familiar"].str.lower() == "x"])
+
+            for index, row in group.iterrows():
+                if not self.check_fraudulent_payees(row):
+                    if str(row["representate_familiar"]).lower() == "x":
+                        beneficiario, created = Persona.objects.get_or_create(
+                            nombre_apellido=row["nombre_appelido"],
+                            dni=row["nie"],
+                            otros_documentos=row["pasaporte"],
+                            fecha_nacimiento=row["fecha_nacimiento"],
+                            numero_adra=int(row["Nº"]),
+                            nacionalidad="sin definir",
+                            domicilio=row["Domicilio"],
+                            are_acte=False,
+                            ciudad=row["Localidad"],
+                            telefono=0,
+                            modificado_por_id=self.current_user.pk,
+                            mensaje="ALTA NUEVA",
+                            active=True,
+                            sexo="mujer",
+                            discapacidad=False,
+                            categoria="1",
+                            aquiler_hipoteca=False,
+                            cert_negativo=False,
+                            empadronamiento=False,
+                            fotocopia_dni=False,
+                            libro_familia=False,
+                            nomnia=False,
+                            prestaciones=False,
+                            recibos=False,
+                            email="",
+                            covid=False,
+                            codigo_postal=row["CP"] if pd.notnull(row["CP"]) else 0,
+                        )
+                        familiares = group[group["representate_familiar"].str.lower() != "x"]
+                        print(familiares)
+                        for _, row_fam in familiares.iterrows():
+                            Hijo.objects.create(
+                                parentesco="familiar",
+                                sexo="mujer",
+                                nombre_apellido=row_fam["nombre_appelido"],
+                                dni=row_fam["nie"],
+                                otros_documentos=row_fam["pasaporte"],
+                                fecha_nacimiento=row_fam["fecha_nacimiento"],
+                                edad=0,
+                                active=True,
+                                persona=beneficiario,
+                                modificado_por=self.current_user,
+                                discapacidad=False,
+                            )
+
+        return self.beneficarios_fraudulentos

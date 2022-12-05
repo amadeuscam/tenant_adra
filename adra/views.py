@@ -1,8 +1,4 @@
-import io
 import os
-from datetime import date
-from xml.dom import VALIDATION_ERR
-
 import telegram
 from allauth.account.adapter import DefaultAccountAdapter
 from django.conf import settings
@@ -10,6 +6,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db import connection
 from django.db.models import Q, Sum
@@ -21,20 +18,14 @@ from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
                                   UpdateView)
 from django_tenants.utils import get_tenant_model
 from jsignature.utils import draw_signature
-from mailmerge import MailMerge
-from openpyxl import Workbook, load_workbook
+from openpyxl import load_workbook
 from openpyxl.styles import Alignment, PatternFill
-from PyPDF2 import PdfFileReader, PdfFileWriter
-from PyPDF2.generic import (BooleanObject, IndirectObject, NameObject,
-                            NumberObject)
-from reportlab.pdfgen import canvas
 from rest_framework import permissions, viewsets
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
-from adra.utils.adra_util import AdraUtils, DeliverySheet, ValoracionSocial, AgeCalculacion
+from adra.utils.adra_util import AdraUtils, DeliverySheet, ValoracionSocial, AgeCalculacion, UploadExcelUsers
 from delegaciones.models import BeneficiariosGlobales, Delegaciones
-
 from .filters import AlimentosFilters
 from .forms import (AlimentosFrom, AlmacenAlimentosFrom, DelegacionForm,
                     HijoForm, PersonaForm, ProfileEditForm, UserEditForm)
@@ -966,6 +957,12 @@ class CustomAllauthAdapter(DefaultAccountAdapter):
 
 @login_required
 def configuracion(request):
+    images = request.FILES.getlist('record', None)
+    if len(images):
+        user = User.objects.get(id=request.user.pk)
+        upload_payess = UploadExcelUsers(images[0], user).upload_payees()
+        return JsonResponse({"usuarios_fraud": list(upload_payess)})
+
     if request.method == "POST":
         if "reset_papeles" in request.POST:
             persona = Persona.objects.all()
@@ -1010,6 +1007,11 @@ def configuracion(request):
                 return redirect("adra:configuracion")
 
     else:
+
+        path = os.path.join(
+            os.path.abspath("source_files"), "2022NotaEntregacalculadora.xlsx"
+        )
+
         delegaciones = Delegaciones.objects.get(pk=request.tenant.pk)
         delegacion_form = DelegacionForm(
             initial={
