@@ -15,8 +15,8 @@ class Persona(models.Model):
     nombre_apellido = models.CharField(
         max_length=100, verbose_name="Nombre del beneficiario", unique=True
     )
-    dni = models.CharField(max_length=20, blank=True, unique=True)
-    otros_documentos = models.CharField(max_length=20, blank=True, unique=True)
+    dni = models.CharField(max_length=20, blank=True)
+    otros_documentos = models.CharField(max_length=20, blank=True)
     fecha_nacimiento = models.DateField(auto_now_add=False)
     numero_adra = models.IntegerField(unique=True)
     nacionalidad = models.CharField(max_length=20)
