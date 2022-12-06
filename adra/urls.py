@@ -55,6 +55,8 @@ urlpatterns = [
     path("telegram/", views.telegram_messages, name="telegram_message_view"),
     path("export/csv/", views.export_users_csv, name="exportar-users-csv"),
     path("export/pdf/<int:pk><str:mode>", views.generar_hoja_entrega, name="pdf_form"),
+    path("export/hoja-entrega-global", views.generar_hoja_entrega_global, name="hoja_entrega_global"),
+    path("export/valoracion-social", views.valoracion_social_global, name="valoracion_social"),
     path(
         "export/docx/<int:pk>",
         views.generar_hoja_valoracion_social,

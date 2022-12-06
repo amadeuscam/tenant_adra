@@ -8,10 +8,10 @@
 
 {% block content %}
     <div class="row">
-        <div class="col-md-6 col-sm-12 ">
+        <div class="col-md-5 col-sm-12 " style="border-right: 2px dotted dodgerblue;border-bottom: 2px dotted dodgerblue;">
             <form action="{% url 'adra:configuracion' %}" method="post">
                 {% csrf_token %}
-                <h2 class="mb-3">Editar Informacion del centro de reparto</h2>
+                <h2 class="mb-5  ">Editar Informacion del centro de reparto</h2>
                 <div class="form-row">
                     <div class="form-group col-md-4 mb-0">
                         {{ delegacion_form.nombre |as_crispy_field }}
@@ -35,39 +35,16 @@
                 </div>
 
 
-                <input type="submit" class="btn btn-primary btn-block mt-3" value="Enviar">
+                <input type="submit" class="btn btn-dark btn-block mt-3" value="Enviar">
             </form>
         </div>
-        <div class="col-md-6 col-sm-12">
-            <div class="col-md-12 col-sm-12">
-                <h2>Resetear papeles beneficiarios</h2>
-                <a class="btn btn-warning mb-3 mt-3" data-toggle="collapse" href="#collapseExample" role="button"
-                   aria-expanded="false" aria-controls="collapseExample">Confirmar</a>
-                <div class="collapse" id="collapseExample">
-                    <div class="card card-body">
-                        <div class="row">
-                            <div class="col-md-12 col-sm-12">
-                                <form action="{% url 'adra:configuracion' %}" method="post">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="reset_papeles" value="si" id="">
-                                    <h3>¿Estas seguro?</h3>
-                                    <input type="submit" value="Si,adelante" class="btn btn-outline btn-success mt-4">
-                                </form>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
-            <div class="col-md-12 col-sm-12">
-
-                <h2 class="pb-3"> Subir beneficiarios </h2>
+        <div class="col-md-7 col-sm-12 p-0">
+            <div class="col-md-12 col-sm-12" style="border-bottom: 2px dotted dodgerblue;padding-bottom: 1em;">
+                <h2 class="pb-3 mt-md-0 mt-sm-5"> Subir beneficiarios </h2>
                 <div class="alert alert-warning" role="alert">
                     <b>No utilizar si ya tiene beneficarios!! </b>
                 </div>
                 <div class="audio_file_upload  bg-light rounded-3 p-3">
-
                     <div id="app">
                         <div class="mb-3">
                             <label for="formFile" class="form-label">Excel file</label>
@@ -116,13 +93,71 @@
                     </div>
 
                 </div>
+            </div>
+            <div class="col-md-12 col-sm-12   mt-2" style="border-bottom: 2px dotted dodgerblue;">
+                <h2 class="mt-md-0 mt-sm-5">Resetear papeles beneficiarios</h2>
+                <a class="btn btn-warning mb-3 mt-3 " data-toggle="collapse" href="#collapseExample" role="button"
+                   aria-expanded="false" aria-controls="collapseExample">Confirmar</a>
+                <div class="collapse" id="collapseExample">
+                    <div class="card card-body">
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12">
+                                <form action="{% url 'adra:configuracion' %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="reset_papeles" value="si" id="">
+                                    <h3>¿Estas seguro?</h3>
+                                    <input type="submit" value="Si,adelante" class="btn btn-outline btn-success mt-4">
+                                </form>
+                            </div>
+                        </div>
 
+                    </div>
+                </div>
 
             </div>
         </div>
-
-
     </div>
+    <div class="col-md-12 col-sm-12 " style="border-bottom: 2px dotted dodgerblue;padding-bottom: 1em;">
+        <h2 class="pb-3 mt-md-4 mt-sm-5">Exportar Ficheros</h2>
+        <div class="row">
+            <div class="col-md-4  text-center  col-sm-12 center-all-ficheros border-ficheros">
+                <h3>Hojas de entrega</h3>
+                <div class="spinner" style="display: none"></div>
+                <div style="display: flex;align-items: center;justify-content: center;width: 50%">
+                    <a role="button" onclick="start_spinner('1')" class="btn btn-dark active"
+                       href="{% url 'adra:hoja_entrega_global' %}">
+                        Generar
+                    </a>
+                </div>
+
+            </div>
+            <div class="col-md-4   text-center col-sm-12 center-all-ficheros border-ficheros">
+                <h3>Listado beneficarios</h3>
+                <div class="spinner2" style="display: none"></div>
+                <div style="display: flex;align-items: center;justify-content: center;width: 50%">
+                    <a role="button" onclick="start_spinner('2')" class="btn btn-dark active"
+                       href="{% url 'adra:exportar-users-csv' %}">
+                        Generar
+                    </a>
+
+                </div>
+            </div>
+            <div class="col-md-4   text-center col-sm-12 center-all-ficheros border-ficheros">
+                <h3>Valoraciones sociales</h3>
+                <div class="spinner3" style="display: none"></div>
+                <div style="display: flex;align-items: center;justify-content: center;width: 50%">
+                    <a role="button" onclick="start_spinner('3')" class="btn btn-dark active"
+                       href="{% url 'adra:valoracion_social' %}">
+                        Generar
+                    </a>
+
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
 
 
 {% endblock content %}
@@ -130,6 +165,25 @@
 {% block script %}
     <script src="{% static 'js/vue/vue3.js' %}"></script>
     <script src="{% static 'js/axios/axios.0.27.js' %}"></script>
+    <script>
+        function start_spinner(spin_number) {
+            console.log("click me")
+            if (spin_number === "1") {
+                document.querySelector(".spinner").style.display = "block"
+            } else {
+                document.querySelector(`.spinner${spin_number}`).style.display = "block"
+            }
+
+        }
+
+        $(window).blur(function () {
+            $('.spinner').hide();
+            $('.spinner2').hide();
+            $('.spinner3').hide();
+        });
+
+
+    </script>
     <script>
         const {createApp} = Vue
 

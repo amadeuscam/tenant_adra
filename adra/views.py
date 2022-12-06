@@ -761,9 +761,7 @@ def generar_hoja_entrega(request, pk, mode):
     # raise
     persona = Persona.objects.get(id=pk)
     if mode == "sin":
-        pdf = DeliverySheet(persona, tenant_info).export_template_pdf(
-            f"{persona.numero_adra}"
-        )
+        pdf = DeliverySheet(persona, tenant_info).export_template_pdf()
         response = HttpResponse(content_type="application/pdf")
         response[
             "Content-Disposition"
@@ -776,13 +774,46 @@ def generar_hoja_entrega(request, pk, mode):
     for arr in AdraUtils().split_list(alimentos, 7):
         DeliverySheet(persona, tenant_info).add_signature(arr)
 
-    res = AdraUtils().zip_files("source_files/generated_pdfs", True)
+    res = AdraUtils().zip_files("source_files/generated_files", True)
 
     response = HttpResponse(res)
     response["Content-Type"] = "application/x-zip-compressed"
     response[
         "Content-Disposition"
     ] = f"attachment; filename={persona.numero_adra}.zip"
+
+    return response
+
+
+def generar_hoja_entrega_global(request):
+    tenant_info = request.tenant
+    beneficiarios = Persona.objects.filter(active=True).exclude(covid=True)
+
+    for beneficiar in beneficiarios:
+        DeliverySheet(beneficiar, tenant_info).export_template_pdf(True)
+    res = AdraUtils().zip_files("source_files/generated_files", True)
+
+    response = HttpResponse(res)
+    response["Content-Type"] = "application/x-zip-compressed"
+    response[
+        "Content-Disposition"
+    ] = f"attachment; filename=hoja_entrega.zip"
+
+    return response
+
+
+def valoracion_social_global(request):
+    beneficiarios = Persona.objects.filter(active=True).exclude(covid=True)
+    for beneficiar in beneficiarios:
+        ValoracionSocial(beneficiar).get_valoracion(True)
+
+    res = AdraUtils().zip_files("source_files/generated_files", True)
+
+    response = HttpResponse(res)
+    response["Content-Type"] = "application/x-zip-compressed"
+    response[
+        "Content-Disposition"
+    ] = f"attachment; filename=valoraciones_sociales.zip"
 
     return response
 

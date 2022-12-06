@@ -116,11 +116,19 @@ class DeliverySheet:
             if writer_annot.get("/T"):
                 writer_annot.update({NameObject("/Ff"): NumberObject(1)})
 
-    def export_template_pdf(self, name):
+    def export_template_pdf(self, write_to_path: bool = False):
         self.set_num_adults_and_childrens()
         pdf = self._load_file()
         self.make_visible_data_and_block()
-        return pdf
+        if write_to_path:
+            pdf.write(
+                open(
+                    f"source_files/generated_files/{self.persona.numero_adra}.pdf",
+                    "wb",
+                )
+            )
+        else:
+            return pdf
 
     def add_signature(self, alimentos):
         self.set_num_adults_and_childrens()
@@ -139,7 +147,7 @@ class DeliverySheet:
         )
         pdf.write(
             open(
-                f"source_files/generated_pdfs/{self.persona.numero_adra}_{random_string}.pdf",
+                f"source_files/generated_files/{self.persona.numero_adra}_{random_string}.pdf",
                 "wb",
             )
         )
@@ -357,11 +365,19 @@ class ValoracionSocial:
         if self.persona.recibos:
             self.document.merge(h="x")
 
-    def get_valoracion(self):
+    def get_valoracion(self, write_to_path: bool = False):
         self.add_beneficiario_info()
         self.add_familiares_info()
         self.documentacion_check()
-        return self.document
+        if write_to_path:
+            self.document.write(
+                open(
+                    f"source_files/generated_files/{self.persona.numero_adra}.docx",
+                    "wb",
+                )
+            )
+        else:
+            return self.document
 
 
 class AgeCalculacion:
