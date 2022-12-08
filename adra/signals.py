@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from django.db import connection
+from django.db import connection, IntegrityError
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from django.shortcuts import get_object_or_404
@@ -10,6 +10,37 @@ from delegaciones.models import BeneficiariosGlobales
 
 from .models import Persona, Profile
 from django.db.models import Q, Sum
+from django_tenants.migration_executors.base import run_migrations
+from django_tenants.signals import post_schema_sync, schema_migrated
+from django_tenants.models import TenantMixin, DomainMixin
+from django.contrib.auth import get_user_model
+from django_tenants.utils import schema_context
+
+
+@receiver(post_schema_sync, sender=TenantMixin)
+def create_superuser_tenant(sender, **kwargs):
+    print("*" * 199)
+    print(kwargs)
+    print(kwargs['tenant'])
+
+
+@receiver(schema_migrated, sender=run_migrations)
+def handle_schema_migrated(sender, **kwargs):
+    print("a" * 199)
+    print(kwargs)
+    schema_name = kwargs['schema_name']
+    print(schema_name)
+    with schema_context(schema_name):
+        try:
+            UserModel = get_user_model()
+            UserModel.objects.create_superuser(
+                username="lucian",
+                password="masina",
+                email="amadeuscam@yahoo.es",
+                is_superuser=True
+            )
+        except IntegrityError:
+            pass
 
 
 @receiver(post_save, sender=User)

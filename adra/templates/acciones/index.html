@@ -8,7 +8,7 @@
 
 {% block content %}
     <div class="row">
-        <div class="col-md-5 col-sm-12 " style="border-right: 2px dotted dodgerblue;border-bottom: 2px dotted dodgerblue;">
+        <div class="col-md-6 col-sm-12 " style="border-right: 2px dotted dodgerblue;border-bottom: 2px dotted dodgerblue;">
             <form action="{% url 'adra:configuracion' %}" method="post">
                 {% csrf_token %}
                 <h2 class="mb-5  ">Editar Informacion del centro de reparto</h2>
@@ -38,7 +38,7 @@
                 <input type="submit" class="btn btn-dark btn-block mt-3" value="Enviar">
             </form>
         </div>
-        <div class="col-md-7 col-sm-12 p-0">
+        <div class="col-md-6 col-sm-12 p-0">
             <div class="col-md-12 col-sm-12" style="border-bottom: 2px dotted dodgerblue;padding-bottom: 1em;">
                 <h2 class="pb-3 mt-md-0 mt-sm-5"> Subir beneficiarios </h2>
                 <div class="alert alert-warning" role="alert">

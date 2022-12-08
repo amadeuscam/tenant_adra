@@ -10,7 +10,6 @@ from jsignature.fields import JSignatureField
 
 class Persona(models.Model):
     SEXO = [("mujer", "Mujer"), ("hombre", "Hombre")]
-    DOMINGO = [("1", "Domingo 2"), ("2", "Domingo 4")]
 
     nombre_apellido = models.CharField(
         max_length=100, verbose_name="Nombre del beneficiario", unique=True
@@ -44,7 +43,6 @@ class Persona(models.Model):
         choices=SEXO,
     )
     discapacidad = models.BooleanField(default=False)
-    categoria = models.CharField(max_length=30, choices=DOMINGO)
     codigo_postal = models.IntegerField(default=0)
     empadronamiento = models.BooleanField(
         default=False,

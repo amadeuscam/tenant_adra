@@ -50,7 +50,7 @@ services:
       - db
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.web.rule=Host(`localhost`,`madrid-torrejon.localhost`,`madrid-arganda.localhost`,`madrid-vallecas.localhost`)"
+      - "traefik.http.routers.web.rule=HostRegexp(`localhost`,`{subhost:[a-zA-Z0-9-]+}.localhost`)"
 
   traefik:
     image: traefik:v2.9.5

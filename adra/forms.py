@@ -194,7 +194,6 @@ class PersonaForm(ModelForm):
             "mensaje",
             "sexo",
             "discapacidad",
-            "categoria",
             "empadronamiento",
             "libro_familia",
             "fotocopia_dni",

@@ -32,7 +32,6 @@ def make_published(modeladmin, request, queryset):
 class PersonaAdmin(admin.ModelAdmin):
     inlines = [HijoInline]
     list_filter = (
-        "categoria",
         "covid",
         "active"
     )

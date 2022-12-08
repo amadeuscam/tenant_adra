@@ -126,12 +126,7 @@
               </h5>
               <p>{{ object.sexo|capfirst }}</p>
             </div>
-            <div class="col-md-3 mb-3">
-              <h5>
-                <b>Categoria</b>
-              </h5>
-              <p>{{ object.get_categoria_display  }}</p>
-            </div>
+
             <div class="col-md-3 mb-3">
               <h5>
                 <b>Nacionalidad</b>
@@ -165,11 +160,9 @@
               <h5>
                 <b>Codigo postal</b>
               </h5>
-               
                 <a target="_blank" href="https://www.codigospostales.com/{{ object.codigo_postal }}">{{ object.codigo_postal }}</a>
-                 
             </div>
-            <div class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
               <h5>
                 <b>Domicilio</b>
               </h5>

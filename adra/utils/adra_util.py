@@ -576,7 +576,6 @@ class UploadExcelUsers:
                             active=True,
                             sexo="mujer",
                             discapacidad=False,
-                            categoria="1",
                             aquiler_hipoteca=False,
                             cert_negativo=False,
                             empadronamiento=False,
