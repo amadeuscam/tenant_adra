@@ -1,3 +1,5 @@
+import os
+
 from django.contrib.auth.models import User
 from django.db import connection, IntegrityError
 from django.db.models.signals import post_delete, post_save
@@ -34,9 +36,9 @@ def handle_schema_migrated(sender, **kwargs):
         try:
             UserModel = get_user_model()
             UserModel.objects.create_superuser(
-                username="lucian",
-                password="masina",
-                email="amadeuscam@yahoo.es",
+                username=os.environ.get("SUPERUSER_NAME"),
+                password=os.environ.get("SUPERUSER_PASSWORD"),
+                email=os.environ.get("SUPERUSER_EMAIL"),
                 is_superuser=True
             )
         except IntegrityError:

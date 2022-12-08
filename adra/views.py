@@ -1,3 +1,4 @@
+import concurrent.futures
 import os
 import telegram
 from allauth.account.adapter import DefaultAccountAdapter
@@ -32,6 +33,7 @@ from .forms import (AlimentosFrom, AlmacenAlimentosFrom, DelegacionForm,
 from .models import Alimentos, AlmacenAlimentos, Hijo, Persona
 from .serializers import (AlacenAlimentosSerializer, PersonaSerializer,
                           UserSerializer)
+from threading import Thread
 
 
 def anuncios(request):
@@ -785,12 +787,26 @@ def generar_hoja_entrega(request, pk, mode):
     return response
 
 
+def generate_files(**kwargs):
+    if kwargs["beneficarios"] == "hoja_entrega":
+        for beneficiar in kwargs["beneficarios"]:
+            DeliverySheet(beneficiar, kwargs["tenenat_info"]).export_template_pdf(True)
+        else:
+            for beneficiar in kwargs["beneficarios"]:
+                ValoracionSocial(beneficiar).get_valoracion(True)
+
+
 def generar_hoja_entrega_global(request):
     tenant_info = request.tenant
     beneficiarios = Persona.objects.filter(active=True).exclude(covid=True)
 
-    for beneficiar in beneficiarios:
-        DeliverySheet(beneficiar, tenant_info).export_template_pdf(True)
+    thread = Thread(target=generate_files,
+                    kwargs={'beneficarios': list(beneficiarios), "tenenat_info": tenant_info, "type": "hoja_entrega"},
+                    daemon=True)
+    thread.start()
+    print('Waiting for the new thread to finish...')
+    # wait for the task to complete
+    thread.join()
     res = AdraUtils().zip_files("source_files/generated_files", True)
 
     response = HttpResponse(res)
@@ -804,9 +820,14 @@ def generar_hoja_entrega_global(request):
 
 def valoracion_social_global(request):
     beneficiarios = Persona.objects.filter(active=True).exclude(covid=True)
-    for beneficiar in beneficiarios:
-        ValoracionSocial(beneficiar).get_valoracion(True)
 
+    thread = Thread(target=generate_files,
+                    kwargs={'beneficarios': list(beneficiarios), "type": "valoracion_social"},
+                    daemon=True)
+    thread.start()
+    print('Waiting for the new thread to finish...')
+    # wait for the task to complete
+    thread.join()
     res = AdraUtils().zip_files("source_files/generated_files", True)
 
     response = HttpResponse(res)
