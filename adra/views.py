@@ -788,12 +788,14 @@ def generar_hoja_entrega(request, pk, mode):
 
 
 def generate_files(**kwargs):
-    if kwargs["beneficarios"] == "hoja_entrega":
+    print(kwargs)
+    print(kwargs["type"])
+    if kwargs["type"] == "hoja_entrega":
         for beneficiar in kwargs["beneficarios"]:
             DeliverySheet(beneficiar, kwargs["tenenat_info"]).export_template_pdf(True)
-        else:
-            for beneficiar in kwargs["beneficarios"]:
-                ValoracionSocial(beneficiar).get_valoracion(True)
+    else:
+        for beneficiar in kwargs["beneficarios"]:
+            ValoracionSocial(beneficiar).get_valoracion(True)
 
 
 def generar_hoja_entrega_global(request):
@@ -801,8 +803,7 @@ def generar_hoja_entrega_global(request):
     beneficiarios = Persona.objects.filter(active=True).exclude(covid=True)
 
     thread = Thread(target=generate_files,
-                    kwargs={'beneficarios': list(beneficiarios), "tenenat_info": tenant_info, "type": "hoja_entrega"},
-                    daemon=True)
+                    kwargs={'beneficarios': list(beneficiarios), "tenenat_info": tenant_info, "type": "hoja_entrega"})
     thread.start()
     print('Waiting for the new thread to finish...')
     # wait for the task to complete
@@ -822,8 +823,7 @@ def valoracion_social_global(request):
     beneficiarios = Persona.objects.filter(active=True).exclude(covid=True)
 
     thread = Thread(target=generate_files,
-                    kwargs={'beneficarios': list(beneficiarios), "type": "valoracion_social"},
-                    daemon=True)
+                    kwargs={'beneficarios': list(beneficiarios), "type": "valoracion_social"})
     thread.start()
     print('Waiting for the new thread to finish...')
     # wait for the task to complete

@@ -37,7 +37,7 @@ services:
     expose:
       - 8000
     command: >
-      sh -c "gunicorn adra_project.wsgi  --threads=2 --bind  0.0.0.0:8000"
+      sh -c "gunicorn adra_project.wsgi --log-level=debug  --threads=2 --bind  0.0.0.0:8000"
     #      python manage.py migrate --no-input &&
     #python manage.py runserver 0.0.0.0:8000 "
     #gunicorn adra_project.wsgi --bind  0.0.0.0:8000"
