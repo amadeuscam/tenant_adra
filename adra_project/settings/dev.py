@@ -18,10 +18,10 @@ DATABASES = {
 }
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+SENDGRID_SANDBOX_MODE_IN_DEBUG = True
 # STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 STATIC_ROOT = "app/static/"
 STATIC_URL = "app/static/"
-
 
 sentry_sdk.init(dsn=None)

@@ -65,7 +65,7 @@ urlpatterns = [
     # end statistics
     # buscar url
     path("buscar/", views.buscar, name="buscar"),
-    path("buscar_por_fecha/", views.buscar_fecha, name="buscar-por-fecha"),
+    path("buscar-alimentos-por-fecha/", views.buscar_fecha, name="buscar-por-fecha"),
     # end bucar url
     # alimentos url
     path(
@@ -86,7 +86,7 @@ urlpatterns = [
     # end alimentos url
     # hijos url
     path(
-        "persona/<int:pk>/hijos", views.adauga_hijo_persona, name="hijo-create"
+        "persona/<int:pk>/hijos", views.anadir_familiar, name="hijo-create"
     ),
     path(
         "persona/hijos/<int:pk>/update",
@@ -106,6 +106,5 @@ urlpatterns = [
     #     views.get_beneficiarios_activos,
     #     name="get_beneficiarios_activos",
     # ),
-    path("adra-anuncios/", views.anuncios, name="anuncio"),
     path("configuracion/", views.configuracion, name="configuracion"),
 ]

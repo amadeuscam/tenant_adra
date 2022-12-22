@@ -19,19 +19,12 @@ from django.contrib.auth import get_user_model
 from django_tenants.utils import schema_context
 
 
-@receiver(post_schema_sync, sender=TenantMixin)
-def create_superuser_tenant(sender, **kwargs):
-    print("*" * 199)
-    print(kwargs)
-    print(kwargs['tenant'])
-
-
 @receiver(schema_migrated, sender=run_migrations)
 def handle_schema_migrated(sender, **kwargs):
-    print("a" * 199)
-    print(kwargs)
+    # print("a" * 199)
+    # print(kwargs)
     schema_name = kwargs['schema_name']
-    print(schema_name)
+    # print(schema_name)
     with schema_context(schema_name):
         try:
             UserModel = get_user_model()

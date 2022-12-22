@@ -49,6 +49,8 @@ docopt==0.6.2
 docx-mailmerge==0.5.0
 et-xmlfile==1.1.0
 eventlet==0.31.0
+factory-boy==3.2.1
+Faker==15.3.4
 fdfgen==0.16.1
 flake8==3.9.2
 flower==1.0.0
@@ -60,6 +62,7 @@ httpie==2.4.0
 humanize==3.13.1
 idna==2.10
 importlib-metadata==4.5.0
+inflection==0.5.1
 iniconfig==1.1.1
 jdcal==1.4.1
 jmespath==0.10.0
@@ -97,7 +100,9 @@ PyQRCode==1.2.1
 pyquery==1.4.3
 PySocks==1.7.1
 pytest==6.2.5
+pytest-cov==4.0.0
 pytest-django==4.4.0
+pytest-factoryboy==2.5.1
 python-dateutil==2.8.1
 python-http-client==3.3.2
 python-memcached==1.59

@@ -36,10 +36,6 @@ from .serializers import (AlacenAlimentosSerializer, PersonaSerializer,
 from threading import Thread
 
 
-def anuncios(request):
-    return render(request, "adra/anuncio.html")
-
-
 @login_required
 def edit(request):
     if request.method == "POST":
@@ -103,16 +99,16 @@ class PersonaDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
-class BuscarDetailView(LoginRequiredMixin, ListView):
-    model = Alimentos
-    template_name = "busqueda_a/view.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["filter"] = AlimentosFilters(
-            self.request.GET, queryset=self.get_queryset()
-        )
-        return context
+# class BuscarDetailView(LoginRequiredMixin, ListView):
+#     model = Alimentos
+#     template_name = "busqueda_a/view.html"
+#
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context["filter"] = AlimentosFilters(
+#             self.request.GET, queryset=self.get_queryset()
+#         )
+#         return context
 
 
 class PersonaCreateView(LoginRequiredMixin, CreateView):
@@ -121,7 +117,8 @@ class PersonaCreateView(LoginRequiredMixin, CreateView):
     form_class = PersonaForm
 
     def form_valid(self, form):
-        print(form.cleaned_data)
+        # print(form)
+        # print(form.cleaned_data)
         logic = Q(
             documentacion_beneficiario=form.cleaned_data["dni"]
             if form.cleaned_data["dni"]
@@ -133,13 +130,13 @@ class PersonaCreateView(LoginRequiredMixin, CreateView):
         beneficario_global = BeneficiariosGlobales.objects.filter(
             logic, nombre_beneficiario=form.cleaned_data["nombre_apellido"]
         )
-        print(beneficario_global)
-        print(beneficario_global.count())
+        # print(beneficario_global)
+        # print(beneficario_global.count())
 
         if beneficario_global.count() > 0:
 
             for beneficario in beneficario_global:
-                print(beneficario.delegacion_name)
+                # print(beneficario.delegacion_name)
 
                 messages.warning(
                     self.request,
@@ -199,13 +196,14 @@ def adauga_alimentos_persona(request, pk):
     almacen = AlmacenAlimentos.objects.get(pk=1)
 
     if request.method == "POST":
+        # print(request.POST)
         a_form = AlimentosFrom(request.POST)
         if a_form.is_valid():
             alimentos = a_form.save(commit=False)
-            signature = a_form.cleaned_data.get("signature")
-            if signature:
-                # as an image
-                signature_picture = draw_signature(signature)
+            # signature = a_form.cleaned_data.get("signature")
+            # if signature:
+            #     # as an image
+            #     signature_picture = draw_signature(signature)
 
             almacen.alimento_1 -= alimentos.alimento_1
             almacen.alimento_2 -= alimentos.alimento_2
@@ -257,6 +255,8 @@ class PersonaAlimentosUpdateView(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         clean = form.changed_data
+        # print(clean)
+        # print(form)
         almacen = AlmacenAlimentos.objects.get(pk=1)
 
         if "alimento_1" in clean:
@@ -437,12 +437,6 @@ class PersonaAlimentosDeleteView(LoginRequiredMixin, DeleteView):
     model = Alimentos
     success_url = "/"
 
-    def test_func(self):
-        persona = self.get_object()
-        if self.request.user == persona.modificado_por:
-            return True
-        return False
-
 
 class AlmacenListView(LoginRequiredMixin, ListView):
     model = AlmacenAlimentos
@@ -469,18 +463,10 @@ class AlmacenUpdateView(LoginRequiredMixin, UpdateView):
         return context
 
 
-class HijoCreateView(LoginRequiredMixin, CreateView):
-    model = Hijo
-    form_class = HijoForm
-
-    def form_valid(self, form):
-        form.instance.modificado_por = self.request.user
-        return super().form_valid(form)
-
-
-def adauga_hijo_persona(request, pk):
+def anadir_familiar(request, pk):
     persona = get_object_or_404(Persona, pk=pk)
     if request.method == "POST":
+        # print(request.POST)
         h_form = HijoForm(request.POST)
         if h_form.is_valid():
             hijo = h_form.save(commit=False)
@@ -711,7 +697,6 @@ def export_users_csv(request):
 def buscar_fecha(request):
     alimentos_list = Alimentos.objects.all()
     user_filter = AlimentosFilters(request.GET, queryset=alimentos_list)
-
     alimento_1 = user_filter.qs.aggregate(Sum("alimento_1"))
     alimento_2 = user_filter.qs.aggregate(Sum("alimento_2"))
     alimento_3 = user_filter.qs.aggregate(Sum("alimento_3"))
@@ -756,9 +741,9 @@ def generar_hoja_entrega(request, pk, mode):
     :param pk: id persona
     :return: pdf generado
     """
-    print("mode generate->", mode)
-    print(request.tenant)
-    print(request.tenant.oar)
+    # print("mode generate->", mode)
+    # print(request.tenant)
+    # print(request.tenant.oar)
     tenant_info = request.tenant
     # raise
     persona = Persona.objects.get(id=pk)
@@ -767,7 +752,7 @@ def generar_hoja_entrega(request, pk, mode):
         response = HttpResponse(content_type="application/pdf")
         response[
             "Content-Disposition"
-        ] = f'attachment;filename="{persona.numero_adra}.pdf"'
+        ] = f'attachment; filename={persona.numero_adra}.pdf'
         pdf.write(response)
         return response
 
@@ -788,8 +773,8 @@ def generar_hoja_entrega(request, pk, mode):
 
 
 def generate_files(**kwargs):
-    print(kwargs)
-    print(kwargs["type"])
+    # print(kwargs)
+    # print(kwargs["type"])
     if kwargs["type"] == "hoja_entrega":
         for beneficiar in kwargs["beneficarios"]:
             DeliverySheet(beneficiar, kwargs["tenenat_info"]).export_template_pdf(True)
@@ -921,7 +906,7 @@ def get_data(request):
     years = Persona.objects.dates("created_at", "year").values_list(
         "created_at__year", flat=True
     )
-    print(years)
+    # print(years)
     for year in years:
         count_altas.append(
             Persona.objects.filter(created_at__year=year).count()
@@ -1009,10 +994,11 @@ class CustomAllauthAdapter(DefaultAccountAdapter):
 
 @login_required
 def configuracion(request):
-    images = request.FILES.getlist('record', None)
-    if len(images):
+    excel_file = request.FILES.getlist('record', None)
+    # print(excel_file)
+    if len(excel_file):
         user = User.objects.get(id=request.user.pk)
-        upload_payess = UploadExcelUsers(images[0], user).upload_payees()
+        upload_payess = UploadExcelUsers(excel_file[0], user).upload_payees()
         return JsonResponse({"usuarios_fraud": list(upload_payess)})
 
     if request.method == "POST":
@@ -1044,7 +1030,7 @@ def configuracion(request):
                 ciudad = form.cleaned_data["ciudad"]
                 calle = form.cleaned_data["calle"]
                 provincia = form.cleaned_data["provincia"]
-                print(nombre, oar, codigo_postal, ciudad, calle, provincia)
+                # print(nombre, oar, codigo_postal, ciudad, calle, provincia)
                 Delegaciones.objects.filter(pk=request.tenant.pk).update(
                     nombre=nombre,
                     oar=oar,

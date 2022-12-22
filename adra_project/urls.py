@@ -8,7 +8,7 @@ urlpatterns = [
     path('toate-dar-admin/', admin.site.urls),
 
     # User management
-    path('accounts/', include('allauth.urls')),
+    path('accounts/', include('allauth.urls'), name="auth_zone"),
     # local apps
     # path('accounts/', include('users.urls')),
     path('', include('adra.urls', namespace="adra")),

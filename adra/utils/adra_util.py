@@ -503,7 +503,7 @@ class UploadExcelUsers:
         print(self.relacion_beneficiarios["pasaporte"])
         print(self.relacion_beneficiarios["nie"])
         self.relacion_beneficiarios['nie_juntos'] = self.relacion_beneficiarios.apply(
-            lambda row: row['pasaporte'] if pd.isna(str(row['nie'])) else row['nie'],
+            lambda row: row['pasaporte'] if pd.isna(row['nie']) else row['nie'],
             axis=1
         )
         self.relacion_beneficiarios.fillna(value=0, inplace=True)
@@ -558,11 +558,12 @@ class UploadExcelUsers:
             print(group[group["representate_familiar"].str.lower() == "x"])
 
             for index, row in group.iterrows():
+                print(row)
                 if not self.check_fraudulent_payees(row):
                     if str(row["representate_familiar"]).lower() == "x":
                         beneficiario, created = Persona.objects.get_or_create(
                             nombre_apellido=row["nombre_appelido"],
-                            dni=row["nie"],
+                            dni=row["nie"] if not row["nie"] == 0.0 else '',
                             otros_documentos=row["pasaporte"],
                             fecha_nacimiento=row["fecha_nacimiento"],
                             numero_adra=int(row["Nº"]),
@@ -570,7 +571,7 @@ class UploadExcelUsers:
                             domicilio=row["Domicilio"],
                             are_acte=False,
                             ciudad=row["Localidad"],
-                            telefono=0,
+                            telefono=int(row["Teléfono"]),
                             modificado_por_id=self.current_user.pk,
                             mensaje="ALTA NUEVA",
                             active=True,
@@ -595,7 +596,7 @@ class UploadExcelUsers:
                                 parentesco="familiar",
                                 sexo="mujer",
                                 nombre_apellido=row_fam["nombre_appelido"],
-                                dni=row_fam["nie"],
+                                dni=row_fam["nie"] if not row_fam["nie"] == 0.0 else '',
                                 otros_documentos=row_fam["pasaporte"],
                                 fecha_nacimiento=row_fam["fecha_nacimiento"],
                                 edad=0,

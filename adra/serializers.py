@@ -3,27 +3,6 @@ from rest_framework import serializers
 from .models import Persona, Hijo, Alimentos, AlmacenAlimentos
 
 
-def timesince(dt, default="now"):
-    from datetime import datetime
-    from django.utils import timezone
-    now = timezone.now()
-    diff = now - dt
-    # print(diff.days)
-    periods = (
-        (diff.days / 365, "year", "years"),
-        (diff.days / 30, "month", "months"),
-        (diff.days / 7, "week", "weeks"),
-        (diff.days, "day", "days"),
-        (diff.seconds / 3600, "hour", "hours"),
-        (diff.seconds / 60, "minute", "minutes"),
-        (diff.seconds, "second", "seconds"),
-    )
-    for period, singular, plural in periods:
-        if period >= 1:
-            return "%d %s ago" % (period, singular if period == 1 else plural)
-    return default
-
-
 class AlimentosSerializer(serializers.ModelSerializer):
     class Meta:
         model = Alimentos

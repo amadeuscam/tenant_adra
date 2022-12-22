@@ -217,7 +217,7 @@
             </div>
 
             <div class="col-md-4 center-all mb-3">
-              <h5><b>Aquiler o Hipoteca</b></h5>
+              <h5><b>Alquiler o Hipoteca</b></h5>
               <p>{% if persona.aquiler_hipoteca %}
                 <i class="large material-icons" style="font-size: 36px;color: green">check_circle</i>
                 {% else %}
@@ -237,7 +237,7 @@
             </div>
 
             <div class="col-md-4 center-all mb-3">
-              <h5><b>Nomia</b></h5>
+              <h5><b>Nomina</b></h5>
               <p>{% if persona.nomnia %}
                 <i class="large material-icons" style="font-size: 36px;color: green">check_circle</i>
                 {% else %}
@@ -306,7 +306,7 @@
 
                   </p>
                   <p class="card-text">Nacido: {{ hijo.fecha_nacimiento|date:"m-d-Y" }}</p>
-                  <p class="card-text">Modificado por: <b>{{ hijo.modificado_por }}</b></p>
+                  <p class="card-text">Modificado por: <b>{{ hijo.modificado_por |capfirst }}</b></p>
                   <hr>
                   <a class="btn " role="button" href="{% url 'adra:hijo-update' hijo.id %}">
                     <i class="large material-icons" title="" style="font-size: 36px;color: darkslategrey">portrait</i>
