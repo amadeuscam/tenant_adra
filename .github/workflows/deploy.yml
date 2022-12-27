@@ -51,7 +51,7 @@ jobs:
           EMAIL: "a@test.com"
           DJANGO_SUPERUSER_PASSWORD: "masina"
         run: |
-          psql -h postgres -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} < test_database.sql
+          psql -h localhost -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} < test_database.sql
           pytest -vv
 
 
