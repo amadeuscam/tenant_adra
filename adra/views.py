@@ -196,7 +196,7 @@ def adauga_alimentos_persona(request, pk):
     almacen = AlmacenAlimentos.objects.get(pk=1)
 
     if request.method == "POST":
-        # print(request.POST)
+        print(request.POST)
         a_form = AlimentosFrom(request.POST)
         if a_form.is_valid():
             alimentos = a_form.save(commit=False)
@@ -696,6 +696,7 @@ def export_users_csv(request):
 @cache_page(60 * 15)
 def buscar_fecha(request):
     alimentos_list = Alimentos.objects.all()
+    # print(request.GET)
     user_filter = AlimentosFilters(request.GET, queryset=alimentos_list)
     alimento_1 = user_filter.qs.aggregate(Sum("alimento_1"))
     alimento_2 = user_filter.qs.aggregate(Sum("alimento_2"))
@@ -740,6 +741,9 @@ def generar_hoja_entrega(request, pk, mode):
     :param request:
     :param pk: id persona
     :return: pdf generado
+
+    Args:
+        mode:
     """
     # print("mode generate->", mode)
     # print(request.tenant)

@@ -1,7 +1,9 @@
 import functools
 import io
+import json
 from datetime import date, datetime
 
+import pytest
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files import File
@@ -21,6 +23,19 @@ from delegaciones.models import BeneficiariosGlobales
 
 class TestViews(TenantTestCase):
 
+    @pytest.fixture(autouse=True)
+    def use_benefiario_fixture(self, familiares, alimentos, almacen_alimentos, beneficario_glb, beneficiario_json,
+                               alimentos_json, almacen_alimentos_json, familiar_json, beneficario):
+        self.beneficario = beneficario
+        self.familiar = familiares
+        self.alimentos = alimentos
+        self.almacen_alimentos = almacen_alimentos
+        self.beneficario_glb = beneficario_glb
+        self.beneficiario_json = beneficiario_json
+        self.alimentos_json = alimentos_json
+        self.almacen_alimentos_json = almacen_alimentos_json
+        self.familiar_json = familiar_json
+
     @classmethod
     def setup_tenant(cls, tenant):
         """
@@ -35,114 +50,30 @@ class TestViews(TenantTestCase):
         super().setUp()
         self.client = TenantClient(self.tenant)
         self.client.login(username='lucian', password='masina')
+        self.beneficario_inst = self.beneficario.create(id=1)
+        self.familiar_inst = self.familiar.create(id=1)
+
         # self.user = User.objects.get(id=1)
-
-        self.beneficario = Persona.objects.create(
-            pk=1,
-            nombre_apellido="Maria Guapa",
-            dni="x00000000q",
-            otros_documentos="",
-            fecha_nacimiento=date(1990, 0o1, 27),
-            numero_adra=1,
-            nacionalidad="española",
-            domicilio="calle sin numero",
-            are_acte=True,
-            ciudad="Madrid",
-            telefono="312570235",
-            modificado_por_id=1,
-            mensaje="alta nueva",
-            active=True,
-            sexo="mujer",
-            discapacidad=False,
-            aquiler_hipoteca=True,
-            cert_negativo=True,
-            empadronamiento=True,
-            fotocopia_dni=True,
-            libro_familia=True,
-            nomnia=True,
-            prestaciones=True,
-            recibos=True,
-            email="a@test.es",
-            covid=False,
-            codigo_postal=28850,
-        )
-        self.familiar = Hijo.objects.create(
-            nombre_apellido="Mercedes Fernandez",
-            parentesco="hija",
-            dni="x00000000w",
-            otros_documentos="",
-            fecha_nacimiento=date(2020, 0o1, 27),
-            active=True,
-            discapacidad=False,
-            sexo="mujer",
-            persona=self.beneficario
-        )
-
-        self.almacen_alimentos = AlmacenAlimentos.objects.create(
-            pk=1,
-            alimento_1=100,
-            alimento_2=100,
-            alimento_3=100,
-            alimento_4=100,
-            alimento_5=100,
-            alimento_6=100,
-            alimento_7=100,
-            alimento_8=100,
-            alimento_9=100,
-            alimento_10=100,
-            alimento_11=100,
-            alimento_12=100,
-            alimento_13=100,
-            alimento_1_caducidad=date(2020, 0o1, 27),
-            alimento_2_caducidad=date(2022, 0o1, 27),
-            alimento_3_caducidad=date(2020, 0o1, 27),
-            alimento_4_caducidad=date(2020, 0o1, 27),
-            alimento_5_caducidad=date(2020, 0o1, 27),
-            alimento_6_caducidad=date(2020, 0o1, 27),
-            alimento_7_caducidad=date(2020, 0o1, 27),
-            alimento_8_caducidad=date(2020, 0o1, 27),
-            alimento_9_caducidad=date(2020, 0o1, 27),
-            alimento_10_caducidad=date(2020, 0o1, 27),
-            alimento_11_caducidad=date(2020, 0o1, 27),
-            alimento_12_caducidad=date(2020, 0o1, 27),
-            alimento_13_caducidad=date(2020, 0o1, 27),
-        )
-        self.alimentos = Alimentos.objects.create(
-            alimento_1=2,
-            alimento_2=2,
-            alimento_3=2,
-            alimento_4=2,
-            alimento_5=2,
-            alimento_6=2,
-            alimento_7=2,
-            alimento_8=2,
-            alimento_9=2,
-            alimento_10=2,
-            alimento_11=2,
-            alimento_12=2,
-            alimento_13=2,
-            fecha_recogida='2022-11-17',
-            persona=self.beneficario,
-        )
 
     def test_edit_profile_get(self):
         response = self.client.get(reverse('adra:edit-profile'))
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_edit_profile_post(self):
-        response_valid = self.client.post(reverse('adra:edit-profile'), data={
+        edit_profile_dict = {
             "sexo": "mujer",
             "first_names": "vasile",
             "last_name": "moza",
             "date_of_birth": "1990-01-27",
             "email": "a@test.es"
-        }, follow=True)
-        self.assertEqual(response_valid.status_code, 200)
+        }
+        response_valid = self.client.post(reverse('adra:edit-profile'), data=edit_profile_dict, follow=True)
+        assert response_valid.status_code == 200
         response_invalid = self.client.post(reverse('adra:edit-profile'), data={})
-        self.assertEqual(response_invalid.status_code, 200)
+        assert response_invalid.status_code == 200
 
     def test_persona_detilview(self):
-        response = self.client.get(reverse('adra:personas_detail', kwargs={"pk": self.beneficario.pk}))
+        response = self.client.get(reverse('adra:personas_detail', kwargs={"pk": self.beneficario_inst.pk}))
         assert "filter" in response.context_data.keys()
 
     def test_persona_list_view(self):
@@ -152,191 +83,102 @@ class TestViews(TenantTestCase):
         assert response.context_data["platform_name"] == settings.PLATFORM_NAME
 
     def test_persona_create_view_with_globals(self):
-        BeneficiariosGlobales.objects.create(
-            delegacion_name="adra torrejon",
-            delegacion_code=1,
-            documentacion_beneficiario="x8731368q",
-            ciudad="Madrid",
-            provincia="Madrid",
-            telefono=663020615,
-            nombre_beneficiario="sdasW32dasdas"
-        )
-        response = self.client.post(reverse('adra:persona-create'),
-                                    data={'nombre_apellido': 'sdasW32dasdas', 'dni': 'x00000000q',
-                                          'fecha_nacimiento': date(2022, 12, 13), 'numero_adra': 423,
-                                          'nacionalidad': 'Rumana', 'domicilio': 'dsa', 'are_acte': False,
-                                          'ciudad': 'Torrejon De Ardoz', 'telefono': 663020615, 'mensaje': 'dasdas',
-                                          'sexo': 'hombre', 'discapacidad': False, 'empadronamiento': True,
-                                          'libro_familia': False, 'fotocopia_dni': True, 'prestaciones': True,
-                                          'nomnia': True, 'cert_negativo': True, 'aquiler_hipoteca': True,
-                                          'recibos': True, 'email': 'Gabri_28@yahoo.es', 'covid': False,
-                                          'codigo_postal': 28850, 'otros_documentos': '', 'active': True}
-                                    )
-
+        self.beneficario_glb.create()
+        response = self.client.post(reverse('adra:persona-create'), data=self.beneficiario_json)
         assert response.status_code == 200
 
     def test_persona_create_view(self):
-        response = self.client.post(reverse('adra:persona-create'),
-                                    data={'nombre_apellido': 'sdasW32dasdas', 'dni': 'x8731368q',
-                                          'fecha_nacimiento': date(2022, 12, 13), 'numero_adra': 423,
-                                          'nacionalidad': 'Rumana', 'domicilio': 'dsa', 'are_acte': False,
-                                          'ciudad': 'Torrejon De Ardoz', 'telefono': 663020615, 'mensaje': 'dasdas',
-                                          'sexo': 'hombre', 'discapacidad': False, 'empadronamiento': True,
-                                          'libro_familia': False, 'fotocopia_dni': True, 'prestaciones': True,
-                                          'nomnia': True, 'cert_negativo': True, 'aquiler_hipoteca': True,
-                                          'recibos': True, 'email': 'Gabri_28@yahoo.es', 'covid': False,
-                                          'codigo_postal': 28850, 'otros_documentos': '', 'active': True}
-                                    , follow=True)
-
-        # print(response)
+        self.beneficiario_json.update({'nombre_apellido': 'John Doe'})
+        response = self.client.post(reverse('adra:persona-create'), data=self.beneficiario_json, follow=True)
         assert response.status_code == 200
 
     def test_persona_create_view_get(self):
+        response = self.client.get(reverse('adra:persona-create'))
+        assert response.context_data["bas"].__str__() == "Maria Fernandez"
         Persona.objects.all().delete()
         response = self.client.get(reverse('adra:persona-create'))
         assert response.context_data["bas"] is None
 
     def test_persona_update_view(self):
-        beneficario = Persona.objects.all()[0]
-        response = self.client.post(reverse('adra:persona-update', kwargs={"pk": self.beneficario.pk}),
-                                    data={'nombre_apellido': 'Maria Guapa', 'dni': 'x00000000q',
-                                          'fecha_nacimiento': date(1990, 0o1, 27), 'numero_adra': 1,
-                                          'nacionalidad': 'Rumana', 'domicilio': 'dsa', 'are_acte': False,
-                                          'ciudad': 'Torrejon De Ardoz', 'telefono': 312570235, 'mensaje': 'dasdas',
-                                          'sexo': 'hombre', 'discapacidad': False, 'empadronamiento': True,
-                                          'libro_familia': False, 'fotocopia_dni': True, 'prestaciones': True,
-                                          'nomnia': True, 'cert_negativo': True, 'aquiler_hipoteca': True,
-                                          'recibos': True, 'email': 'Gabri_28@yahoo.es', 'covid': False,
-                                          'codigo_postal': 28850, 'otros_documentos': '', 'active': True}, follow=True)
+        self.beneficiario_json.update({'nombre_apellido': 'John Doe', 'telefono': 312570235})
+        response = self.client.post(reverse('adra:persona-update', kwargs={"pk": self.beneficario_inst.pk}),
+                                    data=self.beneficiario_json, follow=True)
         assert response.status_code == 200
 
     def test_persona_update_view_context(self):
-        response = self.client.get(reverse('adra:persona-update', kwargs={"pk": self.beneficario.pk}))
+        response = self.client.get(reverse('adra:persona-update', kwargs={"pk": self.beneficario_inst.pk}))
         assert response.context_data["up"] == "update"
 
     def test_adauga_alimentos_persona_get(self):
-        response = self.client.get(reverse('adra:alimentos-create', kwargs={"pk": self.beneficario.pk}))
+        self.almacen_alimentos.create(pk=1)
+        response = self.client.get(reverse('adra:alimentos-create', kwargs={"pk": self.beneficario_inst.pk}))
         assert response.status_code == 200
 
     def test_adauga_alimentos_persona_post_without_signature(self):
+        self.almacen_alimentos.create(pk=1)
         response_without_signature = self.client.post(
-            reverse('adra:alimentos-create', kwargs={"pk": self.beneficario.pk}), data={
-                "alimento_1": 2,
-                "alimento_2": 2,
-                "alimento_3": 2,
-                "alimento_4": 2,
-                "alimento_5": 2,
-                "alimento_6": 2,
-                "alimento_7": 2,
-                "alimento_8": 2,
-                "alimento_9": 2,
-                "alimento_10": 2,
-                "alimento_11": 2,
-                "alimento_12": 2,
-                "alimento_13": 2,
-                "fecha_recogida": date.today()
-            }, follow=True)
+            reverse('adra:alimentos-create', kwargs={"pk": self.beneficario_inst.pk}), data=self.alimentos_json,
+            follow=True)
 
         assert response_without_signature.status_code == 200
+        self.alimentos_json.update({"signature": [{
+            "x": [199, 202, 230, 242, 256, 264, 272, 280, 284, 282, 272, 260, 260, 262, 279, 336, 402, 462, 489,
+                  493, 491, 487, 483, 475, 473, 474, 481, 491, 498, 498, 489, 472, 457, 424, 402, 393],
+            "y": [75, 78, 83, 83, 81, 77, 74, 70, 69, 66, 66, 80, 85, 93, 102, 112, 116, 116, 116, 112, 106,
+                  102, 101, 104, 108, 116, 121, 122, 122, 116, 106, 100, 99, 102, 110, 116]
+        }]})
 
         response_with_signature = self.client.post(
-            reverse('adra:alimentos-create', kwargs={"pk": self.beneficario.pk}), data={
-                "alimento_1": 2,
-                "alimento_2": 2,
-                "alimento_3": 2,
-                "alimento_4": 2,
-                "alimento_5": 2,
-                "alimento_6": 2,
-                "alimento_7": 2,
-                "alimento_8": 2,
-                "alimento_9": 2,
-                "alimento_10": 2,
-                "alimento_11": 2,
-                "alimento_12": 2,
-                "alimento_13": 2,
-                "fecha_recogida": date.today(),
-                "signature": {
-                    "x": [199, 202, 230, 242, 256, 264, 272, 280, 284, 282, 272, 260, 260, 262, 279, 336, 402, 462, 489,
-                          493, 491, 487, 483, 475, 473, 474, 481, 491, 498, 498, 489, 472, 457, 424, 402, 393],
-                    "y": [75, 78, 83, 83, 81, 77, 74, 70, 69, 66, 66, 80, 85, 93, 102, 112, 116, 116, 116, 112, 106,
-                          102, 101, 104, 108, 116, 121, 122, 122, 116, 106, 100, 99, 102, 110, 116]
-                }
-            }, follow=True)
+            reverse('adra:alimentos-create', kwargs={"pk": self.beneficario_inst.pk}), data=self.alimentos_json,
+            follow=True)
 
         assert response_with_signature.status_code == 200
 
     def test_almacen_view(self):
+        self.almacen_alimentos.create()
         response = self.client.get(reverse('adra:almacen-home'))
         assert response.context_data["almacen_adra"].count() > 0
         assert response.context_data["nbar"] == "almacen_a"
         assert response.status_code == 200
 
     def test_almacen_update(self):
-        response = self.client.post(reverse('adra:almacen-update', kwargs={"pk": self.almacen_alimentos.pk}),
-                                    data={'alimento_1': 755, 'alimento_2': 1103, 'alimento_3': 2371, 'alimento_4': 443,
-                                          'alimento_5': 2213, 'alimento_6': 811, 'alimento_7': -2108,
-                                          'alimento_8': 1174, 'alimento_9': 881, 'alimento_10': 158, 'alimento_11': 102,
-                                          'alimento_12': 5581, 'alimento_13': 1548,
-                                          'alimento_1_caducidad': date(2023, 10, 28),
-                                          'alimento_2_caducidad': date(2027, 8, 27),
-                                          'alimento_3_caducidad': date(2028, 12, 31),
-                                          'alimento_4_caducidad': date(2024, 8, 30),
-                                          'alimento_5_caducidad': date(2024, 10, 30),
-                                          'alimento_6_caducidad': date(2024, 1, 20),
-                                          'alimento_7_caducidad': date(2026, 4, 27),
-                                          'alimento_8_caducidad': date(2025, 12, 31),
-                                          'alimento_9_caducidad': date(2025, 9, 9),
-                                          'alimento_10_caducidad': date(2024, 8, 31),
-                                          'alimento_11_caducidad': date(2024, 8, 30),
-                                          'alimento_12_caducidad': date(2023, 2, 23),
-                                          'alimento_13_caducidad': date(2024, 2, 19)})
+        almacen_alimentos = self.almacen_alimentos.create()
+        response = self.client.post(reverse('adra:almacen-update', kwargs={"pk": almacen_alimentos.pk}),
+                                    data=self.almacen_alimentos_json)
 
         assert response.status_code == 302
         response_get_with_context = self.client.get(
-            reverse('adra:almacen-update', kwargs={"pk": self.almacen_alimentos.pk}))
+            reverse('adra:almacen-update', kwargs={"pk": almacen_alimentos.pk}))
 
         assert response_get_with_context.context_data["nbar"] == "almacen_a"
         assert response_get_with_context.status_code == 200
 
     def test_delete_familiar(self):
-        response = self.client.post(reverse('adra:hijo-delete', kwargs={"pk": self.familiar.pk}))
+        response = self.client.post(reverse('adra:hijo-delete', kwargs={"pk": self.familiar_inst.pk}))
         assert response.status_code == 302
 
     def test_anadir_familiar(self):
-        response = self.client.post(reverse('adra:hijo-create', kwargs={"pk": self.beneficario.pk}), data={
-            'parentesco': 'esposo',
-            'nombre_apellido': 'Mariano Jimenez',
-            'dni': 'x05400000q',
-            'otros_documentos': '',
-            'fecha_nacimiento': '1962-12-16',
-            'sexo': 'hombre',
-            'discapacidad': False
-        })
+        response = self.client.post(reverse('adra:hijo-create', kwargs={"pk": self.beneficario_inst.pk}),
+                                    data=self.familiar_json)
         assert response.status_code == 302
 
-        response_get = self.client.get(reverse('adra:hijo-create', kwargs={"pk": self.beneficario.pk}))
+        response_get = self.client.get(reverse('adra:hijo-create', kwargs={"pk": self.beneficario_inst.pk}))
         assert response_get.status_code == 200
 
     def test_update_familiar(self):
-        response = self.client.post(reverse('adra:hijo-update', kwargs={"pk": self.familiar.pk}), data={
-            'parentesco': 'esposo',
-            'nombre_apellido': 'Mariano Jimenez',
-            'dni': 'x05400000q',
-            'otros_documentos': '',
-            'fecha_nacimiento': '1962-12-16',
-            'sexo': 'hombre',
-            'discapacidad': True
-        }, flow=True)
+        self.familiar_json.update({'dni': 'x0540000q', 'discapacidad': True})
+        response = self.client.post(reverse('adra:hijo-update', kwargs={"pk": self.familiar_inst.pk}),
+                                    data=self.familiar_json, flow=True)
         assert response.status_code == 302
 
-        response_get_context = self.client.get(reverse('adra:hijo-update', kwargs={"pk": self.familiar.pk}))
+        response_get_context = self.client.get(reverse('adra:hijo-update', kwargs={"pk": self.familiar_inst.pk}))
         assert response_get_context.context_data["up"] == "update"
         assert response_get_context.status_code == 200
 
     def test_busqueda_beneficiario(self):
         response_get_with_digit = self.client.get(reverse('adra:buscar'), data={"q": "1"})
         assert response_get_with_digit.status_code == 200
-        response_get_with_name = self.client.get(reverse('adra:buscar'), data={"q": "Maria Guapa"})
+        response_get_with_name = self.client.get(reverse('adra:buscar'), data={"q": "Maria Fernandez"})
         assert response_get_with_name.status_code == 200
         response_no_activos = self.client.get(reverse('adra:buscar'), data={"q": "-1"})
         assert response_no_activos.status_code == 200
@@ -369,9 +211,9 @@ class TestViews(TenantTestCase):
             assert response_get.context[k] == v
 
     def test_valoracion_social_single(self):
-        response_get = self.client.get(reverse('adra:docx_form', kwargs={"pk": self.beneficario.pk}))
+        response_get = self.client.get(reverse('adra:docx_form', kwargs={"pk": self.beneficario_inst.pk}))
         assert response_get.headers[
-                   "Content-Disposition"] == f'attachment; filename={self.beneficario.numero_adra}.docx'
+                   "Content-Disposition"] == f'attachment; filename={self.beneficario_inst.numero_adra}.docx'
         assert response_get.headers[
                    "Content-Type"] == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
 
@@ -399,69 +241,42 @@ class TestViews(TenantTestCase):
         assert response_get.status_code == 200
 
     def test_busqueda_alimentos(self):
+        self.alimentos.create()
         data_request = {
-            'created_at__year': '2022',
-            'created_at__month': '11',
-            'created_at__day': '17'
+            'fecha_recogida__year': '2022',
+            'fecha_recogida__month': '01',
+            'fecha_recogida__day': '27'
         }
-        alimentos_columns = [
-            "alimento_1",
-            "alimento_2",
-            "alimento_3",
-            "alimento_4",
-            "alimento_5",
-            "alimento_6",
-            "alimento_7",
-            "alimento_8",
-            "alimento_9",
-            "alimento_10",
-            "alimento_11",
-            "alimento_12",
-            "alimento_13",
-        ]
+        del self.alimentos_json["fecha_recogida"]
+        alimentos_columns = self.alimentos_json.keys()
+
         response_get = self.client.get(reverse('adra:buscar-por-fecha'), data=data_request)
         for column in alimentos_columns:
             assert response_get.context[column][f"{column}__sum"] == 2
         assert response_get.context['nbar'] == 'buscar_av'
 
     def test_alimentos_update_beneficiario(self):
-        self.client.post(
-            reverse('adra:alimentos-create', kwargs={"pk": self.beneficario.pk}), data={
-                "alimento_1": 2,
-                "alimento_2": 2,
-                "alimento_3": 2,
-                "alimento_4": 2,
-                "alimento_5": 2,
-                "alimento_6": 2,
-                "alimento_7": 2,
-                "alimento_8": 2,
-                "alimento_9": 2,
-                "alimento_10": 2,
-                "alimento_11": 2,
-                "alimento_12": 2,
-                "alimento_13": 2,
-                "fecha_recogida": date.today()
-            }, follow=True)
+        self.almacen_alimentos.create(pk=1)
+        alimento = self.alimentos.create(pk=1)
 
-        alimentos_quantity_negative = 4
-        self.client.post(reverse('adra:persona-update-alimentos', kwargs={"pk": self.alimentos.pk}),
-                         data={
-                             "alimento_1": alimentos_quantity_negative,
-                             "alimento_2": alimentos_quantity_negative,
-                             "alimento_3": alimentos_quantity_negative,
-                             "alimento_4": alimentos_quantity_negative,
-                             "alimento_5": alimentos_quantity_negative,
-                             "alimento_6": alimentos_quantity_negative,
-                             "alimento_7": alimentos_quantity_negative,
-                             "alimento_8": alimentos_quantity_negative,
-                             "alimento_9": alimentos_quantity_negative,
-                             "alimento_10": alimentos_quantity_negative,
-                             "alimento_11": alimentos_quantity_negative,
-                             "alimento_12": alimentos_quantity_negative,
-                             "alimento_13": alimentos_quantity_negative,
-                             "fecha_recogida": '2022-11-17',
-
-                         })
+        alimentos_quantity_negative = 6
+        response_scad = self.client.post(reverse('adra:persona-update-alimentos', kwargs={"pk": alimento.pk}),
+                                         data={
+                                             "alimento_1": alimentos_quantity_negative,
+                                             "alimento_2": alimentos_quantity_negative,
+                                             "alimento_3": alimentos_quantity_negative,
+                                             "alimento_4": alimentos_quantity_negative,
+                                             "alimento_5": alimentos_quantity_negative,
+                                             "alimento_6": alimentos_quantity_negative,
+                                             "alimento_7": alimentos_quantity_negative,
+                                             "alimento_8": alimentos_quantity_negative,
+                                             "alimento_9": alimentos_quantity_negative,
+                                             "alimento_10": alimentos_quantity_negative,
+                                             "alimento_11": alimentos_quantity_negative,
+                                             "alimento_12": alimentos_quantity_negative,
+                                             "alimento_13": alimentos_quantity_negative,
+                                             "fecha_recogida": "2022-11-18"
+                                         })
 
         response = self.client.get(reverse('adra:almacen-home'))
         for alm in response.context['almacen_adra']:
@@ -480,52 +295,79 @@ class TestViews(TenantTestCase):
             assert alm.alimento_13 == 96
 
         alimentos_quantity_positive = 2
-        self.client.post(reverse('adra:persona-update-alimentos', kwargs={"pk": self.alimentos.pk}),
-                         data={
-                             "alimento_1": alimentos_quantity_positive,
-                             "alimento_2": alimentos_quantity_positive,
-                             "alimento_3": alimentos_quantity_positive,
-                             "alimento_4": alimentos_quantity_positive,
-                             "alimento_5": alimentos_quantity_positive,
-                             "alimento_6": alimentos_quantity_positive,
-                             "alimento_7": alimentos_quantity_positive,
-                             "alimento_8": alimentos_quantity_positive,
-                             "alimento_9": alimentos_quantity_positive,
-                             "alimento_10": alimentos_quantity_positive,
-                             "alimento_11": alimentos_quantity_positive,
-                             "alimento_12": alimentos_quantity_positive,
-                             "alimento_13": alimentos_quantity_positive,
-                             "fecha_recogida": '2022-11-17',
+        response_urc = self.client.post(reverse('adra:persona-update-alimentos', kwargs={"pk": alimento.pk}),
+                                        data={
+                                            "alimento_1": alimentos_quantity_positive,
+                                            "alimento_2": alimentos_quantity_positive,
+                                            "alimento_3": alimentos_quantity_positive,
+                                            "alimento_4": alimentos_quantity_positive,
+                                            "alimento_5": alimentos_quantity_positive,
+                                            "alimento_6": alimentos_quantity_positive,
+                                            "alimento_7": alimentos_quantity_positive,
+                                            "alimento_8": alimentos_quantity_positive,
+                                            "alimento_9": alimentos_quantity_positive,
+                                            "alimento_10": alimentos_quantity_positive,
+                                            "alimento_11": alimentos_quantity_positive,
+                                            "alimento_12": alimentos_quantity_positive,
+                                            "alimento_13": alimentos_quantity_positive,
+                                            "fecha_recogida": '2022-11-17',
 
-                         })
+                                        })
+
         response = self.client.get(reverse('adra:almacen-home'))
         for alm in response.context['almacen_adra']:
-            assert alm.alimento_1 == 98
-            assert alm.alimento_2 == 98
-            assert alm.alimento_3 == 98
-            assert alm.alimento_4 == 98
-            assert alm.alimento_5 == 98
-            assert alm.alimento_6 == 98
-            assert alm.alimento_7 == 98
-            assert alm.alimento_8 == 98
-            assert alm.alimento_9 == 98
-            assert alm.alimento_10 == 98
-            assert alm.alimento_11 == 98
-            assert alm.alimento_12 == 98
-            assert alm.alimento_13 == 98
+            assert alm.alimento_1 == 100
+            assert alm.alimento_2 == 100
+            assert alm.alimento_3 == 100
+            assert alm.alimento_4 == 100
+            assert alm.alimento_5 == 100
+            assert alm.alimento_6 == 100
+            assert alm.alimento_7 == 100
+            assert alm.alimento_8 == 100
+            assert alm.alimento_9 == 100
+            assert alm.alimento_10 == 100
+            assert alm.alimento_11 == 100
+            assert alm.alimento_12 == 100
+            assert alm.alimento_13 == 100
 
-    def test_generar_hoja_entrega_individual(self):
+    def test_generar_hoja_entrega_individual_sin_firma(self):
+        self.almacen_alimentos.create(pk=1)
+        self.familiar.create_batch(2, fecha_nacimiento=date(2011, 0o1, 27), persona=self.beneficario_inst,
+                                   nombre_apellido="Mercedessss Fernandez")
+
         response_individual = self.client.get(
-            reverse('adra:pdf_form', kwargs={"pk": self.beneficario.pk, "mode": "sin"}))
+            reverse('adra:pdf_form', kwargs={"pk": self.beneficario_inst.pk, "mode": "sin"}))
         assert response_individual.headers[
-                   "Content-Disposition"] == f'attachment; filename={self.beneficario.numero_adra}.pdf'
+                   "Content-Disposition"] == f'attachment; filename={self.beneficario_inst.numero_adra}.pdf'
         assert response_individual.headers["Content-Type"] == 'application/pdf'
         assert response_individual.status_code == 200
 
-        response_all = self.client.get(reverse('adra:pdf_form', kwargs={"pk": self.beneficario.pk, "mode": "con"}))
+    def test_generar_hoja_entrega_individual_con_firma(self):
+        self.almacen_alimentos.create(pk=1)
+        # self.alimentos.create_batch(2, persona=self.beneficario_inst, fecha_recogida="2022-01-27")
+        self.alimentos.create_batch(2, persona=self.beneficario_inst, fecha_recogida="2022-01-28", signature=[{
+            "x": [199, 202, 230, 242, 256, 264, 272, 280, 284, 282, 272, 260, 260, 262, 279, 336, 402, 462, 489, 493,
+                  491, 487, 483, 475, 473, 474, 481, 491, 498, 498, 489, 472, 457, 424, 402, 393],
+            "y": [75, 78, 83, 83, 81, 77, 74, 70, 69, 66, 66, 80, 85, 93, 102, 112, 116, 116, 116, 112, 106, 102, 101,
+                  104, 108, 116, 121, 122, 122, 116, 106, 100, 99, 102, 110, 116]
+
+        }])
+        response_all = self.client.get(reverse('adra:pdf_form', kwargs={"pk": self.beneficario_inst.pk, "mode": "con"}))
         assert response_all.headers[
-                   "Content-Disposition"] == f'attachment; filename={self.beneficario.numero_adra}.zip'
+                   "Content-Disposition"] == f'attachment; filename={self.beneficario_inst.numero_adra}.zip'
         assert response_all.headers["Content-Type"] == "application/x-zip-compressed"
+
+        assert response_all.status_code == 200
+
+    def test_generar_hoja_entrega_individual_con_firma_v2(self):
+        self.almacen_alimentos.create(pk=1)
+        self.alimentos.create()
+
+        response_all = self.client.get(reverse('adra:pdf_form', kwargs={"pk": self.beneficario_inst.pk, "mode": "con"}))
+        assert response_all.headers[
+                   "Content-Disposition"] == f'attachment; filename={self.beneficario_inst.numero_adra}.zip'
+        assert response_all.headers["Content-Type"] == "application/x-zip-compressed"
+
         assert response_all.status_code == 200
 
     def test_generar_hoja_entrega_global(self):
@@ -574,5 +416,5 @@ class TestViews(TenantTestCase):
             'record': fp2,
         }, format='multipart')
         assert len(response_ingestra_fraud.json()["usuarios_fraud"]) == 3
-        print(response_ingesta.json())
-        print(response_ingestra_fraud.json())
+        # print(response_ingesta.json())
+        # print(response_ingestra_fraud.json())

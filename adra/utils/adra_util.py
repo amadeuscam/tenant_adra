@@ -500,8 +500,8 @@ class UploadExcelUsers:
         self.relacion_beneficiarios.rename(columns=col_rename_relacion, inplace=True)
 
     def join_information(self):
-        print(self.relacion_beneficiarios["pasaporte"])
-        print(self.relacion_beneficiarios["nie"])
+        # print(self.relacion_beneficiarios["pasaporte"])
+        # print(self.relacion_beneficiarios["nie"])
         self.relacion_beneficiarios['nie_juntos'] = self.relacion_beneficiarios.apply(
             lambda row: row['pasaporte'] if pd.isna(row['nie']) else row['nie'],
             axis=1
@@ -515,10 +515,10 @@ class UploadExcelUsers:
             how="left"
         )
         self.main_df = self.main_df.fillna({'Teléfono': 0})
-        print(self.main_df)
+        # print(self.main_df)
 
     def check_fraudulent_payees(self, data) -> bool:
-        print(data)
+        # print(data)
         logic = Q(
             documentacion_beneficiario=data["nie_juntos"],
             telefono=data["Teléfono"],
@@ -527,7 +527,7 @@ class UploadExcelUsers:
         beneficario_global = BeneficiariosGlobales.objects.filter(
             logic, nombre_beneficiario=data["nombre_appelido"]
         )
-        print(beneficario_global.count())
+        # print(beneficario_global.count())
         if beneficario_global.count() > 0:
 
             for beneficario in beneficario_global:
@@ -536,8 +536,8 @@ class UploadExcelUsers:
                      "oar": beneficario.delegacion_name
                      }
                 )
-            print(self.beneficarios_fraudulentos)
-            print("cogen de otro sitio")
+            # print(self.beneficarios_fraudulentos)
+            # print("cogen de otro sitio")
             return True
         else:
             return False
@@ -554,11 +554,11 @@ class UploadExcelUsers:
         self.main_df['dss'] = self.main_df["representate_familiar"].apply(self.groub_familiares)
         gkk = self.main_df.groupby(['dss'])
         for name, group in gkk:
-            print(name, group)
-            print(group[group["representate_familiar"].str.lower() == "x"])
+            # print(name, group)
+            # print(group[group["representate_familiar"].str.lower() == "x"])
 
             for index, row in group.iterrows():
-                print(row)
+                # print(row)
                 if not self.check_fraudulent_payees(row):
                     if str(row["representate_familiar"]).lower() == "x":
                         beneficiario, created = Persona.objects.get_or_create(
@@ -590,7 +590,7 @@ class UploadExcelUsers:
                             codigo_postal=row["CP"] if pd.notnull(row["CP"]) else 0,
                         )
                         familiares = group[group["representate_familiar"].str.lower() != "x"]
-                        print(familiares)
+                        # print(familiares)
                         for _, row_fam in familiares.iterrows():
                             Hijo.objects.create(
                                 parentesco="familiar",
