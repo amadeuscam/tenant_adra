@@ -45,9 +45,7 @@ jobs:
           MYSQL_HOST: ${{ env.POSTGRES_HOST }}
           DATABASE_NAME: ${{ env.POSTGRES_DB }}
           SECRET_KEY: ${{ secrets.SECRET_KEY_TEST }}
-        working-directory: .
         run: |
-          echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@myproject.com', 'password')" | python manage.py shell
           pytest -vv
 
 
