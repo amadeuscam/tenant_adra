@@ -285,10 +285,10 @@ if os.environ.get('GITHUB_WORKFLOW'):
     DATABASES = {
         'default': {
             'ENGINE': 'django_tenants.postgresql_backend',
-            'NAME': os.environ.get("POSTGRES_DB"),
-            'USER': os.environ.get("POSTGRES_USER"),
-            'PASSWORD': os.environ.get("POSTGRES_PASSWORD"),
-            'HOST': os.environ.get("POSTGRES_HOST"),
-            'PORT': os.environ.get("POSTGRES_PORT"),
+            'NAME': os.environ.get("DATABASE_NAME"),
+            'USER': os.environ.get("MYSQL_USER"),
+            'PASSWORD': os.environ.get("MYSQL_PASSWORD"),
+            'HOST': os.environ.get("MYSQL_HOST"),
+            'PORT': 5432,
         }
     }
