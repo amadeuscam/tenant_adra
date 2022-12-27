@@ -46,6 +46,7 @@ jobs:
           MYSQL_HOST: ${{ env.POSTGRES_HOST }}
           DATABASE_NAME: ${{ env.POSTGRES_DB }}
           SECRET_KEY: ${{ secrets.SECRET_KEY_TEST }}
+          DJANGO_SETTINGS_MODULE: 'adra_project.settings.dev'
         run: python manage.py migrate
 
       - name: Test with pytest
