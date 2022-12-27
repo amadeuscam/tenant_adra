@@ -45,7 +45,7 @@ jobs:
           MODE: workflow
           MYSQL_USER: ${{ env.POSTGRES_USER }}
           MYSQL_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
-          MYSQL_HOST: "db"
+          MYSQL_HOST: ${{ env.POSTGRES_HOST }}
           DATABASE_NAME: ${{ env.POSTGRES_DB }}
           SECRET_KEY: ${{ secrets.SECRET_KEY_TEST }}
         run: |
