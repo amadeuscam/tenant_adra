@@ -11,6 +11,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -18,7 +22,10 @@ jobs:
 
       - name: Test with pytest
         env:
-          DEBUG: "0"
+          DEBUG: 1
+          ALLOWED_HOSTS: localhost
+          GITHUB_WORKFLOW: True
+          MODE: workflow
           SECRET_KEY: ${{ secrets.SECRET_KEY_TEST }}
         run: |
           pytest -vv
