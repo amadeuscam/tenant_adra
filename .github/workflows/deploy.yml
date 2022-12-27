@@ -9,10 +9,10 @@ jobs:
     name: Build Image
     runs-on: ubuntu-latest
     env:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_HOST: localhost # default host value for the database
-      POSTGRES_DB: djtesting
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_HOST: db # default host value for the database
+      POSTGRES_DB: adra_torrejon_v12
       POSTGRES_PORT: 5432
 
     services:
