@@ -1,4 +1,4 @@
-name: Deploy to ECR
+name: Deploy
 
 on:
   push:
@@ -9,11 +9,11 @@ jobs:
     name: Build Image
     runs-on: ubuntu-latest
     env:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
-      POSTGRES_HOST: localhost # default host value for the database
-      POSTGRES_DB: adra_tenant_new
-      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }} # default host value for the database
+      POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+      POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
 
     services:
       postgres:
@@ -39,7 +39,7 @@ jobs:
           pip install -r requirements.txt
 
 
-      - name: Test with pytest
+      - name: Testing
         env:
           DEBUG: 1
           MYSQL_USER: ${{ env.POSTGRES_USER }}
@@ -48,9 +48,9 @@ jobs:
           DATABASE_NAME: ${{ env.POSTGRES_DB }}
           SECRET_KEY: ${{ secrets.SECRET_KEY_TEST }}
           DJANGO_SETTINGS_MODULE: 'adra_project.settings.dev'
-          SUPERUSER_NAME: lucian
-          SUPERUSER_PASSWORD: masina
-          SUPERUSER_EMAIL: amadeuscam@yahoo.es
+          SUPERUSER_NAME: ${{ secrets.SUPERUSER_NAME }}
+          SUPERUSER_PASSWORD: ${{ secrets.SUPERUSER_PASSWORD }}
+          SUPERUSER_EMAIL: ${{ secrets.SUPERUSER_EMAIL }}
 
         run: |
           python manage.py collectstatic --noinput
