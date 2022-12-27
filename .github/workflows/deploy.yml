@@ -37,17 +37,25 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
+      - name: Configurate database
+        env:
+          DEBUG: 1
+          MYSQL_USER: ${{ env.POSTGRES_USER }}
+          MYSQL_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          MYSQL_HOST: ${{ env.POSTGRES_HOST }}
+          DATABASE_NAME: ${{ env.POSTGRES_DB }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY_TEST }}
+        run: python manage.py migrate
+
       - name: Test with pytest
-#        env:
-#          DEBUG: 1
-#          #          ALLOWED_HOSTS: localhost
-#          #          GITHUB_WORKFLOW: True
-#          #          MODE: workflow
-#          MYSQL_USER: ${{ env.POSTGRES_USER }}
-#          MYSQL_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
-#          MYSQL_HOST: ${{ env.POSTGRES_HOST }}
-#          DATABASE_NAME: ${{ env.POSTGRES_DB }}
-#          SECRET_KEY: ${{ secrets.SECRET_KEY_TEST }}
+        env:
+          DEBUG: 1
+          MYSQL_USER: ${{ env.POSTGRES_USER }}
+          MYSQL_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          MYSQL_HOST: ${{ env.POSTGRES_HOST }}
+          DATABASE_NAME: ${{ env.POSTGRES_DB }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY_TEST }}
         run: pytest -vv
 
 
