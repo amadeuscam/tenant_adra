@@ -50,6 +50,8 @@ jobs:
           DJANGO_SETTINGS_MODULE: 'adra_project.settings.dev'
           EMAIL: "a@test.com"
           DJANGO_SUPERUSER_PASSWORD: "masina"
+          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
+
         run: |
           psql -h localhost -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} < test_database.sql
           pytest -vv
