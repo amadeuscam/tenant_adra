@@ -49,7 +49,7 @@ jobs:
           EMAIL: "a@test.com"
           DJANGO_SETTINGS_MODULE: 'adra_project.settings.dev'
         run: |
-          python manage.py createsuperuser --noinput --username ${{ env.POSTGRES_USER }} --email ${{ env.EMAIL }} --password ${{ env.POSTGRES_PASSWORD }}
+          python manage.py createsuperuser --no-input --username ${{ env.POSTGRES_USER }} --email ${{ env.EMAIL }} --password ${{ env.POSTGRES_PASSWORD }}
           python manage.py migrate
 
       - name: Test with pytest
