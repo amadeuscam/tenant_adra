@@ -46,7 +46,9 @@ jobs:
           DATABASE_NAME: ${{ env.POSTGRES_DB }}
           SECRET_KEY: ${{ secrets.SECRET_KEY_TEST }}
         working-directory: .
-        run: pytest -vv
+        run: |
+          echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@myproject.com', 'password')" | python manage.py shell
+          pytest -vv
 
 
       - name: docker login
