@@ -281,15 +281,14 @@ SENDGRID_ALIMENTOS_TEMPLATE_ID = os.environ.get("SENDGRID_ALIMENTOS_TEMPLATE_ID"
 SENDGRID_ACTIVACION_CUENTA_TEMPLATE_ID = os.environ.get("SENDGRID_ACTIVACION_CUENTA_TEMPLATE_ID")
 SENDGRID_CHANGE_PASSWORD_TEMPLATE_ID = os.environ.get("SENDGRID_CHANGE_PASSWORD_TEMPLATE_ID")
 
-
 if os.environ.get('GITHUB_WORKFLOW'):
     DATABASES = {
         'default': {
-           'ENGINE': 'django_tenants.postgresql_backend',
-           'NAME': 'github_actions',
-           'USER': 'postgres',
-           'PASSWORD': 'postgres',
-           'HOST': '127.0.0.1',
-           'PORT': '5432',
+            'ENGINE': 'django_tenants.postgresql_backend',
+            'NAME': os.environ.get("POSTGRES_DB"),
+            'USER': os.environ.get("POSTGRES_USER"),
+            'PASSWORD': os.environ.get("POSTGRES_PASSWORD"),
+            'HOST': os.environ.get("POSTGRES_HOST"),
+            'PORT': os.environ.get("POSTGRES_PORT"),
         }
     }

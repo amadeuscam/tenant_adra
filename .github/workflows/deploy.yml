@@ -8,14 +8,20 @@ jobs:
   build:
     name: Build Image
     runs-on: ubuntu-latest
+    env:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: localhost # default host value for the database
+      POSTGRES_DB: djtesting
+      POSTGRES_PORT: 5432
 
     services:
       postgres:
-        image: postgres:latest
+        image: postgres:12
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: github_actions
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
         ports:
           - 5432:5432
         # needed because the postgres container does not provide a healthcheck
@@ -34,6 +40,7 @@ jobs:
 
       - name: Test with pytest
         env:
+          DEBUG: "0"
           SECRET_KEY: ${{ secrets.SECRET_KEY_TEST }}
         working-directory: .
         run: pytest -vv
