@@ -46,7 +46,6 @@ jobs:
           DATABASE_NAME: ${{ env.POSTGRES_DB }}
           SECRET_KEY: ${{ secrets.SECRET_KEY_TEST }}
         run: |
-          python manage.py migrate --noinput
           pytest -vv
 
 
