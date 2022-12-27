@@ -11,7 +11,7 @@ jobs:
     env:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
-      POSTGRES_HOST: db # default host value for the database
+      POSTGRES_HOST: localhost # default host value for the database
       POSTGRES_DB: adra_torrejon_v12
       POSTGRES_PORT: 5432
 
@@ -46,6 +46,7 @@ jobs:
           DATABASE_NAME: ${{ env.POSTGRES_DB }}
           SECRET_KEY: ${{ secrets.SECRET_KEY_TEST }}
         run: |
+          python manage.py migrate --noinput
           pytest -vv
 
 
