@@ -51,6 +51,9 @@ jobs:
           EMAIL: "a@test.com"
           DJANGO_SUPERUSER_PASSWORD: "masina"
           PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          SUPERUSER_NAME: lucian
+          SUPERUSER_PASSWORD: masina
+          SUPERUSER_EMAIL: amadeuscam@yahoo.es
 
         run: |
           psql -h localhost -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} < test_database.sql
