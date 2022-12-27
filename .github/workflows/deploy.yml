@@ -38,21 +38,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Configurate database
-        env:
-          DEBUG: 1
-          MYSQL_USER: ${{ env.POSTGRES_USER }}
-          MYSQL_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
-          MYSQL_HOST: ${{ env.POSTGRES_HOST }}
-          DATABASE_NAME: ${{ env.POSTGRES_DB }}
-          SECRET_KEY: ${{ secrets.SECRET_KEY_TEST }}
-          EMAIL: "a@test.com"
-          DJANGO_SETTINGS_MODULE: 'adra_project.settings.dev'
-          DJANGO_SUPERUSER_PASSWORD: "masina"
-        run: |
-          python manage.py migrate
-          python manage.py createsuperuser --no-input --username ${{ env.POSTGRES_USER }} --email ${{ env.EMAIL }}
-          
 
       - name: Test with pytest
         env:
@@ -63,7 +48,12 @@ jobs:
           DATABASE_NAME: ${{ env.POSTGRES_DB }}
           SECRET_KEY: ${{ secrets.SECRET_KEY_TEST }}
           DJANGO_SETTINGS_MODULE: 'adra_project.settings.dev'
-        run: pytest -vv
+          EMAIL: "a@test.com"
+          DJANGO_SUPERUSER_PASSWORD: "masina"
+        run: |
+          python manage.py migrate
+          python manage.py createsuperuser --no-input --username ${{ env.POSTGRES_USER }} --email ${{ env.EMAIL }}
+          pytest -vv
 
 
       - name: docker login
