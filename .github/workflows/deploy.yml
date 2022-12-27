@@ -56,7 +56,7 @@ jobs:
           SUPERUSER_EMAIL: amadeuscam@yahoo.es
 
         run: |
-          psql -h localhost -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} < test_database.sql
+          python manage.py collectstatic --noinput
           pytest -vv
 
 
