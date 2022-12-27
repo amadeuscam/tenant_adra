@@ -50,8 +50,9 @@ jobs:
           DJANGO_SETTINGS_MODULE: 'adra_project.settings.dev'
           DJANGO_SUPERUSER_PASSWORD: "masina"
         run: |
-          python manage.py createsuperuser --no-input --username ${{ env.POSTGRES_USER }} --email ${{ env.EMAIL }}
           python manage.py migrate
+          python manage.py createsuperuser --no-input --username ${{ env.POSTGRES_USER }} --email ${{ env.EMAIL }}
+          
 
       - name: Test with pytest
         env:
