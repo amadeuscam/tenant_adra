@@ -8,24 +8,6 @@ jobs:
   build:
     name: Build Image
     runs-on: ubuntu-latest
-    env:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
-      POSTGRES_HOST: localhost # default host value for the database
-      POSTGRES_DB: adra_tenant_new
-      POSTGRES_PORT: 5432
-
-    services:
-      postgres:
-        image: postgres:12
-        env:
-          POSTGRES_USER: ${{ env.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
-          POSTGRES_DB: ${{ env.POSTGRES_DB }}
-        ports:
-          - 5432:5432
-        # needed because the postgres container does not provide a healthcheck
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
       - uses: actions/checkout@v2
@@ -42,15 +24,8 @@ jobs:
       - name: Test with pytest
         env:
           DEBUG: 1
-          MYSQL_USER: ${{ env.POSTGRES_USER }}
-          MYSQL_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
-          MYSQL_HOST: ${{ env.POSTGRES_HOST }}
-          DATABASE_NAME: ${{ env.POSTGRES_DB }}
           SECRET_KEY: ${{ secrets.SECRET_KEY_TEST }}
           DJANGO_SETTINGS_MODULE: 'adra_project.settings.dev'
-          EMAIL: "a@test.com"
-          DJANGO_SUPERUSER_PASSWORD: "masina"
-          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
           SUPERUSER_NAME: lucian
           SUPERUSER_PASSWORD: masina
           SUPERUSER_EMAIL: amadeuscam@yahoo.es
