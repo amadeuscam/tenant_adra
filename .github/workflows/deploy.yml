@@ -51,7 +51,6 @@ jobs:
           EMAIL: "a@test.com"
           DJANGO_SUPERUSER_PASSWORD: "masina"
         run: |
-#          python manage.py createsuperuser --no-input --username ${{ env.POSTGRES_USER }} --email ${{ env.EMAIL }}
           pytest -vv
 
 
