@@ -1,6 +1,7 @@
 import functools
 import io
 import json
+import re
 from datetime import date, datetime
 
 import pytest
@@ -25,7 +26,8 @@ class TestViews(TenantTestCase):
 
     @pytest.fixture(autouse=True)
     def use_benefiario_fixture(self, familiares, alimentos, almacen_alimentos, beneficario_glb, beneficiario_json,
-                               alimentos_json, almacen_alimentos_json, familiar_json, beneficario):
+                               alimentos_json, almacen_alimentos_json, familiar_json, beneficario, aliments_a_repatir,
+                               aliments_a_repatir_json_post, capsys):
         self.beneficario = beneficario
         self.familiar = familiares
         self.alimentos = alimentos
@@ -35,6 +37,9 @@ class TestViews(TenantTestCase):
         self.alimentos_json = alimentos_json
         self.almacen_alimentos_json = almacen_alimentos_json
         self.familiar_json = familiar_json
+        self.aliments_a_repatir = aliments_a_repatir
+        self.aliments_a_repatir_json_post = aliments_a_repatir_json_post
+        self.capsys = capsys
 
     @classmethod
     def setup_tenant(cls, tenant):
@@ -51,7 +56,7 @@ class TestViews(TenantTestCase):
         self.client = TenantClient(self.tenant)
         self.client.login(username='lucian', password='masina')
         self.beneficario_inst = self.beneficario.create(id=1)
-        self.familiar_inst = self.familiar.create(id=1)
+        # self.familiar_inst = self.familiar.create(id=1)
 
         # self.user = User.objects.get(id=1)
 
@@ -111,8 +116,99 @@ class TestViews(TenantTestCase):
 
     def test_adauga_alimentos_persona_get(self):
         self.almacen_alimentos.create(pk=1)
+        self.aliments_a_repatir.create(pk=1)
+        self.familiar.create()
+
         response = self.client.get(reverse('adra:alimentos-create', kwargs={"pk": self.beneficario_inst.pk}))
+        for index in range(1, 14):
+            value = int(re.findall(r'\d+', str(response.context["form"][f"alimento_{index}"]))[1])
+            if index in [10, 11]:
+                assert value == 3
+            else:
+                assert value == 6
         assert response.status_code == 200
+
+    def test_adauga_alimentos_persona_fullfill_unit(self):
+        self.almacen_alimentos.create(pk=1)
+        self.aliments_a_repatir.create(pk=1)
+        for d in range(3):
+            self.familiar.create(fecha_nacimiento=f"199{d}-01-27", nombre_apellido=f"Mercedes{d}")
+
+        response = self.client.get(reverse('adra:alimentos-create', kwargs={"pk": self.beneficario_inst.pk}))
+        for index in range(1, 14):
+            value = int(re.findall(r'\d+', str(response.context["form"][f"alimento_{index}"]))[1])
+            print(index, value)
+            if index in [10, 11]:
+                assert value == 0
+            else:
+                assert value == 12
+        assert response.status_code == 200
+
+    def test_adauga_alimentos_persona_fullfill_family(self):
+        self.almacen_alimentos.create(pk=1)
+        self.aliments_a_repatir.create(pk=1,
+                                       alimento_1_type="familia",
+                                       alimento_1_0_3=3,
+                                       alimento_1_4_6=5,
+                                       alimento_1_7_9=9,
+                                       alimento_2_type="familia",
+                                       alimento_2_0_3=1,
+                                       alimento_2_4_6=3,
+                                       alimento_2_7_9=6,
+                                       )
+        for d in range(2):
+            self.familiar.create(fecha_nacimiento=f"199{d}-01-01", nombre_apellido=f"Mercedes{d}")
+
+        response_03 = self.client.get(reverse('adra:alimentos-create', kwargs={"pk": self.beneficario_inst.pk}))
+        for index in range(1, 14):
+            value = int(re.findall(r'\d+', str(response_03.context["form"][f"alimento_{index}"]))[1])
+            print(index, value)
+            if index in [10, 11]:
+                assert value == 0
+            else:
+                if index == 1:
+                    assert value == 3
+                if index == 2:
+                    assert value == 1
+        assert response_03.status_code == 200
+
+        for d in range(3):
+            self.familiar.create(fecha_nacimiento=f"199{d}-01-01", nombre_apellido=f"Mercedesz{d}")
+
+        response_4_6 = self.client.get(reverse('adra:alimentos-create', kwargs={"pk": self.beneficario_inst.pk}))
+        for index in range(1, 14):
+            value = int(re.findall(r'\d+', str(response_4_6.context["form"][f"alimento_{index}"]))[1])
+            print(index, value)
+            if index in [10, 11]:
+                assert value == 0
+            else:
+                if index == 1:
+                    assert value == 5
+                if index == 2:
+                    assert value == 3
+        assert response_4_6.status_code == 200
+
+        for d in range(4):
+            self.familiar.create(fecha_nacimiento=f"199{d}-01-01", nombre_apellido=f"Mercedeszd{d}")
+
+        response_7_x = self.client.get(reverse('adra:alimentos-create', kwargs={"pk": self.beneficario_inst.pk}))
+        for index in range(1, 14):
+            value = int(re.findall(r'\d+', str(response_7_x.context["form"][f"alimento_{index}"]))[1])
+            print(index, value)
+            if index in [10, 11]:
+                assert value == 0
+            else:
+                if index == 1:
+                    assert value == 9
+                if index == 2:
+                    assert value == 6
+        assert response_7_x.status_code == 200
+
+        for d in range(6):
+            self.familiar.create(fecha_nacimiento=f"199{d}-01-01", nombre_apellido=f"Mercedeszd{d}")
+
+        response_invalid = self.client.get(reverse('adra:alimentos-create', kwargs={"pk": self.beneficario_inst.pk}))
+        assert response_invalid.status_code == 200
 
     def test_adauga_alimentos_persona_post_without_signature(self):
         self.almacen_alimentos.create(pk=1)
@@ -154,7 +250,8 @@ class TestViews(TenantTestCase):
         assert response_get_with_context.status_code == 200
 
     def test_delete_familiar(self):
-        response = self.client.post(reverse('adra:hijo-delete', kwargs={"pk": self.familiar_inst.pk}))
+        familiar = self.familiar.create(id=1)
+        response = self.client.post(reverse('adra:hijo-delete', kwargs={"pk": familiar.pk}))
         assert response.status_code == 302
 
     def test_anadir_familiar(self):
@@ -167,11 +264,12 @@ class TestViews(TenantTestCase):
 
     def test_update_familiar(self):
         self.familiar_json.update({'dni': 'x0540000q', 'discapacidad': True})
-        response = self.client.post(reverse('adra:hijo-update', kwargs={"pk": self.familiar_inst.pk}),
+        familiar = self.familiar.create(id=1)
+        response = self.client.post(reverse('adra:hijo-update', kwargs={"pk": familiar.pk}),
                                     data=self.familiar_json, flow=True)
         assert response.status_code == 302
 
-        response_get_context = self.client.get(reverse('adra:hijo-update', kwargs={"pk": self.familiar_inst.pk}))
+        response_get_context = self.client.get(reverse('adra:hijo-update', kwargs={"pk": familiar.pk}))
         assert response_get_context.context_data["up"] == "update"
         assert response_get_context.status_code == 200
 
@@ -186,6 +284,7 @@ class TestViews(TenantTestCase):
         assert response_no_activos.status_code == 200
 
     def test_statistics_beneficarios(self):
+        self.familiar.create(id=1)
         response_get = self.client.get(reverse('adra:statistics-personas'))
         ds = {'total_per_mujer_02': 1,
               'total_per_mujer_03': 0,
@@ -383,6 +482,12 @@ class TestViews(TenantTestCase):
         assert response.status_code == 200
 
     def test_configuracion_front(self):
+        self.aliments_a_repatir.create(pk=1)
+        alm_repatir = self.aliments_a_repatir_json_post
+        del alm_repatir["modificado_por"]
+        alm_repatir["form_reparto"] = ''
+        print(self.aliments_a_repatir_json_post)
+
         response_get = self.client.get(reverse('adra:configuracion'))
         assert response_get.status_code == 200
 
@@ -418,3 +523,24 @@ class TestViews(TenantTestCase):
         assert len(response_ingestra_fraud.json()["usuarios_fraud"]) == 3
         # print(response_ingesta.json())
         # print(response_ingestra_fraud.json())
+
+        response_post_alimentos_repartir = self.client.post(reverse('adra:configuracion'), data=alm_repatir)
+        assert response_post_alimentos_repartir.status_code == 302
+        # for index, (key, value) in enumerate(start=1, alm_repatir.items()):
+        del alm_repatir["form_reparto"]
+        for index in range(1, 14):
+            assert alm_repatir[f"alimento_{index}"] == 3
+            assert alm_repatir[f"alimento_{index}_type"] == "unidad"
+            assert alm_repatir[f"alimento_{index}_0_3"] == 3
+            assert alm_repatir[f"alimento_{index}_4_6"] == 3
+            assert alm_repatir[f"alimento_{index}_7_9"] == 3
+            # print(alm_repatir[f"alimento_{index}"])
+            # print(alm_repatir[f"alimento_{index}_type"])
+            # print(alm_repatir[f"alimento_{index}_0_3"])
+            # print(alm_repatir[f"alimento_{index}_4_6"])
+            # print(alm_repatir[f"alimento_{index}_7_9"])
+            # print(dir(response_post_alimentos_repartir))
+        # print(response_post_alimentos_repartir)
+        # print(response_post_alimentos_repartir.request)
+        # print(response_post_alimentos_repartir.flush)
+        # print(response_post_alimentos_repartir.items)

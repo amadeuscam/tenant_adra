@@ -29,8 +29,8 @@ from adra.utils.adra_util import AdraUtils, DeliverySheet, ValoracionSocial, Age
 from delegaciones.models import BeneficiariosGlobales, Delegaciones
 from .filters import AlimentosFilters
 from .forms import (AlimentosFrom, AlmacenAlimentosFrom, DelegacionForm,
-                    HijoForm, PersonaForm, ProfileEditForm, UserEditForm)
-from .models import Alimentos, AlmacenAlimentos, Hijo, Persona
+                    HijoForm, PersonaForm, ProfileEditForm, UserEditForm, AlimentosRepatrirForm)
+from .models import Alimentos, AlmacenAlimentos, Hijo, Persona, AlimentosRepatir
 from .serializers import (AlacenAlimentosSerializer, PersonaSerializer,
                           UserSerializer)
 from threading import Thread
@@ -229,7 +229,38 @@ def adauga_alimentos_persona(request, pk):
             return redirect(persona)
 
     else:
-        a_form = AlimentosFrom()
+        alm_repatir = AlimentosRepatir.objects.get(pk=1)
+        # print(alm_repatir.alimento_1)
+        # print(alm_repatir.alimento_1_type)
+        init_reparto_alimento = {}
+        for index in range(1, 14):
+            if getattr(alm_repatir, f"alimento_{index}_type") == "unidad":
+                # print("baby", len([fam for fam in persona.hijo.all() if fam.age <= 3]))
+                babys = len([fam for fam in persona.hijo.all() if fam.age <= 3])
+                if babys > 0 and index in [10, 11]:
+                    init_reparto_alimento[f"alimento_{index}"] = (getattr(alm_repatir, f"alimento_{index}") * babys)
+                    continue
+                else:
+                    if index in [10, 11]:
+                        init_reparto_alimento[f"alimento_{index}"] = 0
+                        continue
+                init_reparto_alimento[f"alimento_{index}"] = (getattr(alm_repatir,
+                                                                      f"alimento_{index}") * persona.numero_beneficiarios)
+            else:
+                print("familiares")
+                print("index", index)
+                print("persona.numero_beneficiarios", persona.numero_beneficiarios)
+                print(getattr(alm_repatir, f"alimento_{index}_0_3"))
+                if 0 <= persona.numero_beneficiarios <= 3:
+                    init_reparto_alimento[f"alimento_{index}"] = getattr(alm_repatir, f"alimento_{index}_0_3")
+                elif 4 <= persona.numero_beneficiarios <= 6:
+                    init_reparto_alimento[f"alimento_{index}"] = getattr(alm_repatir, f"alimento_{index}_4_6")
+                elif 7 <= persona.numero_beneficiarios <= 10:
+                    init_reparto_alimento[f"alimento_{index}"] = getattr(alm_repatir, f"alimento_{index}_7_9")
+                else:
+                    print("ninguna es correcta")
+        print(init_reparto_alimento) # no tocar, es para los test esto
+        a_form = AlimentosFrom(initial=init_reparto_alimento)
     return render(request, "adra/alimentos_form.html", {"form": a_form})
 
 
@@ -1006,6 +1037,21 @@ def configuracion(request):
         return JsonResponse({"usuarios_fraud": list(upload_payess)})
 
     if request.method == "POST":
+        print(request.POST)
+        if "form_reparto" in request.POST.keys():
+            pst = request.POST.copy()
+            del pst["form_reparto"]
+            alm_repatir = AlimentosRepatir.objects.get(pk=1)
+            form = AlimentosRepatrirForm(pst, instance=alm_repatir)
+            # check whether it's valid:
+            if form.is_valid():
+                print("is valid")
+                alm_rpt = form.save(commit=False)
+                alm_rpt.modificado_por = request.user
+                alm_rpt.save()
+                messages.success(request, "La configuraciòn se ha guardado correctamente ")
+                return redirect("adra:configuracion")
+
         if "reset_papeles" in request.POST:
             persona = Persona.objects.all()
             print("cambiar el estado de los papeles")
@@ -1022,6 +1068,8 @@ def configuracion(request):
                 p.save()
             messages.success(request, "La tarea se ha relizado correctamente ")
             return redirect("adra:configuracion")
+
+
         else:
             form = DelegacionForm(request.POST)
             # check whether it's valid:
@@ -1050,10 +1098,6 @@ def configuracion(request):
 
     else:
 
-        path = os.path.join(
-            os.path.abspath("source_files"), "2022NotaEntregacalculadora.xlsx"
-        )
-
         delegaciones = Delegaciones.objects.get(pk=request.tenant.pk)
         delegacion_form = DelegacionForm(
             initial={
@@ -1065,9 +1109,23 @@ def configuracion(request):
                 "provincia": delegaciones.provincia,
             }
         )
-        # print(delegaciones)
+
+        alm_repatir = AlimentosRepatir.objects.get(pk=1)
+        init_reparto_alimento = {}
+        for index in range(1, 14):
+            init_reparto_alimento[f"alimento_{index}"] = getattr(alm_repatir, f"alimento_{index}")
+            init_reparto_alimento[f"alimento_{index}_type"] = getattr(alm_repatir, f"alimento_{index}_type")
+            init_reparto_alimento[f"alimento_{index}_0_3"] = getattr(alm_repatir, f"alimento_{index}_0_3")
+            init_reparto_alimento[f"alimento_{index}_4_6"] = getattr(alm_repatir, f"alimento_{index}_4_6")
+            init_reparto_alimento[f"alimento_{index}_7_9"] = getattr(alm_repatir, f"alimento_{index}_7_9")
+
+        alimentos_a_repatir_form = AlimentosRepatrirForm(initial=init_reparto_alimento)
         return render(
             request,
             "acciones/index.html",
-            {"nbar": "acciones", "delegacion_form": delegacion_form},
+            {
+                "nbar": "acciones",
+                "delegacion_form": delegacion_form,
+                "alimentos_repatir": alimentos_a_repatir_form
+            },
         )

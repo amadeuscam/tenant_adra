@@ -292,3 +292,44 @@ SENDGRID_CHANGE_PASSWORD_TEMPLATE_ID = os.environ.get("SENDGRID_CHANGE_PASSWORD_
 #             'PORT': 5432,
 #         }
 #     }
+ALIMENTOS_METADATA = {
+    "alimento_1": {
+        "name": "Arroz Blanco"
+    },
+    "alimento_2": {
+        "name": "Alubia cocida"
+    },
+    "alimento_3": {
+        "name": "Conserva de atún"
+    },
+    "alimento_4": {
+        "name": "Pasta alimenticia tipo macarron"
+    },
+    "alimento_5": {
+        "name": "Tomate frito en conserva"
+    },
+    "alimento_6": {
+        "name": "Galletas"
+    },
+    "alimento_7": {
+        "name": "Macedonia de verduras en conserva"
+    },
+    "alimento_8": {
+        "name": "Fruta en conserva"
+    },
+    "alimento_9": {
+        "name": "Cacao soluble"
+    },
+    "alimento_10": {
+        "name": "Tarritos infantiles con pollo"
+    },
+    "alimento_11": {
+        "name": "Tarritos infantiles de fruta"
+    },
+    "alimento_12": {
+        "name": "Leche entera UHT"
+    },
+    "alimento_13": {
+        "name": "Aceite de oliva"
+    },
+}

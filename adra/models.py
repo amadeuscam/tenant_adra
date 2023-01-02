@@ -6,6 +6,7 @@ from django.core.validators import validate_email
 from django.db import models
 from django.urls import reverse
 from jsignature.fields import JSignatureField
+from django.conf import settings
 
 
 class Persona(models.Model):
@@ -371,3 +372,93 @@ class Profile(models.Model):
 
     def __str__(self):
         return f"Profile for user {self.user.username}"
+
+
+class AlimentosRepatir(models.Model):
+    TIPO = (("unidad", "Unidad"), ("familia", "Familia"))
+
+    alimento_1 = models.IntegerField(default=0, verbose_name=settings.ALIMENTOS_METADATA["alimento_1"]["name"])
+    alimento_1_type = models.CharField(choices=TIPO, max_length=21, default="unidad", verbose_name='Entrega')
+    alimento_1_0_3 = models.IntegerField(default=0, verbose_name="Rango 0-3 familia")
+    alimento_1_4_6 = models.IntegerField(default=0, verbose_name="Rango 4-6 familia")
+    alimento_1_7_9 = models.IntegerField(default=0, verbose_name="Rango 7-9 familia")
+
+    alimento_2 = models.IntegerField(default=0, verbose_name=settings.ALIMENTOS_METADATA["alimento_2"]["name"])
+    alimento_2_type = models.CharField(choices=TIPO, max_length=20, default="unidad", verbose_name='Entrega')
+    alimento_2_0_3 = models.IntegerField(default=0, verbose_name="Rango 0-3 familia")
+    alimento_2_4_6 = models.IntegerField(default=0, verbose_name="Rango 4-6 familia")
+    alimento_2_7_9 = models.IntegerField(default=0, verbose_name="Rango 7-9 familia")
+
+    alimento_3 = models.IntegerField(default=0, verbose_name=settings.ALIMENTOS_METADATA["alimento_3"]["name"])
+    alimento_3_type = models.CharField(choices=TIPO, max_length=20, default="unidad", verbose_name='Entrega')
+    alimento_3_0_3 = models.IntegerField(default=0, verbose_name="Rango 0-3 familia")
+    alimento_3_4_6 = models.IntegerField(default=0, verbose_name="Rango 4-6 familia")
+    alimento_3_7_9 = models.IntegerField(default=0, verbose_name="Rango 7-9 familia")
+
+    alimento_4 = models.IntegerField(default=0, verbose_name=settings.ALIMENTOS_METADATA["alimento_4"]["name"])
+    alimento_4_type = models.CharField(choices=TIPO, max_length=20, default="unidad", verbose_name='Entrega')
+    alimento_4_0_3 = models.IntegerField(default=0, verbose_name="Rango 0-3 familia")
+    alimento_4_4_6 = models.IntegerField(default=0, verbose_name="Rango 4-6 familia")
+    alimento_4_7_9 = models.IntegerField(default=0, verbose_name="Rango 7-9 familia")
+
+    alimento_5 = models.IntegerField(default=0, verbose_name=settings.ALIMENTOS_METADATA["alimento_5"]["name"])
+    alimento_5_type = models.CharField(choices=TIPO, max_length=20, default="unidad", verbose_name='Entrega')
+    alimento_5_0_3 = models.IntegerField(default=0, verbose_name="Rango 0-3 familia")
+    alimento_5_4_6 = models.IntegerField(default=0, verbose_name="Rango 4-6 familia")
+    alimento_5_7_9 = models.IntegerField(default=0, verbose_name="Rango 7-9 familia")
+
+    alimento_6 = models.IntegerField(default=0, verbose_name=settings.ALIMENTOS_METADATA["alimento_6"]["name"])
+    alimento_6_type = models.CharField(choices=TIPO, max_length=20, default="unidad", verbose_name='Entrega')
+    alimento_6_0_3 = models.IntegerField(default=0, verbose_name="Rango 0-3 familia")
+    alimento_6_4_6 = models.IntegerField(default=0, verbose_name="Rango 4-6 familia")
+    alimento_6_7_9 = models.IntegerField(default=0, verbose_name="Rango 7-9 familia")
+
+    alimento_7 = models.IntegerField(default=0, verbose_name=settings.ALIMENTOS_METADATA["alimento_7"]["name"])
+    alimento_7_type = models.CharField(choices=TIPO, max_length=20, default="unidad", verbose_name='Entrega')
+    alimento_7_0_3 = models.IntegerField(default=0, verbose_name="Rango 0-3 familia")
+    alimento_7_4_6 = models.IntegerField(default=0, verbose_name="Rango 4-6 familia")
+    alimento_7_7_9 = models.IntegerField(default=0, verbose_name="Rango 7-9 familia")
+
+    alimento_8 = models.IntegerField(default=0, verbose_name=settings.ALIMENTOS_METADATA["alimento_8"]["name"])
+    alimento_8_type = models.CharField(choices=TIPO, max_length=20, default="unidad", verbose_name='Entrega')
+    alimento_8_0_3 = models.IntegerField(default=0, verbose_name="Rango 0-3 familia")
+    alimento_8_4_6 = models.IntegerField(default=0, verbose_name="Rango 4-6 familia")
+    alimento_8_7_9 = models.IntegerField(default=0, verbose_name="Rango 7-9 familia")
+
+    alimento_9 = models.IntegerField(default=0, verbose_name=settings.ALIMENTOS_METADATA["alimento_9"]["name"])
+    alimento_9_type = models.CharField(choices=TIPO, max_length=20, default="unidad", verbose_name='Entrega')
+    alimento_9_0_3 = models.IntegerField(default=0, verbose_name="Rango 0-3 familia")
+    alimento_9_4_6 = models.IntegerField(default=0, verbose_name="Rango 4-6 familia")
+    alimento_9_7_9 = models.IntegerField(default=0, verbose_name="Rango 7-9 familia")
+
+    alimento_10 = models.IntegerField(default=0, verbose_name=settings.ALIMENTOS_METADATA["alimento_10"]["name"])
+    alimento_10_type = models.CharField(choices=TIPO, max_length=20, default="unidad", verbose_name='Entrega')
+    alimento_10_0_3 = models.IntegerField(default=0, verbose_name="Rango 0-3 familia")
+    alimento_10_4_6 = models.IntegerField(default=0, verbose_name="Rango 4-6 familia")
+    alimento_10_7_9 = models.IntegerField(default=0, verbose_name="Rango 7-9 familia")
+
+    alimento_11 = models.IntegerField(default=0, verbose_name=settings.ALIMENTOS_METADATA["alimento_11"]["name"])
+    alimento_11_type = models.CharField(choices=TIPO, max_length=20, default="unidad", verbose_name='Entrega')
+    alimento_11_0_3 = models.IntegerField(default=0, verbose_name="Rango 0-3 familia")
+    alimento_11_4_6 = models.IntegerField(default=0, verbose_name="Rango 4-6 familia")
+    alimento_11_7_9 = models.IntegerField(default=0, verbose_name="Rango 7-9 familia")
+
+    alimento_12 = models.IntegerField(default=0, verbose_name=settings.ALIMENTOS_METADATA["alimento_12"]["name"])
+    alimento_12_type = models.CharField(choices=TIPO, max_length=20, default="unidad", verbose_name='Entrega')
+    alimento_12_0_3 = models.IntegerField(default=0, verbose_name="Rango 0-3 familia")
+    alimento_12_4_6 = models.IntegerField(default=0, verbose_name="Rango 4-6 familia")
+    alimento_12_7_9 = models.IntegerField(default=0, verbose_name="Rango 7-9 familia")
+
+    alimento_13 = models.IntegerField(default=0, verbose_name=settings.ALIMENTOS_METADATA["alimento_13"]["name"])
+    alimento_13_type = models.CharField(choices=TIPO, max_length=20, default="unidad", verbose_name='Entrega')
+    alimento_13_0_3 = models.IntegerField(default=0, verbose_name="Rango 0-3 familia")
+    alimento_13_4_6 = models.IntegerField(default=0, verbose_name="Rango 4-6 familia")
+    alimento_13_7_9 = models.IntegerField(default=0, verbose_name="Rango 7-9 familia")
+
+    modificado_por = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Alimento a Repatir"
+        verbose_name_plural = "Alimentos a Repatir"

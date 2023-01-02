@@ -1,12 +1,18 @@
 from django.conf import settings
 from django.contrib import admin
 
-from .models import Alimentos, AlmacenAlimentos, Hijo, Persona, Profile
+from .models import Alimentos, AlmacenAlimentos, Hijo, Persona, Profile, AlimentosRepatir
 
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ["user", "date_of_birth"]
+
+
+@admin.register(AlimentosRepatir)
+class ProfileAdmin(admin.ModelAdmin):
+    list_per_page = 50
+    # list_display = ["user", "date_of_birth"]
 
 
 class HijoInline(admin.TabularInline):

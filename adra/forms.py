@@ -4,7 +4,7 @@ from django.forms import DateInput, EmailInput, Form, ModelForm
 from jsignature.forms import JSignatureField
 from jsignature.widgets import JSignatureWidget
 
-from .models import Alimentos, AlmacenAlimentos, Hijo, Persona, Profile
+from .models import Alimentos, AlmacenAlimentos, Hijo, Persona, Profile, AlimentosRepatir
 
 
 class AlimentosFrom(ModelForm):
@@ -355,3 +355,88 @@ class SignupForm(Form):
         user.first_name = self.cleaned_data["first_name"]
         user.last_name = self.cleaned_data["last_name"]
         user.save()
+
+
+class AlimentosRepatrirForm(ModelForm):
+    class Meta:
+        model = AlimentosRepatir
+        fields = (
+            "alimento_1",
+            "alimento_1_0_3",
+            "alimento_1_4_6",
+            "alimento_1_7_9",
+
+            "alimento_2",
+            "alimento_2_0_3",
+            "alimento_2_4_6",
+            "alimento_2_7_9",
+
+            "alimento_3",
+            "alimento_3_0_3",
+            "alimento_3_4_6",
+            "alimento_3_7_9",
+
+            "alimento_4",
+            "alimento_4_0_3",
+            "alimento_4_4_6",
+            "alimento_4_7_9",
+
+            "alimento_5",
+            "alimento_5_0_3",
+            "alimento_5_4_6",
+            "alimento_5_7_9",
+
+            "alimento_6",
+            "alimento_6_0_3",
+            "alimento_6_4_6",
+            "alimento_6_7_9",
+
+            "alimento_7",
+            "alimento_7_0_3",
+            "alimento_7_4_6",
+            "alimento_7_7_9",
+
+            "alimento_8",
+            "alimento_8_0_3",
+            "alimento_8_4_6",
+            "alimento_8_7_9",
+
+            "alimento_9",
+            "alimento_9_0_3",
+            "alimento_9_4_6",
+            "alimento_9_7_9",
+
+            "alimento_10",
+            "alimento_10_0_3",
+            "alimento_10_4_6",
+            "alimento_10_7_9",
+
+            "alimento_11",
+            "alimento_11_0_3",
+            "alimento_11_4_6",
+            "alimento_11_7_9",
+
+            "alimento_12",
+            "alimento_12_0_3",
+            "alimento_12_4_6",
+            "alimento_12_7_9",
+
+            "alimento_13",
+            "alimento_13_0_3",
+            "alimento_13_4_6",
+            "alimento_13_7_9",
+
+            "alimento_1_type",
+            "alimento_2_type",
+            "alimento_3_type",
+            "alimento_4_type",
+            "alimento_5_type",
+            "alimento_6_type",
+            "alimento_7_type",
+            "alimento_8_type",
+            "alimento_9_type",
+            "alimento_10_type",
+            "alimento_11_type",
+            "alimento_12_type",
+            "alimento_13_type",
+        )

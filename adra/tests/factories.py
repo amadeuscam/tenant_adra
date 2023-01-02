@@ -2,10 +2,11 @@ from datetime import date
 
 import factory
 from faker import Faker
-from adra.models import Persona, Hijo, Alimentos, AlmacenAlimentos, Profile
+from adra.models import Persona, Hijo, Alimentos, AlmacenAlimentos, Profile, AlimentosRepatir
 from faker import Factory as FakerFactory
 
 from delegaciones.models import BeneficiariosGlobales
+from django.contrib.auth import get_user_model
 
 
 # fake = Faker()
@@ -114,7 +115,6 @@ class AlimentosFactory(factory.django.DjangoModelFactory):
     persona = factory.SubFactory(PersonaFactory)
 
 
-
 class BeneficiarioGlobalFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = BeneficiariosGlobales
@@ -126,3 +126,80 @@ class BeneficiarioGlobalFactory(factory.django.DjangoModelFactory):
     provincia = "Madrid"
     telefono = 000000000
     nombre_beneficiario = "sdasW32dasdas"
+
+
+class UserFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = get_user_model()
+
+
+class AlimentosRepatirFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = AlimentosRepatir
+
+    alimento_1 = 3
+    alimento_1_type = "unidad"
+    alimento_1_0_3 = 3
+    alimento_1_4_6 = 3
+    alimento_1_7_9 = 3
+    alimento_2 = 3
+    alimento_2_type = "unidad"
+    alimento_2_0_3 = 3
+    alimento_2_4_6 = 3
+    alimento_2_7_9 = 3
+    alimento_3 = 3
+    alimento_3_type = "unidad"
+    alimento_3_0_3 = 3
+    alimento_3_4_6 = 3
+    alimento_3_7_9 = 3
+    alimento_4 = 3
+    alimento_4_type = "unidad"
+    alimento_4_0_3 = 3
+    alimento_4_4_6 = 3
+    alimento_4_7_9 = 3
+    alimento_5 = 3
+    alimento_5_type = "unidad"
+    alimento_5_0_3 = 3
+    alimento_5_4_6 = 3
+    alimento_5_7_9 = 3
+    alimento_6 = 3
+    alimento_6_type = "unidad"
+    alimento_6_0_3 = 3
+    alimento_6_4_6 = 3
+    alimento_6_7_9 = 3
+    alimento_7 = 3
+    alimento_7_type = "unidad"
+    alimento_7_0_3 = 3
+    alimento_7_4_6 = 3
+    alimento_7_7_9 = 3
+    alimento_8 = 3
+    alimento_8_type = "unidad"
+    alimento_8_0_3 = 3
+    alimento_8_4_6 = 3
+    alimento_8_7_9 = 3
+    alimento_9 = 3
+    alimento_9_type = "unidad"
+    alimento_9_0_3 = 3
+    alimento_9_4_6 = 3
+    alimento_9_7_9 = 3
+    alimento_10 = 3
+    alimento_10_type = "unidad"
+    alimento_10_0_3 = 3
+    alimento_10_4_6 = 3
+    alimento_10_7_9 = 3
+    alimento_11 = 3
+    alimento_11_type = "unidad"
+    alimento_11_0_3 = 3
+    alimento_11_4_6 = 3
+    alimento_11_7_9 = 3
+    alimento_12 = 3
+    alimento_12_type = "unidad"
+    alimento_12_0_3 = 3
+    alimento_12_4_6 = 3
+    alimento_12_7_9 = 3
+    alimento_13 = 3
+    alimento_13_type = "unidad"
+    alimento_13_0_3 = 3
+    alimento_13_4_6 = 3
+    alimento_13_7_9 = 3
+    modificado_por = factory.SubFactory(UserFactory)
