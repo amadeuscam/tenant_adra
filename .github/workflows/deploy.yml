@@ -13,7 +13,7 @@ jobs:
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
       POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }} # default host value for the database
       POSTGRES_DB: ${{ secrets.SQL_DATABASE }}
-      POSTGRES_PORT: ${{ secrets.SQL_PORT }}
+      POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
 
     services:
       postgres:
@@ -42,11 +42,11 @@ jobs:
         env:
           DEBUG: 1
           SQL_ENGINE: ${{ secrets.SQL_ENGINE }}
-          SQL_USER: ${{ secrets.SQL_USER }}
-          SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
-          SQL_HOST: ${{ secrets.SQL_HOST }}
+          SQL_USER: ${{ secrets.POSTGRES_USER }}
+          SQL_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          SQL_HOST: ${{ secrets.POSTGRES_HOST }}
           SQL_DATABASE: ${{ secrets.SQL_DATABASE }}
-          SQL_PORT: ${{ secrets.SQL_PORT }}
+          SQL_PORT: ${{ secrets.POSTGRES_PORT }}
           SECRET_KEY: ${{ secrets.SECRET_KEY_TEST }}
           DJANGO_SETTINGS_MODULE: "adra_project.settings.dev"
           SUPERUSER_NAME: ${{ secrets.SUPERUSER_NAME }}
