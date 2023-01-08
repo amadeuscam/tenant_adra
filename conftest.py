@@ -1,13 +1,8 @@
-import pytest
-from adra.models import Alimentos, Persona, Hijo, AlmacenAlimentos, Profile
-from django.contrib.auth.models import User
-from datetime import datetime
 from datetime import date
-from django.utils import timezone
-
+import pytest
 from pytest_factoryboy import register
 from adra.tests.factories import (PersonaFactory, HijoFactory, AlmacenAlimentosFactory, AlimentosFactory,
-                                  BeneficiarioGlobalFactory, AlimentosRepatirFactory)
+                                  BeneficiarioGlobalFactory, AlimentosRepatirFactory, UserFactory)
 
 register(PersonaFactory)
 register(HijoFactory)
@@ -15,14 +10,13 @@ register(AlmacenAlimentosFactory)
 register(AlimentosFactory)
 register(BeneficiarioGlobalFactory)
 register(AlimentosRepatirFactory)
+register(UserFactory)
 
 
-# @pytest.fixture
-# def init_fam_ben(db, persona_factory, hijo_factory):
-#     familiar = hijo_factory.create()
-#     beneficario = persona_factory.create()
-#     return familiar, beneficario
-#
+@pytest.fixture
+def user_fa(user_factory):
+    return user_factory
+
 
 @pytest.fixture
 def beneficario(persona_factory):

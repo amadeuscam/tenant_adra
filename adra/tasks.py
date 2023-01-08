@@ -74,7 +74,7 @@ def check_caducidad_todas_delegaciones() -> str:
                     AlmacenAlimentos, number
                 )
                 print(producto, days)
-                if days in [37, 10, 0]:
+                if days in [36, 10, 0]:
                     if days == 0:
                         send_email_sendgrid(
                             producto, list_email, tenant, "ha caducado"

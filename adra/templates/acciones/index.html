@@ -4,655 +4,656 @@
 {% load static %}
 
 {% block title %}
-    Configuracion del centro de reparto
+Configuracion del centro de reparto
 {% endblock %}
 
 {% block content %}
-    <div class="row">
-        <div class="col-md-6 col-sm-12 "
-             style="border-right: 2px dotted dodgerblue;border-bottom: 2px dotted dodgerblue;">
-            <form action="{% url 'adra:configuracion' %}" method="post">
-                {% csrf_token %}
-                <h2 class="mb-5  ">Editar Informacion del centro de reparto</h2>
-                <div class="form-row">
-                    <div class="form-group col-md-4 mb-0">
-                        {{ delegacion_form.nombre |as_crispy_field }}
-                    </div>
-                    <div class="form-group col-md-4 mb-0">
-                        {{ delegacion_form.oar |as_crispy_field }}
-                    </div>
-
-                    <div class="form-group col-md-4 mb-0">
-                        {{ delegacion_form.codigo_postal |as_crispy_field }}
-                    </div>
-                    <div class="form-group col-md-4 mb-0">
-                        {{ delegacion_form.ciudad |as_crispy_field }}
-                    </div>
-                    <div class="form-group col-md-4 mb-0">
-                        {{ delegacion_form.calle |as_crispy_field }}
-                    </div>
-                    <div class="form-group col-md-4 mb-0">
-                        {{ delegacion_form.provincia |as_crispy_field }}
-                    </div>
+<div class="row">
+    <div class="col-md-6 col-sm-12 " style="border-right: 2px dotted dodgerblue;border-bottom: 2px dotted dodgerblue;">
+        <form action="{% url 'adra:configuracion' %}" method="post">
+            {% csrf_token %}
+            <h2 class="mb-5  ">Editar Informacion del centro de reparto</h2>
+            <div class="form-row">
+                <div class="form-group col-md-4 mb-0">
+                    {{ delegacion_form.nombre |as_crispy_field }}
+                </div>
+                <div class="form-group col-md-4 mb-0">
+                    {{ delegacion_form.oar |as_crispy_field }}
                 </div>
 
-
-                <input type="submit" class="btn btn-dark btn-block mt-3" value="Enviar">
-            </form>
-        </div>
-        <div class="col-md-6 col-sm-12 p-0">
-            <div class="col-md-12 col-sm-12" style="border-bottom: 2px dotted dodgerblue;padding-bottom: 1em;">
-                <h2 class="pb-3 mt-md-0 mt-sm-5"> Subir beneficiarios </h2>
-                <div class="alert alert-warning" role="alert">
-                    <b>No utilizar si ya tiene beneficarios!! </b>
+                <div class="form-group col-md-4 mb-0">
+                    {{ delegacion_form.codigo_postal |as_crispy_field }}
                 </div>
-                <div class="audio_file_upload  bg-light rounded-3 p-3">
-                    <div id="app">
-                        <div class="mb-3">
-                            <label for="formFile" class="form-label">Excel file</label>
-                            <input class="form-control" required type="file" id="formFile"
-                                   accept=".csv,.xlsm, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel.sheet.macroEnabled.12"
-                                   ref="file"
-                                   @change="selectFile( $event )">
-                        </div>
-
-                        <div class="center-all">
-                            <div class="col-2"></div>
-                            <button class="btn btn-dark   mb-3 col-5" :disabled="!excel_file" @click="upload">
-                                Upload
-                            </button>
-                        </div>
+                <div class="form-group col-md-4 mb-0">
+                    {{ delegacion_form.ciudad |as_crispy_field }}
+                </div>
+                <div class="form-group col-md-4 mb-0">
+                    {{ delegacion_form.calle |as_crispy_field }}
+                </div>
+                <div class="form-group col-md-4 mb-0">
+                    {{ delegacion_form.provincia |as_crispy_field }}
+                </div>
+            </div>
 
 
-                        <div class="progress mb-3" v-if="excel_file">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
-                                 :aria-valuenow="progress"
-                                 :style="'width:' +  progress + '%'"
-                                 aria-valuemin="0"
-                                 aria-valuemax="100">[[progress]]
-                            </div>
+            <input type="submit" class="btn btn-dark btn-block mt-3" value="Enviar">
+        </form>
+    </div>
+    <div class="col-md-6 col-sm-12 p-0">
+        <div class="col-md-12 col-sm-12" style="border-bottom: 2px dotted dodgerblue;padding-bottom: 1em;">
+            <h2 class="pb-3 mt-md-0 mt-sm-5"> Subir beneficiarios </h2>
+            <div class="alert alert-warning" role="alert">
+                <b>No utilizar si ya tiene beneficarios!! </b>
+            </div>
+            <div class="audio_file_upload  bg-light rounded-3 p-3">
+                <div id="app">
+                    <div class="mb-3">
+                        <label for="formFile" class="form-label">Excel file</label>
+                        <input class="form-control" required type="file" id="formFile"
+                            accept=".csv,.xlsm, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel.sheet.macroEnabled.12"
+                            ref="file" @change="selectFile( $event )">
+                    </div>
+
+                    <div class="center-all">
+                        <div class="col-2"></div>
+                        <button class="btn btn-dark   mb-3 col-5" :disabled="!excel_file" @click="upload">
+                            Upload
+                        </button>
+                    </div>
+
+
+                    <div class="progress mb-3" v-if="excel_file">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                            :aria-valuenow="progress" :style="'width:' +  progress + '%'" aria-valuemin="0"
+                            aria-valuemax="100">[[progress]]
                         </div>
-                        <div class="alert  " :class="'alert-'+ message.cls" v-for="message in messages"
-                             role="alert"
-                             v-if="messages.length > 0">
-                            [[ message.text]]
-                        </div>
-                        <table class="table" v-if="payees_fraud.length > 0">
-                            <thead>
+                    </div>
+                    <div class="alert  " :class="'alert-'+ message.cls" v-for="message in messages" role="alert"
+                        v-if="messages.length > 0">
+                        [[ message.text]]
+                    </div>
+                    <table class="table" v-if="payees_fraud.length > 0">
+                        <thead>
                             <tr>
                                 <th scope="col">Nombre</th>
                                 <th scope="col">Oar</th>
                             </tr>
-                            </thead>
-                            <tbody>
+                        </thead>
+                        <tbody>
                             <tr v-for="payees in payees_fraud">
                                 <th scope="row">[[payees.nombre]]</th>
                                 <td>[[payees.oar]]</td>
                             </tr>
-                            </tbody>
-                        </table>
+                        </tbody>
+                    </table>
 
-                    </div>
-
-                </div>
-            </div>
-            <div class="col-md-12 col-sm-12   mt-2" style="border-bottom: 2px dotted dodgerblue;">
-                <h2 class="mt-md-0 mt-sm-5">Resetear papeles beneficiarios</h2>
-                <a class="btn btn-warning mb-3 mt-3 " data-toggle="collapse" href="#collapseExample" role="button"
-                   aria-expanded="false" aria-controls="collapseExample">Confirmar</a>
-                <div class="collapse" id="collapseExample">
-                    <div class="card card-body">
-                        <div class="row">
-                            <div class="col-md-12 col-sm-12">
-                                <form action="{% url 'adra:configuracion' %}" method="post">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="reset_papeles" value="si" id="">
-                                    <h3>¿Estas seguro?</h3>
-                                    <input type="submit" value="Si,adelante" class="btn btn-outline btn-success mt-4">
-                                </form>
-                            </div>
-                        </div>
-
-                    </div>
                 </div>
 
             </div>
         </div>
-    </div>
-    <div class="col-md-12 col-sm-12 " style="border-bottom: 2px dotted dodgerblue;padding-bottom: 1em;">
-        <h2 class="pb-3 mt-md-4 mt-sm-5">Exportar Ficheros</h2>
-        <div class="row">
-            <div class="col-md-4  text-center  col-sm-12 center-all-ficheros border-ficheros">
-                <h3>Hojas de entrega</h3>
-                <div class="spinner" style="display: none"></div>
-                <div style="display: flex;align-items: center;justify-content: center;width: 50%">
-                    <a role="button" onclick="start_spinner('1')" class="btn btn-dark active"
-                       href="{% url 'adra:hoja_entrega_global' %}">
-                        Generar
-                    </a>
-                </div>
-
-            </div>
-            <div class="col-md-4   text-center col-sm-12 center-all-ficheros border-ficheros">
-                <h3>Listado beneficarios</h3>
-                <div class="spinner2" style="display: none"></div>
-                <div style="display: flex;align-items: center;justify-content: center;width: 50%">
-                    <a role="button" onclick="start_spinner('2')" class="btn btn-dark active"
-                       href="{% url 'adra:exportar-users-csv' %}">
-                        Generar
-                    </a>
+        <div class="col-md-12 col-sm-12   mt-2" style="border-bottom: 2px dotted dodgerblue;">
+            <h2 class="mt-md-0 mt-sm-5">Resetear papeles beneficiarios</h2>
+            <a class="btn btn-warning mb-3 mt-3 " data-toggle="collapse" href="#collapseExample" role="button"
+                aria-expanded="false" aria-controls="collapseExample">Confirmar</a>
+            <div class="collapse" id="collapseExample">
+                <div class="card card-body">
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12">
+                            <form action="{% url 'adra:configuracion' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="reset_papeles" value="si" id="">
+                                <h3>¿Estas seguro?</h3>
+                                <input type="submit" value="Si,adelante" class="btn btn-outline btn-success mt-4">
+                            </form>
+                        </div>
+                    </div>
 
                 </div>
             </div>
-            <div class="col-md-4   text-center col-sm-12 center-all-ficheros border-ficheros">
-                <h3>Valoraciones sociales</h3>
-                <div class="spinner3" style="display: none"></div>
-                <div style="display: flex;align-items: center;justify-content: center;width: 50%">
-                    <a role="button" onclick="start_spinner('3')" class="btn btn-dark active"
-                       href="{% url 'adra:valoracion_social' %}">
-                        Generar
-                    </a>
-
-                </div>
-            </div>
-
 
         </div>
     </div>
-    <div class="col-md-12 col-sm-12 mt-3"
-         style="border-right: 2px dotted dodgerblue;border-bottom: 2px dotted dodgerblue;">
-        {% if alimentos_repatir.subject.errors %}
-            <ol>
-                {% for error in alimentos_repatir.subject.errors %}
-                    <li><strong>{{ error|escape }}</strong></li>
-                {% endfor %}
-            </ol>
-        {% endif %}
-        <form action="{% url 'adra:configuracion' %}" method="post">
-            {% csrf_token %}
-            <h2 class="mb-5  ">Cantidades a repartir</h2>
-            <input type="hidden" name="form_reparto" id="">
-            <div class="form-row">
-                <div class="form-group col-md-6 mb-0">
-                    <div class="row">
-                        <div class="col-6">{{ alimentos_repatir.alimento_1 |as_crispy_field }}</div>
-                        <div class="col-6">{{ alimentos_repatir.alimento_1_type |as_crispy_field }}</div>
-                        <div class="collapse col-md-12 col-sm-12" id="collapsealimento1">
-                            <div class="card card-body">
-                                <div class="row">
-                                    <div class="col-4">{{ alimentos_repatir.alimento_1_0_3 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_1_4_6 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_1_7_9 |as_crispy_field }}</div>
-                                </div>
-                            </div>
-                        </div>
+</div>
+<div class="col-md-12 col-sm-12 " style="border-bottom: 2px dotted dodgerblue;padding-bottom: 1em;">
+    <h2 class="pb-3 mt-md-4 mt-sm-5">Exportar Ficheros</h2>
+    <div class="row">
+        <div class="col-md-4  text-center  col-sm-12 center-all-ficheros border-ficheros">
+            <h3>Hojas de entrega</h3>
+            <div class="spinner" style="display: none"></div>
+            <div style="display: flex;align-items: center;justify-content: center;width: 50%">
+                <a role="button" onclick="start_spinner('1')" class="btn btn-dark active"
+                    href="{% url 'adra:hoja_entrega_global' %}">
+                    Generar
+                </a>
+            </div>
 
-                    </div>
-                </div>
-                <hr>
-                <div class="form-group col-md-6 mb-0">
-                    <div class="row">
-                        <div class="col-6">{{ alimentos_repatir.alimento_2 |as_crispy_field }}</div>
-                        <div class="col-6">{{ alimentos_repatir.alimento_2_type |as_crispy_field }}</div>
-                        <div class="collapse col-md-12 col-sm-12" id="collapsealimento2">
-                            <div class="card card-body">
-                                <div class="row">
-                                    <div class="col-4">{{ alimentos_repatir.alimento_2_0_3 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_2_4_6 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_2_7_9 |as_crispy_field }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        </div>
+        <div class="col-md-4   text-center col-sm-12 center-all-ficheros border-ficheros">
+            <h3>Listado beneficarios</h3>
+            <div class="spinner2" style="display: none"></div>
+            <div style="display: flex;align-items: center;justify-content: center;width: 50%">
+                <a role="button" onclick="start_spinner('2')" class="btn btn-dark active"
+                    href="{% url 'adra:exportar-users-csv' %}">
+                    Generar
+                </a>
 
-                <div class="form-group col-md-6 mb-0">
-                    <div class="row">
-                        <div class="col-6">{{ alimentos_repatir.alimento_3 |as_crispy_field }}</div>
-                        <div class="col-6">{{ alimentos_repatir.alimento_3_type |as_crispy_field }}</div>
-                        <div class="collapse col-md-12 col-sm-12" id="collapsealimento3">
-                            <div class="card card-body">
-                                <div class="row">
-                                    <div class="col-4">{{ alimentos_repatir.alimento_3_0_3 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_3_4_6 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_3_7_9 |as_crispy_field }}</div>
-                                </div>
+            </div>
+        </div>
+        <div class="col-md-4   text-center col-sm-12 center-all-ficheros border-ficheros">
+            <h3>Valoraciones sociales</h3>
+            <div class="spinner3" style="display: none"></div>
+            <div style="display: flex;align-items: center;justify-content: center;width: 50%">
+                <a role="button" onclick="start_spinner('3')" class="btn btn-dark active"
+                    href="{% url 'adra:valoracion_social' %}">
+                    Generar
+                </a>
+
+            </div>
+        </div>
+
+
+    </div>
+</div>
+<div class="col-md-12 col-sm-12 mt-3" style="border-right: 2px dotted dodgerblue;border-bottom: 2px dotted dodgerblue;">
+    {% if alimentos_repatir.subject.errors %}
+    <ol>
+        {% for error in alimentos_repatir.subject.errors %}
+        <li><strong>{{ error|escape }}</strong></li>
+        {% endfor %}
+    </ol>
+    {% endif %}
+    <form action="{% url 'adra:configuracion' %}" method="post">
+        {% csrf_token %}
+        <h2 class="mb-5  ">Cantidades a repartir</h2>
+        <input type="hidden" name="form_reparto" id="">
+        <div class="form-row">
+            <div class="form-group col-md-6 mb-0">
+                <div class="row">
+                    <div class="col-6">{{ alimentos_repatir.alimento_1 |as_crispy_field }}</div>
+                    <div class="col-6">{{ alimentos_repatir.alimento_1_type |as_crispy_field }}</div>
+                    <div class="collapse col-md-12 col-sm-12" id="collapsealimento1">
+                        <div class="card card-body">
+                            <div class="row">
+                                <div class="col-4">{{ alimentos_repatir.alimento_1_0_3 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_1_4_6 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_1_7_9 |as_crispy_field }}</div>
                             </div>
                         </div>
                     </div>
+
                 </div>
-                <div class="form-group col-md-6 mb-0">
-                    <div class="row">
-                        <div class="col-6">{{ alimentos_repatir.alimento_4 |as_crispy_field }}</div>
-                        <div class="col-6">{{ alimentos_repatir.alimento_4_type |as_crispy_field }}</div>
-                        <div class="collapse col-md-12 col-sm-12" id="collapsealimento4">
-                            <div class="card card-body">
-                                <div class="row">
-                                    <div class="col-4">{{ alimentos_repatir.alimento_4_0_3 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_4_4_6 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_4_7_9 |as_crispy_field }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group col-md-6 mb-0">
-                    <div class="row">
-                        <div class="col-6">{{ alimentos_repatir.alimento_5 |as_crispy_field }}</div>
-                        <div class="col-6">{{ alimentos_repatir.alimento_5_type |as_crispy_field }}</div>
-                        <div class="collapse col-md-12 col-sm-12" id="collapsealimento5">
-                            <div class="card card-body">
-                                <div class="row">
-                                    <div class="col-4">{{ alimentos_repatir.alimento_5_0_3 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_5_4_6 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_5_7_9 |as_crispy_field }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group col-md-6 mb-0">
-                    <div class="row">
-                        <div class="col-6">{{ alimentos_repatir.alimento_6 |as_crispy_field }}</div>
-                        <div class="col-6">{{ alimentos_repatir.alimento_6_type |as_crispy_field }}</div>
-                        <div class="collapse col-md-12 col-sm-12" id="collapsealimento6">
-                            <div class="card card-body">
-                                <div class="row">
-                                    <div class="col-4">{{ alimentos_repatir.alimento_6_0_3 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_6_4_6 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_6_7_9 |as_crispy_field }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group col-md-6 mb-0">
-                    <div class="row">
-                        <div class="col-6">{{ alimentos_repatir.alimento_7 |as_crispy_field }}</div>
-                        <div class="col-6">{{ alimentos_repatir.alimento_7_type |as_crispy_field }}</div>
-                        <div class="collapse col-md-12 col-sm-12" id="collapsealimento7">
-                            <div class="card card-body">
-                                <div class="row">
-                                    <div class="col-4">{{ alimentos_repatir.alimento_7_0_3 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_7_4_6 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_7_7_9 |as_crispy_field }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group col-md-6 mb-0">
-                    <div class="row">
-                        <div class="col-6">{{ alimentos_repatir.alimento_8 |as_crispy_field }}</div>
-                        <div class="col-6">{{ alimentos_repatir.alimento_8_type |as_crispy_field }}</div>
-                        <div class="collapse col-md-12 col-sm-12" id="collapsealimento8">
-                            <div class="card card-body">
-                                <div class="row">
-                                    <div class="col-4">{{ alimentos_repatir.alimento_8_0_3 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_8_4_6 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_8_7_9 |as_crispy_field }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group col-md-6 mb-0">
-                    <div class="row">
-                        <div class="col-6">{{ alimentos_repatir.alimento_9 |as_crispy_field }}</div>
-                        <div class="col-6">{{ alimentos_repatir.alimento_9_type |as_crispy_field }}</div>
-                        <div class="collapse col-md-12 col-sm-12" id="collapsealimento9">
-                            <div class="card card-body">
-                                <div class="row">
-                                    <div class="col-4">{{ alimentos_repatir.alimento_9_0_3 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_9_4_6 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_9_7_9 |as_crispy_field }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group col-md-6 mb-0">
-                    <div class="row">
-                        <div class="col-6">{{ alimentos_repatir.alimento_10 |as_crispy_field }}</div>
-                        <div class="col-6">{{ alimentos_repatir.alimento_10_type |as_crispy_field }}</div>
-                        <div class="collapse col-md-12 col-sm-12" id="collapsealimento10">
-                            <div class="card card-body">
-                                <div class="row">
-                                    <div class="col-4">{{ alimentos_repatir.alimento_10_0_3 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_10_4_6 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_10_7_9 |as_crispy_field }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group col-md-6 mb-0">
-                    <div class="row">
-                        <div class="col-6">{{ alimentos_repatir.alimento_11 |as_crispy_field }}</div>
-                        <div class="col-6">{{ alimentos_repatir.alimento_11_type |as_crispy_field }}</div>
-                        <div class="collapse col-md-12 col-sm-12" id="collapsealimento11">
-                            <div class="card card-body">
-                                <div class="row">
-                                    <div class="col-4">{{ alimentos_repatir.alimento_11_0_3 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_11_4_6 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_11_7_9 |as_crispy_field }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group col-md-6 mb-0">
-                    <div class="row">
-                        <div class="col-6">{{ alimentos_repatir.alimento_12 |as_crispy_field }}</div>
-                        <div class="col-6">{{ alimentos_repatir.alimento_12_type |as_crispy_field }}</div>
-                        <div class="collapse col-md-12 col-sm-12" id="collapsealimento12">
-                            <div class="card card-body">
-                                <div class="row">
-                                    <div class="col-4">{{ alimentos_repatir.alimento_12_0_3 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_12_4_6 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_12_7_9 |as_crispy_field }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group col-md-6 mb-0">
-                    <div class="row">
-                        <div class="col-6">{{ alimentos_repatir.alimento_13 |as_crispy_field }}</div>
-                        <div class="col-6">{{ alimentos_repatir.alimento_13_type |as_crispy_field }}</div>
-                        <div class="collapse col-md-12 col-sm-12" id="collapsealimento13">
-                            <div class="card card-body">
-                                <div class="row">
-                                    <div class="col-4">{{ alimentos_repatir.alimento_13_0_3 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_13_4_6 |as_crispy_field }}</div>
-                                    <div class="col-4">{{ alimentos_repatir.alimento_13_7_9 |as_crispy_field }}</div>
-                                </div>
+            </div>
+            <hr>
+            <div class="form-group col-md-6 mb-0">
+                <div class="row">
+                    <div class="col-6">{{ alimentos_repatir.alimento_2 |as_crispy_field }}</div>
+                    <div class="col-6">{{ alimentos_repatir.alimento_2_type |as_crispy_field }}</div>
+                    <div class="collapse col-md-12 col-sm-12" id="collapsealimento2">
+                        <div class="card card-body">
+                            <div class="row">
+                                <div class="col-4">{{ alimentos_repatir.alimento_2_0_3 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_2_4_6 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_2_7_9 |as_crispy_field }}</div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <div class="form-group col-md-6 mb-0">
+                <div class="row">
+                    <div class="col-6">{{ alimentos_repatir.alimento_3 |as_crispy_field }}</div>
+                    <div class="col-6">{{ alimentos_repatir.alimento_3_type |as_crispy_field }}</div>
+                    <div class="collapse col-md-12 col-sm-12" id="collapsealimento3">
+                        <div class="card card-body">
+                            <div class="row">
+                                <div class="col-4">{{ alimentos_repatir.alimento_3_0_3 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_3_4_6 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_3_7_9 |as_crispy_field }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group col-md-6 mb-0">
+                <div class="row">
+                    <div class="col-6">{{ alimentos_repatir.alimento_4 |as_crispy_field }}</div>
+                    <div class="col-6">{{ alimentos_repatir.alimento_4_type |as_crispy_field }}</div>
+                    <div class="collapse col-md-12 col-sm-12" id="collapsealimento4">
+                        <div class="card card-body">
+                            <div class="row">
+                                <div class="col-4">{{ alimentos_repatir.alimento_4_0_3 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_4_4_6 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_4_7_9 |as_crispy_field }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group col-md-6 mb-0">
+                <div class="row">
+                    <div class="col-6">{{ alimentos_repatir.alimento_5 |as_crispy_field }}</div>
+                    <div class="col-6">{{ alimentos_repatir.alimento_5_type |as_crispy_field }}</div>
+                    <div class="collapse col-md-12 col-sm-12" id="collapsealimento5">
+                        <div class="card card-body">
+                            <div class="row">
+                                <div class="col-4">{{ alimentos_repatir.alimento_5_0_3 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_5_4_6 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_5_7_9 |as_crispy_field }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group col-md-6 mb-0">
+                <div class="row">
+                    <div class="col-6">{{ alimentos_repatir.alimento_6 |as_crispy_field }}</div>
+                    <div class="col-6">{{ alimentos_repatir.alimento_6_type |as_crispy_field }}</div>
+                    <div class="collapse col-md-12 col-sm-12" id="collapsealimento6">
+                        <div class="card card-body">
+                            <div class="row">
+                                <div class="col-4">{{ alimentos_repatir.alimento_6_0_3 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_6_4_6 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_6_7_9 |as_crispy_field }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group col-md-6 mb-0">
+                <div class="row">
+                    <div class="col-6">{{ alimentos_repatir.alimento_7 |as_crispy_field }}</div>
+                    <div class="col-6">{{ alimentos_repatir.alimento_7_type |as_crispy_field }}</div>
+                    <div class="collapse col-md-12 col-sm-12" id="collapsealimento7">
+                        <div class="card card-body">
+                            <div class="row">
+                                <div class="col-4">{{ alimentos_repatir.alimento_7_0_3 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_7_4_6 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_7_7_9 |as_crispy_field }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group col-md-6 mb-0">
+                <div class="row">
+                    <div class="col-6">{{ alimentos_repatir.alimento_8 |as_crispy_field }}</div>
+                    <div class="col-6">{{ alimentos_repatir.alimento_8_type |as_crispy_field }}</div>
+                    <div class="collapse col-md-12 col-sm-12" id="collapsealimento8">
+                        <div class="card card-body">
+                            <div class="row">
+                                <div class="col-4">{{ alimentos_repatir.alimento_8_0_3 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_8_4_6 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_8_7_9 |as_crispy_field }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group col-md-6 mb-0">
+                <div class="row">
+                    <div class="col-6">{{ alimentos_repatir.alimento_9 |as_crispy_field }}</div>
+                    <div class="col-6">{{ alimentos_repatir.alimento_9_type |as_crispy_field }}</div>
+                    <div class="collapse col-md-12 col-sm-12" id="collapsealimento9">
+                        <div class="card card-body">
+                            <div class="row">
+                                <div class="col-4">{{ alimentos_repatir.alimento_9_0_3 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_9_4_6 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_9_7_9 |as_crispy_field }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group col-md-6 mb-0">
+                <div class="row">
+                    <div class="col-6">{{ alimentos_repatir.alimento_10 |as_crispy_field }}</div>
+                    <div class="col-6">{{ alimentos_repatir.alimento_10_type |as_crispy_field }}</div>
+                    <div class="collapse col-md-12 col-sm-12" id="collapsealimento10">
+                        <div class="card card-body">
+                            <div class="row">
+                                <div class="col-4">{{ alimentos_repatir.alimento_10_0_3 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_10_4_6 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_10_7_9 |as_crispy_field }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group col-md-6 mb-0">
+                <div class="row">
+                    <div class="col-6">{{ alimentos_repatir.alimento_11 |as_crispy_field }}</div>
+                    <div class="col-6">{{ alimentos_repatir.alimento_11_type |as_crispy_field }}</div>
+                    <div class="collapse col-md-12 col-sm-12" id="collapsealimento11">
+                        <div class="card card-body">
+                            <div class="row">
+                                <div class="col-4">{{ alimentos_repatir.alimento_11_0_3 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_11_4_6 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_11_7_9 |as_crispy_field }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group col-md-6 mb-0">
+                <div class="row">
+                    <div class="col-6">{{ alimentos_repatir.alimento_12 |as_crispy_field }}</div>
+                    <div class="col-6">{{ alimentos_repatir.alimento_12_type |as_crispy_field }}</div>
+                    <div class="collapse col-md-12 col-sm-12" id="collapsealimento12">
+                        <div class="card card-body">
+                            <div class="row">
+                                <div class="col-4">{{ alimentos_repatir.alimento_12_0_3 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_12_4_6 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_12_7_9 |as_crispy_field }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group col-md-6 mb-0">
+                <div class="row">
+                    <div class="col-6">{{ alimentos_repatir.alimento_13 |as_crispy_field }}</div>
+                    <div class="col-6">{{ alimentos_repatir.alimento_13_type |as_crispy_field }}</div>
+                    <div class="collapse col-md-12 col-sm-12" id="collapsealimento13">
+                        <div class="card card-body">
+                            <div class="row">
+                                <div class="col-4">{{ alimentos_repatir.alimento_13_0_3 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_13_4_6 |as_crispy_field }}</div>
+                                <div class="col-4">{{ alimentos_repatir.alimento_13_7_9 |as_crispy_field }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-            <input type="submit" class="btn btn-dark btn-block mt-3 mb-3" value="Guardar">
-        </form>
-    </div>
+
+        <input type="submit" class="btn btn-dark btn-block mt-3 mb-3" value="Guardar">
+    </form>
+</div>
 
 
 {% endblock content %}
 
 {% block script %}
-    <script src="{% static 'js/vue/vue3.js' %}"></script>
-    <script src="{% static 'js/axios/axios.0.27.js' %}"></script>
-    <script>
-
-        for (let j = 0; j < 14; j++) {
-            $(`#id_alimento_${j}_type option:selected`).each(function () {
-                if ($(this).text() === "Familia") {
-                    $(`#collapsealimento${j}`).collapse('show')
-                     $(`#id_alimento_${j}`).prop( "readonly", true )
-                } else {
-                    $(`#collapsealimento${j}`).collapse("hide")
-                     $(`#id_alimento_${j}`).prop( "readonly", false )
-                }
-            });
-        }
-
-
-        $("#id_alimento_1_type").change(function () {
-            $("#id_alimento_1_type option:selected").each(function () {
-                if ($(this).text() === "Familia") {
-                    $('#collapsealimento1').collapse('show')
-                    $(`#id_alimento_1`).prop( "readonly", true )
-                } else {
-                    $('#collapsealimento1').collapse("hide")
-                    $(`#id_alimento_1`).prop( "readonly", false )
-                }
-            });
-        });
-
-        $("#id_alimento_2_type").change(function () {
-            $("#id_alimento_2_type option:selected").each(function () {
-                if ($(this).text() === "Familia") {
-                    $('#collapsealimento2').collapse('show');
-                      $(`#id_alimento_2`).prop( "readonly", true )
-                } else {
-                    $('#collapsealimento2').collapse("hide");
-                      $(`#id_alimento_2`).prop( "readonly", false )
-                }
-            });
-        });
-
-        $("#id_alimento_3_type").change(function () {
-            $("#id_alimento_3_type option:selected").each(function () {
-                if ($(this).text() === "Familia") {
-                    $('#collapsealimento3').collapse('show')
-                    $(`#id_alimento_3`).prop( "readonly", true )
-                } else {
-                    $('#collapsealimento3').collapse("hide")
-                    $(`#id_alimento_3`).prop( "readonly", false )
-                }
-            });
-        });
-        $("#id_alimento_4_type").change(function () {
-            $("#id_alimento_4_type option:selected").each(function () {
-                if ($(this).text() === "Familia") {
-                    $('#collapsealimento4').collapse('show')
-                     $(`#id_alimento_4`).prop( "readonly", true )
-                } else {
-                    $('#collapsealimento4').collapse("hide")
-                     $(`#id_alimento_4`).prop( "readonly", false )
-                }
-            });
-        });
-
-        $("#id_alimento_5_type").change(function () {
-            $("#id_alimento_5_type option:selected").each(function () {
-                if ($(this).text() === "Familia") {
-                    $('#collapsealimento5').collapse('show')
-                     $(`#id_alimento_5`).prop( "readonly", true )
-                } else {
-                    $('#collapsealimento5').collapse("hide")
-                     $(`#id_alimento_5`).prop( "readonly", false )
-                }
-            });
-        });
-        $("#id_alimento_6_type").change(function () {
-            $("#id_alimento_6_type option:selected").each(function () {
-                if ($(this).text() === "Familia") {
-                    $('#collapsealimento6').collapse('show')
-                    $('#id_alimento_6').prop( "readonly", true )
-                } else {
-                    $('#collapsealimento6').collapse("hide")
-                    $('#id_alimento_6').prop( "readonly", false )
-
-                }
-            });
-        });
-
-        $("#id_alimento_7_type").change(function () {
-            $("#id_alimento_7_type option:selected").each(function () {
-                if ($(this).text() === "Familia") {
-                    $('#collapsealimento7').collapse('show')
-                    $('#id_alimento_7').prop( "readonly", true )
-                } else {
-                    $('#collapsealimento7').collapse("hide")
-                    $('#id_alimento_7').prop( "readonly", false )
-                }
-            });
-        });
-
-
-        $("#id_alimento_8_type").change(function () {
-            $("#id_alimento_8_type option:selected").each(function () {
-                if ($(this).text() === "Familia") {
-                    $('#collapsealimento8').collapse('show')
-                     $('#id_alimento_8').prop( "readonly", true )
-                } else {
-                    $('#collapsealimento8').collapse("hide")
-                     $('#id_alimento_8').prop( "readonly", false )
-                }
-            });
-        });
-        $("#id_alimento_9_type").change(function () {
-            $("#id_alimento_9_type option:selected").each(function () {
-                if ($(this).text() === "Familia") {
-                    $('#collapsealimento9').collapse('show')
-                     $('#id_alimento_9').prop( "readonly", true )
-                } else {
-                    $('#collapsealimento9').collapse("hide")
-                     $('#id_alimento_9').prop( "readonly", false )
-                }
-            });
-        });
-
-        $("#id_alimento_10_type").change(function () {
-            $("#id_alimento_10_type option:selected").each(function () {
-                if ($(this).text() === "Familia") {
-                    $('#collapsealimento10').collapse('show')
-                    $('#id_alimento_10').prop( "readonly", true )
-                } else {
-                    $('#collapsealimento10').collapse("hide")
-                    $('#id_alimento_10').prop( "readonly", false )
-                }
-            });
-        });
-        $("#id_alimento_11_type").change(function () {
-            $("#id_alimento_11_type option:selected").each(function () {
-                if ($(this).text() === "Familia") {
-                    $('#collapsealimento11').collapse('show')
-                     $('#id_alimento_11').prop( "readonly", true )
-                } else {
-                    $('#collapsealimento11').collapse("hide")
-                     $('#id_alimento_11').prop( "readonly", false )
-                }
-            });
-        });
-        $("#id_alimento_12_type").change(function () {
-            $("#id_alimento_12_type option:selected").each(function () {
-                if ($(this).text() === "Familia") {
-                    $('#collapsealimento12').collapse('show')
-                    $('#id_alimento_12').prop( "readonly", true )
-                } else {
-                    $('#collapsealimento12').collapse("hide")
-                    $('#id_alimento_12').prop( "readonly", false )
-                }
-            });
-        });
-
-        $("#id_alimento_13_type").change(function () {
-            $("#id_alimento_13_type option:selected").each(function () {
-                if ($(this).text() === "Familia") {
-                    $('#collapsealimento13').collapse('show')
-                    $('#id_alimento_13').prop( "readonly", true )
-                } else {
-                    $('#collapsealimento13').collapse("hide")
-                    $('#id_alimento_13').prop( "readonly", false )
-                }
-            });
-        });
-
-
-        function start_spinner(spin_number) {
-            console.log("click me")
-            if (spin_number === "1") {
-                document.querySelector(".spinner").style.display = "block"
+<script src="{% static 'js/vue/vue3.js' %}"></script>
+<script src="{% static 'js/axios/axios.0.27.js' %}"></script>
+<script>
+    for (let j = 0; j < 14; j++) {
+        $(`#id_alimento_${j}_type option:selected`).each(function () {
+            if ($(this).text() === "Familia") {
+                $(`#collapsealimento${j}`).collapse('show')
+                $(`#id_alimento_${j}`).prop("readonly", true)
             } else {
-                document.querySelector(`.spinner${spin_number}`).style.display = "block"
+                $(`#collapsealimento${j}`).collapse("hide")
+                $(`#id_alimento_${j}`).prop("readonly", false)
             }
+        });
+    }
 
+
+    $("#id_alimento_1_type").change(function () {
+        $("#id_alimento_1_type option:selected").each(function () {
+            if ($(this).text() === "Familia") {
+                $('#collapsealimento1').collapse('show')
+                $(`#id_alimento_1`).prop("readonly", true)
+            } else {
+                $('#collapsealimento1').collapse("hide")
+                $(`#id_alimento_1`).prop("readonly", false)
+            }
+        });
+    });
+
+    $("#id_alimento_2_type").change(function () {
+        $("#id_alimento_2_type option:selected").each(function () {
+            if ($(this).text() === "Familia") {
+                $('#collapsealimento2').collapse('show');
+                $(`#id_alimento_2`).prop("readonly", true)
+            } else {
+                $('#collapsealimento2').collapse("hide");
+                $(`#id_alimento_2`).prop("readonly", false)
+            }
+        });
+    });
+
+    $("#id_alimento_3_type").change(function () {
+        $("#id_alimento_3_type option:selected").each(function () {
+            if ($(this).text() === "Familia") {
+                $('#collapsealimento3').collapse('show')
+                $(`#id_alimento_3`).prop("readonly", true)
+            } else {
+                $('#collapsealimento3').collapse("hide")
+                $(`#id_alimento_3`).prop("readonly", false)
+            }
+        });
+    });
+    $("#id_alimento_4_type").change(function () {
+        $("#id_alimento_4_type option:selected").each(function () {
+            if ($(this).text() === "Familia") {
+                $('#collapsealimento4').collapse('show')
+                $(`#id_alimento_4`).prop("readonly", true)
+            } else {
+                $('#collapsealimento4').collapse("hide")
+                $(`#id_alimento_4`).prop("readonly", false)
+            }
+        });
+    });
+
+    $("#id_alimento_5_type").change(function () {
+        $("#id_alimento_5_type option:selected").each(function () {
+            if ($(this).text() === "Familia") {
+                $('#collapsealimento5').collapse('show')
+                $(`#id_alimento_5`).prop("readonly", true)
+            } else {
+                $('#collapsealimento5').collapse("hide")
+                $(`#id_alimento_5`).prop("readonly", false)
+            }
+        });
+    });
+    $("#id_alimento_6_type").change(function () {
+        $("#id_alimento_6_type option:selected").each(function () {
+            if ($(this).text() === "Familia") {
+                $('#collapsealimento6').collapse('show')
+                $('#id_alimento_6').prop("readonly", true)
+            } else {
+                $('#collapsealimento6').collapse("hide")
+                $('#id_alimento_6').prop("readonly", false)
+
+            }
+        });
+    });
+
+    $("#id_alimento_7_type").change(function () {
+        $("#id_alimento_7_type option:selected").each(function () {
+            if ($(this).text() === "Familia") {
+                $('#collapsealimento7').collapse('show')
+                $('#id_alimento_7').prop("readonly", true)
+            } else {
+                $('#collapsealimento7').collapse("hide")
+                $('#id_alimento_7').prop("readonly", false)
+            }
+        });
+    });
+
+
+    $("#id_alimento_8_type").change(function () {
+        $("#id_alimento_8_type option:selected").each(function () {
+            if ($(this).text() === "Familia") {
+                $('#collapsealimento8').collapse('show')
+                $('#id_alimento_8').prop("readonly", true)
+            } else {
+                $('#collapsealimento8').collapse("hide")
+                $('#id_alimento_8').prop("readonly", false)
+            }
+        });
+    });
+    $("#id_alimento_9_type").change(function () {
+        $("#id_alimento_9_type option:selected").each(function () {
+            if ($(this).text() === "Familia") {
+                $('#collapsealimento9').collapse('show')
+                $('#id_alimento_9').prop("readonly", true)
+            } else {
+                $('#collapsealimento9').collapse("hide")
+                $('#id_alimento_9').prop("readonly", false)
+            }
+        });
+    });
+
+    $("#id_alimento_10_type").change(function () {
+        $("#id_alimento_10_type option:selected").each(function () {
+            if ($(this).text() === "Familia") {
+                $('#collapsealimento10').collapse('show')
+                $('#id_alimento_10').prop("readonly", true)
+            } else {
+                $('#collapsealimento10').collapse("hide")
+                $('#id_alimento_10').prop("readonly", false)
+            }
+        });
+    });
+    $("#id_alimento_11_type").change(function () {
+        $("#id_alimento_11_type option:selected").each(function () {
+            if ($(this).text() === "Familia") {
+                $('#collapsealimento11').collapse('show')
+                $('#id_alimento_11').prop("readonly", true)
+            } else {
+                $('#collapsealimento11').collapse("hide")
+                $('#id_alimento_11').prop("readonly", false)
+            }
+        });
+    });
+    $("#id_alimento_12_type").change(function () {
+        $("#id_alimento_12_type option:selected").each(function () {
+            if ($(this).text() === "Familia") {
+                $('#collapsealimento12').collapse('show')
+                $('#id_alimento_12').prop("readonly", true)
+            } else {
+                $('#collapsealimento12').collapse("hide")
+                $('#id_alimento_12').prop("readonly", false)
+            }
+        });
+    });
+
+    $("#id_alimento_13_type").change(function () {
+        $("#id_alimento_13_type option:selected").each(function () {
+            if ($(this).text() === "Familia") {
+                $('#collapsealimento13').collapse('show')
+                $('#id_alimento_13').prop("readonly", true)
+            } else {
+                $('#collapsealimento13').collapse("hide")
+                $('#id_alimento_13').prop("readonly", false)
+            }
+        });
+    });
+
+
+    function start_spinner(spin_number) {
+        console.log("click me")
+        if (spin_number === "1") {
+            document.querySelector(".spinner").style.display = "block"
+        } else {
+            document.querySelector(`.spinner${spin_number}`).style.display = "block"
         }
 
-        $(window).blur(function () {
-            $('.spinner').hide();
-            $('.spinner2').hide();
-            $('.spinner3').hide();
-        });
+    }
 
+    $(window).blur(function () {
+        $('.spinner').hide();
+        $('.spinner2').hide();
+        $('.spinner3').hide();
+    });
+</script>
+<script>
+    const {
+        createApp
+    } = Vue
 
-    </script>
-    <script>
-        const {createApp} = Vue
-
-        createApp({
-            data() {
-                return {
-                    messages: [],
-                    payees_fraud: [],
-                    progress: 0,
-                    excel_file: null,
-                    audio_player: null,
-                    valid_form: {
-                        file: false,
-                        all: false
-                    }
+    createApp({
+        data() {
+            return {
+                messages: [],
+                payees_fraud: [],
+                progress: 0,
+                excel_file: null,
+                audio_player: null,
+                valid_form: {
+                    file: false,
+                    all: false
                 }
+            }
+        },
+        delimiters: ['[[', ']]'],
+        methods: {
+            selectFile(event) {
+                this.excel_file = event.target.files[0]
+                this.messages = []
+                if (!['application/vnd.ms-excel.sheet.macroEnabled.12',
+                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    ].includes(this.excel_file['type'])) {
+                    this.messages.push({
+                        text: "El fichero no tiene el formato correcto",
+                        cls: "danger"
+                    })
+                    this.valid_form.file = false
+                    this.excel_file = null
+                    console.log("no valid")
+                } else {
+                    console.log("valid")
+                    this.valid_form.file = true
+                    this.message = null
+                }
+
             },
-            delimiters: ['[[', ']]'],
-            methods: {
-                selectFile(event) {
-                    this.excel_file = event.target.files[0]
-                    this.messages = []
-                    if (!['application/vnd.ms-excel.sheet.macroEnabled.12', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'].includes(this.excel_file['type'])) {
-                        this.messages.push({text: "El fichero no tiene el formato correcto", cls: "danger"})
-                        this.valid_form.file = false
-                        this.excel_file = null
-                        console.log("no valid")
-                    } else {
-                        console.log("valid")
-                        this.valid_form.file = true
-                        this.message = null
-                    }
+            upload() {
+                this.progress = 0
+                this.messages = []
+                this.valid_form.all = this.valid_form.file
+                if (this.valid_form.all) {
+                    this.performUpload(this.excel_file, event => {
+                        console.log(event)
+                        this.progress = Math.round((100 * event.loaded) / event.total)
+                    }).then(response => {
+                        this.payees_fraud = response.data['usuarios_fraud']
 
-                },
-                upload() {
-                    this.progress = 0
-                    this.messages = []
-                    this.valid_form.all = this.valid_form.file
-                    if (this.valid_form.all) {
-                        this.performUpload(this.excel_file, event => {
-                            console.log(event)
-                            this.progress = Math.round((100 * event.loaded) / event.total)
-                        }).then(response => {
-                            this.payees_fraud = response.data['usuarios_fraud']
-
-                            if (response.data['usuarios_fraud'].length > 0) {
-                                this.messages.push({
-                                    text: "Se han dectectado beneficiarios fraudulentos,los que aparecen en la lista no se han añadido.",
-                                    cls: "warning"
-                                })
-                            } else {
-                                this.messages.push({
-                                    text: "Los beneficiarios se ha añadido correctamente",
-                                    cls: "success"
-                                })
-                            }
+                        if (response.data['usuarios_fraud'].length > 0) {
+                            this.messages.push({
+                                text: "Se han dectectado beneficiarios fraudulentos,los que aparecen en la lista no se han añadido.",
+                                cls: "warning"
+                            })
+                        } else {
+                            this.messages.push({
+                                text: "Los beneficiarios se ha añadido correctamente",
+                                cls: "success"
+                            })
+                        }
 
 
-                        }).catch(error => {
-                            this.progress = 0
-                            this.messages.push({text: "Hay un problema al subir el fichero", cls: "danger"})
-                            this.excel_file = null
+                    }).catch(error => {
+                        this.progress = 0
+                        this.messages.push({
+                            text: "Hay un problema al subir el fichero",
+                            cls: "danger"
                         })
-                    }
-
-
-                },
-                performUpload(file, onUploadProgress) {
-                    let formData = new FormData()
-                    formData.append('record', file)
-                    axios.defaults.xsrfCookieName = 'csrftoken';
-                    axios.defaults.xsrfHeaderName = 'X-CSRFToken';
-
-                    return axios.post("{% url 'adra:configuracion' %}", formData, {
-                        headers: {
-                            "Content-Type": "multipart/form-data",
-                            "X-CSRFToken": "{{ csrf_token }}"
-                        },
-                        onUploadProgress
+                        this.excel_file = null
                     })
                 }
+
+
+            },
+            performUpload(file, onUploadProgress) {
+                let formData = new FormData()
+                formData.append('record', file)
+                axios.defaults.xsrfCookieName = 'csrftoken';
+                axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+
+                return axios.post("{% url 'adra:configuracion' %}", formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    },
+                    onUploadProgress
+                })
             }
-        }).mount('#app')
-    </script>
+        }
+    }).mount('#app')
+</script>
 {% endblock %}

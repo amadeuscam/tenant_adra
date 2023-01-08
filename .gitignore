@@ -1,6 +1,8 @@
 docker-compose.yml
 .vscode/
 .idea/
+app/
+skip-covered/
 *.pyc
 *.pyo
 .env*

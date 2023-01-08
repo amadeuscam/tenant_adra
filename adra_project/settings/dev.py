@@ -1,5 +1,6 @@
-from .base import *  # noqa
 import os
+
+from .base import *  # noqa
 
 DEBUG = True
 
@@ -7,13 +8,12 @@ ALLOWED_HOSTS = ["*"]
 
 DATABASES = {
     "default": {
-        "ENGINE": "django_tenants.postgresql_backend",
-        "CONN_MAX_AGE": 3600,
-        "NAME": os.environ.get("DATABASE_NAME"),
-        "USER": os.environ.get("MYSQL_USER"),
-        "PASSWORD": os.environ.get("MYSQL_PASSWORD"),
-        "HOST": os.environ.get("MYSQL_HOST"),
-        "PORT": 5432,
+        "ENGINE": os.environ.get("SQL_ENGINE"),
+        "NAME": os.environ.get("SQL_DATABASE"),
+        "USER": os.environ.get("SQL_USER"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD"),
+        "HOST": os.environ.get("SQL_HOST"),
+        "PORT": os.environ.get("SQL_PORT"),
     }
 }
 

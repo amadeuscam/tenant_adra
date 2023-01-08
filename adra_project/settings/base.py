@@ -12,18 +12,16 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = os.getenv("SECRET_KEY")
 SECRET_KEY = os.getenv("SECRET_KEY")
-ALLOWED_HOSTS = ['*']
-# django-allauth config
+ALLOWED_HOSTS = ["*"]
+# django-allauth configSENDGRID_ALIMENTOS_TEMPLATE_ID
 SITE_ID = 1
 SESSION_COOKIE_AGE = 86400
-DATABASE_ROUTERS = (
-    'django_tenants.routers.TenantSyncRouter',
-)
+DATABASE_ROUTERS = ("django_tenants.routers.TenantSyncRouter",)
 TENANT_LIMIT_SET_CALLS = True
 TOKEN_KEY_USER = os.getenv("Token_KEY_USER")
 # Application definition
 list_apps = [
-    'django.contrib.contenttypes',
+    "django.contrib.contenttypes",
     "jsignature",
     # default
     "django.contrib.admin",
@@ -41,18 +39,17 @@ list_apps = [
     # api zone rest
     "rest_framework",
     "rest_framework.authtoken",
-    'tenant_schemas_celery',
+    "tenant_schemas_celery",
     "corsheaders",
     # s3 amazon
     "storages",
     # "allauth.socialaccount",
 ]
 SHARED_APPS = [
-                  'django_tenants',  # mandatory, should always be before any django app
-                  'delegaciones',  # you must list the app where your tenant model resides in
-                  'adra',
-
-              ] + list_apps
+    "django_tenants",  # mandatory, should always be before any django app
+    "delegaciones",  # you must list the app where your tenant model resides in
+    "adra",
+] + list_apps
 
 TENANT_APPS = list_apps + [
     "adra",
@@ -63,7 +60,7 @@ INSTALLED_APPS = list(SHARED_APPS) + [
 ]
 
 MIDDLEWARE = [
-    'django_tenants.middleware.main.TenantMainMiddleware',
+    "django_tenants.middleware.main.TenantMainMiddleware",
     "django.middleware.cache.UpdateCacheMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -82,7 +79,10 @@ ROOT_URLCONF = "adra_project.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, 'adra/templates'), os.path.join(BASE_DIR, 'adra/templates', 'account')],
+        "DIRS": [
+            os.path.join(BASE_DIR, "adra/templates"),
+            os.path.join(BASE_DIR, "adra/templates", "account"),
+        ],
         # "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -151,7 +151,9 @@ MULTITENANT_TEMPLATE_DIRS = [
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-MULTITENANT_RELATIVE_STATIC_ROOT = ""  # (default: create sub-directory for each tenant)
+MULTITENANT_RELATIVE_STATIC_ROOT = (
+    ""  # (default: create sub-directory for each tenant)
+)
 
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
@@ -262,7 +264,7 @@ LOGGING = {
             "formatter": "console",
             # "filters": ['tenant_context']
         }
-    }
+    },
 }
 
 # para cuando tengo por fin https
@@ -270,66 +272,36 @@ LOGGING = {
 # CSRF_COOKIE_SECURE = True
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
-TENANT_MODEL = 'delegaciones.Delegaciones'
+TENANT_MODEL = "delegaciones.Delegaciones"
 TENANT_DOMAIN_MODEL = "delegaciones.Domain"  # app.Model
-PUBLIC_SCHEMA_URLCONF = 'delegaciones.urls'
-JSIGNATURE_WIDTH = '100%'
+PUBLIC_SCHEMA_URLCONF = "delegaciones.urls"
+JSIGNATURE_WIDTH = "100%"
 JSIGNATURE_HEIGHT = 200
 
 SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
-SENDGRID_ALIMENTOS_TEMPLATE_ID = os.environ.get("SENDGRID_ALIMENTOS_TEMPLATE_ID")
-SENDGRID_ACTIVACION_CUENTA_TEMPLATE_ID = os.environ.get("SENDGRID_ACTIVACION_CUENTA_TEMPLATE_ID")
-SENDGRID_CHANGE_PASSWORD_TEMPLATE_ID = os.environ.get("SENDGRID_CHANGE_PASSWORD_TEMPLATE_ID")
+SENDGRID_ALIMENTOS_TEMPLATE_ID = os.environ.get(
+    "SENDGRID_ALIMENTOS_TEMPLATE_ID"
+)
+SENDGRID_ACTIVACION_CUENTA_TEMPLATE_ID = os.environ.get(
+    "SENDGRID_ACTIVACION_CUENTA_TEMPLATE_ID"
+)
+SENDGRID_CHANGE_PASSWORD_TEMPLATE_ID = os.environ.get(
+    "SENDGRID_CHANGE_PASSWORD_TEMPLATE_ID"
+)
 
-# if os.environ.get('GITHUB_WORKFLOW'):
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django_tenants.postgresql_backend',
-#             'NAME': os.environ.get("DATABASE_NAME"),
-#             'USER': os.environ.get("MYSQL_USER"),
-#             'PASSWORD': os.environ.get("MYSQL_PASSWORD"),
-#             'HOST': os.environ.get("MYSQL_HOST"),
-#             'PORT': 5432,
-#         }
-#     }
+
 ALIMENTOS_METADATA = {
-    "alimento_1": {
-        "name": "Arroz Blanco"
-    },
-    "alimento_2": {
-        "name": "Alubia cocida"
-    },
-    "alimento_3": {
-        "name": "Conserva de atún"
-    },
-    "alimento_4": {
-        "name": "Pasta alimenticia tipo macarron"
-    },
-    "alimento_5": {
-        "name": "Tomate frito en conserva"
-    },
-    "alimento_6": {
-        "name": "Galletas"
-    },
-    "alimento_7": {
-        "name": "Macedonia de verduras en conserva"
-    },
-    "alimento_8": {
-        "name": "Fruta en conserva"
-    },
-    "alimento_9": {
-        "name": "Cacao soluble"
-    },
-    "alimento_10": {
-        "name": "Tarritos infantiles con pollo"
-    },
-    "alimento_11": {
-        "name": "Tarritos infantiles de fruta"
-    },
-    "alimento_12": {
-        "name": "Leche entera UHT"
-    },
-    "alimento_13": {
-        "name": "Aceite de oliva"
-    },
+    "alimento_1": {"name": "Arroz Blanco"},
+    "alimento_2": {"name": "Alubia cocida"},
+    "alimento_3": {"name": "Conserva de atún"},
+    "alimento_4": {"name": "Pasta alimenticia tipo macarron"},
+    "alimento_5": {"name": "Tomate frito en conserva"},
+    "alimento_6": {"name": "Galletas"},
+    "alimento_7": {"name": "Macedonia de verduras en conserva"},
+    "alimento_8": {"name": "Fruta en conserva"},
+    "alimento_9": {"name": "Cacao soluble"},
+    "alimento_10": {"name": "Tarritos infantiles con pollo"},
+    "alimento_11": {"name": "Tarritos infantiles de fruta"},
+    "alimento_12": {"name": "Leche entera UHT"},
+    "alimento_13": {"name": "Aceite de oliva"},
 }
