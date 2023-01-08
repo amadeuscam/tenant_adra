@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
@@ -38,16 +38,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-
       - name: Testing
         env:
           DEBUG: 1
-          MYSQL_USER: ${{ env.POSTGRES_USER }}
-          MYSQL_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
-          MYSQL_HOST: ${{ env.POSTGRES_HOST }}
-          DATABASE_NAME: ${{ env.POSTGRES_DB }}
+          SQL_ENGINE: ${{ secrets.SQL_ENGINE }}
+          SQL_USER: ${{ secrets.SQL_USER }}
+          SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
+          SQL_HOST: ${{ secrets.SQL_HOST }}
+          SQL_DATABASE: ${{ secrets.SQL_DATABASE }}
+          SQL_PORT: ${{ secrets.SQL_PORT }}
           SECRET_KEY: ${{ secrets.SECRET_KEY_TEST }}
-          DJANGO_SETTINGS_MODULE: 'adra_project.settings.dev'
+          DJANGO_SETTINGS_MODULE: "adra_project.settings.dev"
           SUPERUSER_NAME: ${{ secrets.SUPERUSER_NAME }}
           SUPERUSER_PASSWORD: ${{ secrets.SUPERUSER_PASSWORD }}
           SUPERUSER_EMAIL: ${{ secrets.SUPERUSER_EMAIL }}
@@ -56,13 +57,12 @@ jobs:
           python manage.py collectstatic --noinput
           pytest -vv
 
-
       - name: docker login
         env:
           DOCKER_USER: ${{secrets.DOCKER_USER}}
           DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
         run: |
-          docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
+          docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
 
       - name: Build, tag, and push web image to Docker hub
         env:
