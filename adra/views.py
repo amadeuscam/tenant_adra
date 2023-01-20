@@ -1,5 +1,7 @@
 import concurrent.futures
 import os
+from threading import Thread
+
 import telegram
 from allauth.account.adapter import DefaultAccountAdapter
 from django.conf import settings
@@ -14,7 +16,7 @@ from django.db.models import Q, Sum
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
-from django.views.decorators.cache import cache_page
+from django.views.decorators.cache import cache_page, never_cache
 from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
                                   UpdateView)
 from django_tenants.utils import get_tenant_model
@@ -25,15 +27,18 @@ from rest_framework import permissions, viewsets
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
-from adra.utils.adra_util import AdraUtils, DeliverySheet, ValoracionSocial, AgeCalculacion, UploadExcelUsers
+from adra.utils.adra_util import (AdraUtils, AgeCalculacion, DeliverySheet,
+                                  UploadExcelUsers, ValoracionSocial)
 from delegaciones.models import BeneficiariosGlobales, Delegaciones
+
 from .filters import AlimentosFilters
-from .forms import (AlimentosFrom, AlmacenAlimentosFrom, DelegacionForm,
-                    HijoForm, PersonaForm, ProfileEditForm, UserEditForm, AlimentosRepatrirForm)
-from .models import Alimentos, AlmacenAlimentos, Hijo, Persona, AlimentosRepatir
+from .forms import (AlimentosFrom, AlimentosRepatrirForm, AlmacenAlimentosFrom,
+                    DelegacionForm, HijoForm, PersonaForm, ProfileEditForm,
+                    UserEditForm)
+from .models import (Alimentos, AlimentosRepatir, AlmacenAlimentos, Hijo,
+                     Persona)
 from .serializers import (AlacenAlimentosSerializer, PersonaSerializer,
                           UserSerializer)
-from threading import Thread
 
 
 @login_required
@@ -806,7 +811,7 @@ def generar_hoja_entrega(request, pk, mode):
 
     return response
 
-
+@never_cache
 def generate_files(**kwargs):
     # print(kwargs)
     # print(kwargs["type"])
@@ -817,7 +822,7 @@ def generate_files(**kwargs):
         for beneficiar in kwargs["beneficarios"]:
             ValoracionSocial(beneficiar).get_valoracion(True)
 
-
+@never_cache
 def generar_hoja_entrega_global(request):
     tenant_info = request.tenant
     beneficiarios = Persona.objects.filter(active=True).exclude(covid=True)
@@ -838,7 +843,7 @@ def generar_hoja_entrega_global(request):
 
     return response
 
-
+@never_cache
 def valoracion_social_global(request):
     beneficiarios = Persona.objects.filter(active=True).exclude(covid=True)
 
@@ -858,7 +863,7 @@ def valoracion_social_global(request):
 
     return response
 
-
+@never_cache
 def generar_hoja_valoracion_social(request, pk):
     persona = Persona.objects.get(pk=pk, active=True)
     val = ValoracionSocial(persona).get_valoracion()

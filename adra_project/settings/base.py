@@ -61,7 +61,7 @@ INSTALLED_APPS = list(SHARED_APPS) + [
 
 MIDDLEWARE = [
     "django_tenants.middleware.main.TenantMainMiddleware",
-    "django.middleware.cache.UpdateCacheMiddleware",
+    # "django.middleware.cache.UpdateCacheMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -71,7 +71,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "django.middleware.cache.FetchFromCacheMiddleware",
+    # "django.middleware.cache.FetchFromCacheMiddleware",
 ]
 
 ROOT_URLCONF = "adra_project.urls"
@@ -275,7 +275,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 TENANT_MODEL = "delegaciones.Delegaciones"
 TENANT_DOMAIN_MODEL = "delegaciones.Domain"  # app.Model
 PUBLIC_SCHEMA_URLCONF = "delegaciones.urls"
-JSIGNATURE_WIDTH = "100%"
+JSIGNATURE_WIDTH = 400
 JSIGNATURE_HEIGHT = 200
 
 SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
