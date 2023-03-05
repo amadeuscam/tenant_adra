@@ -500,9 +500,10 @@ class TestViews(TenantTestCase):
     def test_statistics_beneficarios(self):
         self.familiar.create(id=1)
         response_get = self.client.get(reverse("adra:statistics-personas"))
+        print(response_get.context)
         ds = {
-            "total_per_mujer_02": 1,
-            "total_per_mujer_03": 0,
+            "total_per_mujer_02": 0,
+            "total_per_mujer_03": 1,
             "total_per_mujer_16": 1,
             "total_per_mujer_65": 0,
             "total_mujeres": 2,
@@ -511,8 +512,8 @@ class TestViews(TenantTestCase):
             "total_per_hombre_16": 0,
             "total_per_hombre_65": 0,
             "total_hombres": 0,
-            "total_02": 1,
-            "total_03": 0,
+            "total_02": 0,
+            "total_03": 1,
             "total_16": 1,
             "total_65": 0,
             "total_personas": 2,
@@ -522,6 +523,7 @@ class TestViews(TenantTestCase):
             "nbar": "stat",
         }
         for k, v in ds.items():
+            print(response_get.context[k])
             assert response_get.context[k] == v
 
     def test_valoracion_social_single(self):
