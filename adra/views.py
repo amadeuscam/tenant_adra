@@ -1,5 +1,8 @@
 import concurrent.futures
 import os
+import queue  # imported for using queue.Empty exception
+import time
+from multiprocessing import Lock, Process, Queue, current_process
 from threading import Thread
 
 import telegram
@@ -16,6 +19,7 @@ from django.db.models import Q, Sum
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page, never_cache
 from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
                                   UpdateView)
@@ -241,30 +245,45 @@ def adauga_alimentos_persona(request, pk):
         for index in range(1, 14):
             if getattr(alm_repatir, f"alimento_{index}_type") == "unidad":
                 # print("baby", len([fam for fam in persona.hijo.all() if fam.age <= 3]))
-                babys = len([fam for fam in persona.hijo.all() if fam.age <= 3])
+                babys = len(
+                    [fam for fam in persona.hijo.all() if fam.age <= 3]
+                )
                 if babys > 0 and index in [10, 11]:
-                    init_reparto_alimento[f"alimento_{index}"] = (getattr(alm_repatir, f"alimento_{index}") * babys)
+                    init_reparto_alimento[f"alimento_{index}"] = (
+                        getattr(alm_repatir, f"alimento_{index}") * babys
+                    )
                     continue
                 else:
                     if index in [10, 11]:
                         init_reparto_alimento[f"alimento_{index}"] = 0
                         continue
-                init_reparto_alimento[f"alimento_{index}"] = (getattr(alm_repatir,
-                                                                      f"alimento_{index}") * persona.numero_beneficiarios)
+                init_reparto_alimento[f"alimento_{index}"] = (
+                    getattr(alm_repatir, f"alimento_{index}")
+                    * persona.numero_beneficiarios
+                )
             else:
                 print("familiares")
                 print("index", index)
-                print("persona.numero_beneficiarios", persona.numero_beneficiarios)
+                print(
+                    "persona.numero_beneficiarios",
+                    persona.numero_beneficiarios,
+                )
                 print(getattr(alm_repatir, f"alimento_{index}_0_3"))
                 if 0 <= persona.numero_beneficiarios <= 3:
-                    init_reparto_alimento[f"alimento_{index}"] = getattr(alm_repatir, f"alimento_{index}_0_3")
+                    init_reparto_alimento[f"alimento_{index}"] = getattr(
+                        alm_repatir, f"alimento_{index}_0_3"
+                    )
                 elif 4 <= persona.numero_beneficiarios <= 6:
-                    init_reparto_alimento[f"alimento_{index}"] = getattr(alm_repatir, f"alimento_{index}_4_6")
+                    init_reparto_alimento[f"alimento_{index}"] = getattr(
+                        alm_repatir, f"alimento_{index}_4_6"
+                    )
                 elif 7 <= persona.numero_beneficiarios <= 10:
-                    init_reparto_alimento[f"alimento_{index}"] = getattr(alm_repatir, f"alimento_{index}_7_9")
+                    init_reparto_alimento[f"alimento_{index}"] = getattr(
+                        alm_repatir, f"alimento_{index}_7_9"
+                    )
                 else:
                     print("ninguna es correcta")
-        print(init_reparto_alimento) # no tocar, es para los test esto
+        print(init_reparto_alimento)  # no tocar, es para los test esto
         a_form = AlimentosFrom(initial=init_reparto_alimento)
     return render(request, "adra/alimentos_form.html", {"form": a_form})
 
@@ -654,7 +673,9 @@ def export_users_csv(request):
     response["Content-Disposition"] = "attachment; filename=beneficiarios.xlsx"
 
     # workbook = Workbook()
-    workbook = load_workbook(filename='source_files/Listado_beneficiarios.xlsx')
+    workbook = load_workbook(
+        filename="source_files/Listado_beneficiarios.xlsx"
+    )
 
     # Get active worksheet/tab
     worksheet = workbook.active
@@ -681,6 +702,7 @@ def export_users_csv(request):
     #     cell = worksheet.cell(row=row_num, column=col_num)
     #     cell.value = column_title
     from openpyxl.styles import Font
+
     fontStyle = Font(size="12")
     count = 0
     for ben in beneficiarios_queryset:
@@ -698,7 +720,9 @@ def export_users_csv(request):
         ]
         # Assign the data for each cell of the row
         for col_num, cell_value in enumerate(row, 1):
-            cell = worksheet.cell(row=row_num, column=col_num, value=cell_value)
+            cell = worksheet.cell(
+                row=row_num, column=col_num, value=cell_value
+            )
             # cell.value = cell_value
             cell.fill = fill
             cell.alignment = Alignment(horizontal="center")
@@ -792,7 +816,7 @@ def generar_hoja_entrega(request, pk, mode):
         response = HttpResponse(content_type="application/pdf")
         response[
             "Content-Disposition"
-        ] = f'attachment; filename={persona.numero_adra}.pdf'
+        ] = f"attachment; filename={persona.numero_adra}.pdf"
         pdf.write(response)
         return response
 
@@ -811,57 +835,68 @@ def generar_hoja_entrega(request, pk, mode):
 
     return response
 
-@never_cache
+
 def generate_files(**kwargs):
-    # print(kwargs)
-    # print(kwargs["type"])
     if kwargs["type"] == "hoja_entrega":
         for beneficiar in kwargs["beneficarios"]:
-            DeliverySheet(beneficiar, kwargs["tenenat_info"]).export_template_pdf(True)
+            DeliverySheet(
+                beneficiar, kwargs["tenenat_info"]
+            ).export_template_pdf(True)
     else:
         for beneficiar in kwargs["beneficarios"]:
             ValoracionSocial(beneficiar).get_valoracion(True)
+
 
 @never_cache
 def generar_hoja_entrega_global(request):
     tenant_info = request.tenant
     beneficiarios = Persona.objects.filter(active=True).exclude(covid=True)
 
-    thread = Thread(target=generate_files,
-                    kwargs={'beneficarios': list(beneficiarios), "tenenat_info": tenant_info, "type": "hoja_entrega"})
-    thread.start()
-    print('Waiting for the new thread to finish...')
+    process = Process(
+        target=generate_files,
+        kwargs={
+            "beneficarios": list(beneficiarios),
+            "tenenat_info": tenant_info,
+            "type": "hoja_entrega",
+        },
+    )
+    process.start()
+    print("Waiting for the new process to finish...")
     # wait for the task to complete
-    thread.join()
+    process.join()
     res = AdraUtils().zip_files("source_files/generated_files", True)
 
     response = HttpResponse(res)
     response["Content-Type"] = "application/x-zip-compressed"
-    response[
-        "Content-Disposition"
-    ] = f"attachment; filename=hoja_entrega.zip"
+    response["Content-Disposition"] = f"attachment; filename=hoja_entrega.zip"
 
     return response
+
 
 @never_cache
 def valoracion_social_global(request):
     beneficiarios = Persona.objects.filter(active=True).exclude(covid=True)
-
-    thread = Thread(target=generate_files,
-                    kwargs={'beneficarios': list(beneficiarios), "type": "valoracion_social"})
-    thread.start()
-    print('Waiting for the new thread to finish...')
+    process = Process(
+        target=generate_files,
+        kwargs={
+            "beneficarios": list(beneficiarios),
+            "type": "valoracion_social",
+        },
+    )
+    process.start()
+    print("Waiting for the new process to finish...")
     # wait for the task to complete
-    thread.join()
+    process.join()
     res = AdraUtils().zip_files("source_files/generated_files", True)
 
     response = HttpResponse(res)
     response["Content-Type"] = "application/x-zip-compressed"
     response[
         "Content-Disposition"
-    ] = f"attachment; filename=valoraciones_sociales.zip"
+    ] = f"attachment; filename=valoraciones_sociales.zip"  # noqa
 
     return response
+
 
 @never_cache
 def generar_hoja_valoracion_social(request, pk):
@@ -1034,7 +1069,7 @@ class CustomAllauthAdapter(DefaultAccountAdapter):
 
 @login_required
 def configuracion(request):
-    excel_file = request.FILES.getlist('record', None)
+    excel_file = request.FILES.getlist("record", None)
     # print(excel_file)
     if len(excel_file):
         user = User.objects.get(id=request.user.pk)
@@ -1054,7 +1089,9 @@ def configuracion(request):
                 alm_rpt = form.save(commit=False)
                 alm_rpt.modificado_por = request.user
                 alm_rpt.save()
-                messages.success(request, "La configuraciòn se ha guardado correctamente ")
+                messages.success(
+                    request, "La configuraciòn se ha guardado correctamente "
+                )
                 return redirect("adra:configuracion")
 
         if "reset_papeles" in request.POST:
@@ -1073,7 +1110,6 @@ def configuracion(request):
                 p.save()
             messages.success(request, "La tarea se ha relizado correctamente ")
             return redirect("adra:configuracion")
-
 
         else:
             form = DelegacionForm(request.POST)
@@ -1118,19 +1154,31 @@ def configuracion(request):
         alm_repatir = AlimentosRepatir.objects.get(pk=1)
         init_reparto_alimento = {}
         for index in range(1, 14):
-            init_reparto_alimento[f"alimento_{index}"] = getattr(alm_repatir, f"alimento_{index}")
-            init_reparto_alimento[f"alimento_{index}_type"] = getattr(alm_repatir, f"alimento_{index}_type")
-            init_reparto_alimento[f"alimento_{index}_0_3"] = getattr(alm_repatir, f"alimento_{index}_0_3")
-            init_reparto_alimento[f"alimento_{index}_4_6"] = getattr(alm_repatir, f"alimento_{index}_4_6")
-            init_reparto_alimento[f"alimento_{index}_7_9"] = getattr(alm_repatir, f"alimento_{index}_7_9")
+            init_reparto_alimento[f"alimento_{index}"] = getattr(
+                alm_repatir, f"alimento_{index}"
+            )
+            init_reparto_alimento[f"alimento_{index}_type"] = getattr(
+                alm_repatir, f"alimento_{index}_type"
+            )
+            init_reparto_alimento[f"alimento_{index}_0_3"] = getattr(
+                alm_repatir, f"alimento_{index}_0_3"
+            )
+            init_reparto_alimento[f"alimento_{index}_4_6"] = getattr(
+                alm_repatir, f"alimento_{index}_4_6"
+            )
+            init_reparto_alimento[f"alimento_{index}_7_9"] = getattr(
+                alm_repatir, f"alimento_{index}_7_9"
+            )
 
-        alimentos_a_repatir_form = AlimentosRepatrirForm(initial=init_reparto_alimento)
+        alimentos_a_repatir_form = AlimentosRepatrirForm(
+            initial=init_reparto_alimento
+        )
         return render(
             request,
             "acciones/index.html",
             {
                 "nbar": "acciones",
                 "delegacion_form": delegacion_form,
-                "alimentos_repatir": alimentos_a_repatir_form
+                "alimentos_repatir": alimentos_a_repatir_form,
             },
         )
