@@ -14725,3 +14725,15 @@ section {
 .border-ficheros {
     border: 2px solid  darkgray;
 }
+.center-all-r  {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+}
+.center-all-c  {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}

@@ -17,7 +17,7 @@ services:
     networks:
       - default
   pgadmin:
-    container_name: pgadmin4_container
+    container_name: pgadmin4_container_django
     image: dpage/pgadmin4
     restart: always
     environment:

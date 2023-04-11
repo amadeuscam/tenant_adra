@@ -28,7 +28,7 @@ list_apps = [
     "django.contrib.auth",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "whitenoise.runserver_nostatic",
+    # "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
     "django.contrib.sites",
     "django_filters",
@@ -63,7 +63,7 @@ MIDDLEWARE = [
     "django_tenants.middleware.main.TenantMainMiddleware",
     # "django.middleware.cache.UpdateCacheMiddleware",
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
+    # "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -149,7 +149,7 @@ MULTITENANT_TEMPLATE_DIRS = [
     os.path.join(BASE_DIR, "adra/tenants/%s/templates"),
 ]
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MULTITENANT_RELATIVE_STATIC_ROOT = (
     ""  # (default: create sub-directory for each tenant)

@@ -68,6 +68,15 @@ class TestViews(TenantTestCase):
         response = self.client.get(reverse("adra:edit-profile"))
         assert response.status_code == 200
 
+    def test_download_alimentos_repartidos(self):
+        # self.aliments_a_repatir.create(pk=1)
+        self.alimentos.create()
+        response = self.client.post(reverse("adra:buscar-por-fecha"),data={"download":"download"})
+        print(response)
+
+        assert response.status_code == 200
+
+
     def test_edit_profile_post(self):
         edit_profile_dict = {
             "sexo": "mujer",
@@ -917,13 +926,3 @@ class TestViews(TenantTestCase):
             assert alm_repatir[f"alimento_{index}_0_3"] == 3
             assert alm_repatir[f"alimento_{index}_4_6"] == 3
             assert alm_repatir[f"alimento_{index}_7_9"] == 3
-            # print(alm_repatir[f"alimento_{index}"])
-            # print(alm_repatir[f"alimento_{index}_type"])
-            # print(alm_repatir[f"alimento_{index}_0_3"])
-            # print(alm_repatir[f"alimento_{index}_4_6"])
-            # print(alm_repatir[f"alimento_{index}_7_9"])
-            # print(dir(response_post_alimentos_repartir))
-        # print(response_post_alimentos_repartir)
-        # print(response_post_alimentos_repartir.request)
-        # print(response_post_alimentos_repartir.flush)
-        # print(response_post_alimentos_repartir.items)

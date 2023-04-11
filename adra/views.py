@@ -25,7 +25,7 @@ from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
                                   UpdateView)
 from django_tenants.utils import get_tenant_model
 from jsignature.utils import draw_signature
-from openpyxl import load_workbook
+from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Alignment, PatternFill
 from rest_framework import permissions, viewsets
 from sendgrid import SendGridAPIClient
@@ -755,6 +755,7 @@ def export_users_csv(request):
 @login_required
 @cache_page(60 * 15)
 def buscar_fecha(request):
+    # print(request.GET['download'] )
     alimentos_list = Alimentos.objects.all()
     # print(request.GET)
     user_filter = AlimentosFilters(request.GET, queryset=alimentos_list)
@@ -771,6 +772,98 @@ def buscar_fecha(request):
     alimento_11 = user_filter.qs.aggregate(Sum("alimento_11"))
     alimento_12 = user_filter.qs.aggregate(Sum("alimento_12"))
     alimento_13 = user_filter.qs.aggregate(Sum("alimento_13"))
+
+    if 'download' in request.POST:
+        response = HttpResponse(
+            content_type="application/vnd.openxmlformats-officedocument.\
+            spreadsheetml.sheet",
+        )
+        response["Content-Disposition"] = "attachment; filename=alimentos_repartidos.xlsx"  # noqa
+
+        workbook = Workbook()
+        # Get active worksheet/tab
+        worksheet = workbook.active
+        # Delete the default worksheet
+        # workbook.remove(workbook.active)
+        worksheet.title = "Alimentos Repartidos"
+        # Define the titles for columns
+        columns = [
+            "Arroz Blanco",
+            "Alubia cocida",
+            "Conserva de atún",
+            "Pasta alimenticia tipo macarron",
+            "Tomate frito en conserva",
+            "Galletas",
+            "Macedonia de verduras en conserva",
+            "Fruta en conserva",
+            "Cacao soluble",
+            "Tarritos infantiles con pollo",
+            "Tarritos infantiles con fruta",
+            "Leche entera UHT",
+            "Aceite de oliva",
+            "Fecha Recogida",
+            "Beneficiario",
+        ]
+
+        row_num = 1
+        # fill = PatternFill(start_color="43fb32", fill_type="solid")
+        # Assign the titles for each cell of the header
+        for col_num, column_title in enumerate(columns, 1):
+            cell = worksheet.cell(row=row_num, column=col_num)
+            cell.value = column_title
+
+        from openpyxl.styles import Font
+
+        fontStyle = Font(size="12")
+        count = 0
+        for alimento in alimentos_list:
+            row_num += 1
+            # Define the data for each cell in the row
+            row = [
+                alimento.alimento_1,
+                alimento.alimento_2,
+                alimento.alimento_3,
+                alimento.alimento_4,
+                alimento.alimento_5,
+                alimento.alimento_6,
+                alimento.alimento_7,
+                alimento.alimento_8,
+                alimento.alimento_9,
+                alimento.alimento_10,
+                alimento.alimento_11,
+                alimento.alimento_12,
+                alimento.alimento_13,
+                alimento.fecha_recogida.strftime("%d/%m/%Y"),
+                alimento.persona.nombre_apellido,
+            ]
+            # Assign the data for each cell of the row
+            for col_num, cell_value in enumerate(row, 1):
+                cell = worksheet.cell(
+                    row=row_num, column=col_num, value=cell_value
+                )
+                # cell.value = cell_value
+                # cell.fill = fill
+                cell.alignment = Alignment(horizontal="center")
+                cell.font = fontStyle
+
+        # auto resize colum width
+        for col in worksheet.columns:
+            print(dir(col))
+            print(col)
+            max_length = 0
+            column = col[0].column_letter  # Get the column name
+            for cell in col:
+                try:  # Necessary to avoid error on empty cells
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                except:
+                    pass
+            adjusted_width = (max_length + 2) * 1.2
+            worksheet.column_dimensions[column].width = adjusted_width
+
+        workbook.save(response)
+
+        return response
 
     return render(
         request,
