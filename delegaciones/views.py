@@ -3,7 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django_tenants.utils import tenant_context
 
-from adra.models import Alimentos, AlmacenAlimentos, Persona, Hijo
+from adra.models import Alimentos, AlmacenAlimentos, Hijo, Persona
 from adra.utils.adra_util import AgeCalculacion
 from delegaciones.models import Delegaciones
 
@@ -50,7 +50,6 @@ def get_oar_info(request):
                         "alimento_10",
                         "alimento_11",
                         "alimento_12",
-                        "alimento_13",
                     ]
 
                     almacen_alimentos_lst = []

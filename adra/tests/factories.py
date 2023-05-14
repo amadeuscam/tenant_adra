@@ -1,13 +1,13 @@
 from datetime import date
 
 import factory
-from faker import Faker
-from adra.models import Persona, Hijo, Alimentos, AlmacenAlimentos, Profile, AlimentosRepatir
-from faker import Factory as FakerFactory
-
-from delegaciones.models import BeneficiariosGlobales
 from django.contrib.auth import get_user_model
+from faker import Factory as FakerFactory
+from faker import Faker
 
+from adra.models import (Alimentos, AlimentosRepatir, AlmacenAlimentos, Hijo,
+                         Persona, Profile)
+from delegaciones.models import BeneficiariosGlobales
 
 # fake = Faker()
 # faker = FakerFactory.create()
@@ -78,7 +78,6 @@ class AlmacenAlimentosFactory(factory.django.DjangoModelFactory):
     alimento_10 = 100
     alimento_11 = 100
     alimento_12 = 100
-    alimento_13 = 100
     alimento_1_caducidad = date(2020, 0o1, 27)
     alimento_2_caducidad = date(2022, 0o1, 27)
     alimento_3_caducidad = date(2020, 0o1, 27)
@@ -91,7 +90,6 @@ class AlmacenAlimentosFactory(factory.django.DjangoModelFactory):
     alimento_10_caducidad = date(2020, 0o1, 27)
     alimento_11_caducidad = date(2020, 0o1, 27)
     alimento_12_caducidad = date(2020, 0o1, 27)
-    alimento_13_caducidad = date(2020, 0o1, 27)
 
 
 class AlimentosFactory(factory.django.DjangoModelFactory):
@@ -110,7 +108,6 @@ class AlimentosFactory(factory.django.DjangoModelFactory):
     alimento_10 = 2
     alimento_11 = 2
     alimento_12 = 2
-    alimento_13 = 2
     fecha_recogida = date(2022, 0o1, 27)
     persona = factory.SubFactory(PersonaFactory)
 
@@ -136,7 +133,7 @@ class UserFactory(factory.django.DjangoModelFactory):
 class AlimentosRepatirFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = AlimentosRepatir
-
+        
     alimento_1 = 3
     alimento_1_type = "unidad"
     alimento_1_0_3 = 3
@@ -197,9 +194,4 @@ class AlimentosRepatirFactory(factory.django.DjangoModelFactory):
     alimento_12_0_3 = 3
     alimento_12_4_6 = 3
     alimento_12_7_9 = 3
-    alimento_13 = 3
-    alimento_13_type = "unidad"
-    alimento_13_0_3 = 3
-    alimento_13_4_6 = 3
-    alimento_13_7_9 = 3
     modificado_por = factory.SubFactory(UserFactory)

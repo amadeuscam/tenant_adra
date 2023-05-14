@@ -108,18 +108,6 @@ class PersonaDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
-# class BuscarDetailView(LoginRequiredMixin, ListView):
-#     model = Alimentos
-#     template_name = "busqueda_a/view.html"
-#
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context["filter"] = AlimentosFilters(
-#             self.request.GET, queryset=self.get_queryset()
-#         )
-#         return context
-
-
 class PersonaCreateView(LoginRequiredMixin, CreateView):
     model = Persona
     success_url = "/"
@@ -202,7 +190,7 @@ class PersonaDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
 
 def adauga_alimentos_persona(request, pk):
     persona = get_object_or_404(Persona, pk=pk)
-    almacen = AlmacenAlimentos.objects.get(pk=1)
+    almacen = AlmacenAlimentos.objects.get(pk=2)
 
     if request.method == "POST":
         print(request.POST)
@@ -226,7 +214,6 @@ def adauga_alimentos_persona(request, pk):
             almacen.alimento_10 -= alimentos.alimento_10
             almacen.alimento_11 -= alimentos.alimento_11
             almacen.alimento_12 -= alimentos.alimento_12
-            almacen.alimento_13 -= alimentos.alimento_13
 
             alimentos.persona = persona
             alimentos.modificado_por = request.user
@@ -238,23 +225,21 @@ def adauga_alimentos_persona(request, pk):
             return redirect(persona)
 
     else:
-        alm_repatir = AlimentosRepatir.objects.get(pk=1)
-        # print(alm_repatir.alimento_1)
-        # print(alm_repatir.alimento_1_type)
+        alm_repatir = AlimentosRepatir.objects.get(pk=2)
+
         init_reparto_alimento = {}
-        for index in range(1, 14):
+        for index in range(1, 13):
             if getattr(alm_repatir, f"alimento_{index}_type") == "unidad":
-                # print("baby", len([fam for fam in persona.hijo.all() if fam.age <= 3]))
                 babys = len(
                     [fam for fam in persona.hijo.all() if fam.age <= 3]
                 )
-                if babys > 0 and index in [10, 11]:
+                if babys > 0 and index in [11, 12]:
                     init_reparto_alimento[f"alimento_{index}"] = (
                         getattr(alm_repatir, f"alimento_{index}") * babys
                     )
                     continue
                 else:
-                    if index in [10, 11]:
+                    if index in [11, 12]:
                         init_reparto_alimento[f"alimento_{index}"] = 0
                         continue
                 init_reparto_alimento[f"alimento_{index}"] = (
@@ -303,7 +288,6 @@ class PersonaAlimentosUpdateView(LoginRequiredMixin, UpdateView):
         "alimento_10",
         "alimento_11",
         "alimento_12",
-        "alimento_13",
         "fecha_recogida",
         "signature",
     ]
@@ -312,7 +296,7 @@ class PersonaAlimentosUpdateView(LoginRequiredMixin, UpdateView):
         clean = form.changed_data
         # print(clean)
         # print(form)
-        almacen = AlmacenAlimentos.objects.get(pk=1)
+        almacen = AlmacenAlimentos.objects.get(pk=2)
 
         if "alimento_1" in clean:
             valor_anterior_alimento_1 = form.initial["alimento_1"]
@@ -469,19 +453,6 @@ class PersonaAlimentosUpdateView(LoginRequiredMixin, UpdateView):
                     form.instance.alimento_12 - valor_anterior_alimento_12
                 )
                 almacen.alimento_12 += restante
-
-        if "alimento_13" in clean:
-            valor_anterior_alimento_13 = form.initial["alimento_13"]
-            if form.instance.alimento_13 > valor_anterior_alimento_13:
-                restante = abs(
-                    form.instance.alimento_13 - valor_anterior_alimento_13
-                )
-                almacen.alimento_13 -= restante
-            else:
-                restante = abs(
-                    form.instance.alimento_13 - valor_anterior_alimento_13
-                )
-                almacen.alimento_13 += restante
 
         almacen.save()
         form.instance.modificado_por = self.request.user
@@ -771,7 +742,6 @@ def buscar_fecha(request):
     alimento_10 = user_filter.qs.aggregate(Sum("alimento_10"))
     alimento_11 = user_filter.qs.aggregate(Sum("alimento_11"))
     alimento_12 = user_filter.qs.aggregate(Sum("alimento_12"))
-    alimento_13 = user_filter.qs.aggregate(Sum("alimento_13"))
 
     if 'download' in request.POST:
         response = HttpResponse(
@@ -788,19 +758,18 @@ def buscar_fecha(request):
         worksheet.title = "Alimentos Repartidos"
         # Define the titles for columns
         columns = [
-            "Arroz Blanco",
-            "Alubia cocida",
-            "Conserva de atún",
-            "Pasta alimenticia tipo macarron",
-            "Tomate frito en conserva",
-            "Galletas",
-            "Macedonia de verduras en conserva",
-            "Fruta en conserva",
-            "Cacao soluble",
-            "Tarritos infantiles con pollo",
-            "Tarritos infantiles con fruta",
-            "Leche entera UHT",
-            "Aceite de oliva",
+            settings.ALIMENTOS_METADATA["alimento_1"]["name"],
+            settings.ALIMENTOS_METADATA["alimento_2"]["name"],
+            settings.ALIMENTOS_METADATA["alimento_3"]["name"],
+            settings.ALIMENTOS_METADATA["alimento_4"]["name"],
+            settings.ALIMENTOS_METADATA["alimento_5"]["name"],
+            settings.ALIMENTOS_METADATA["alimento_6"]["name"],
+            settings.ALIMENTOS_METADATA["alimento_7"]["name"],
+            settings.ALIMENTOS_METADATA["alimento_8"]["name"],
+            settings.ALIMENTOS_METADATA["alimento_9"]["name"],
+            settings.ALIMENTOS_METADATA["alimento_10"]["name"],
+            settings.ALIMENTOS_METADATA["alimento_11"]["name"],
+            settings.ALIMENTOS_METADATA["alimento_12"]["name"],
             "Fecha Recogida",
             "Beneficiario",
         ]
@@ -832,7 +801,6 @@ def buscar_fecha(request):
                 alimento.alimento_10,
                 alimento.alimento_11,
                 alimento.alimento_12,
-                alimento.alimento_13,
                 alimento.fecha_recogida.strftime("%d/%m/%Y"),
                 alimento.persona.nombre_apellido,
             ]
@@ -882,7 +850,6 @@ def buscar_fecha(request):
             "alimento_10": alimento_10,
             "alimento_11": alimento_11,
             "alimento_12": alimento_12,
-            "alimento_13": alimento_13,
             "nbar": "buscar_av",
         },
     )
@@ -1174,7 +1141,7 @@ def configuracion(request):
         if "form_reparto" in request.POST.keys():
             pst = request.POST.copy()
             del pst["form_reparto"]
-            alm_repatir = AlimentosRepatir.objects.get(pk=1)
+            alm_repatir = AlimentosRepatir.objects.get(pk=2)
             form = AlimentosRepatrirForm(pst, instance=alm_repatir)
             # check whether it's valid:
             if form.is_valid():
@@ -1244,9 +1211,9 @@ def configuracion(request):
             }
         )
 
-        alm_repatir = AlimentosRepatir.objects.get(pk=1)
+        alm_repatir = AlimentosRepatir.objects.get(pk=2)
         init_reparto_alimento = {}
-        for index in range(1, 14):
+        for index in range(1, 13):
             init_reparto_alimento[f"alimento_{index}"] = getattr(
                 alm_repatir, f"alimento_{index}"
             )

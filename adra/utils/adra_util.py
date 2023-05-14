@@ -4,10 +4,11 @@ import random
 import zipfile
 from datetime import date
 from pathlib import Path
+from random import randrange
 
+import numpy as np
+import pandas as pd
 from django.db.models import Q
-
-from adra.models import Persona, Hijo
 from jsignature.utils import draw_signature
 from mailmerge import MailMerge
 from openpyxl import Workbook
@@ -16,11 +17,9 @@ from PyPDF2 import PdfFileReader, PdfFileWriter
 from PyPDF2.generic import (BooleanObject, IndirectObject, NameObject,
                             NumberObject)
 from reportlab.pdfgen import canvas
-import pandas as pd
-import numpy as np
 
+from adra.models import Hijo, Persona
 from delegaciones.models import BeneficiariosGlobales
-from random import randrange
 
 
 class AdraUtils:
@@ -96,7 +95,7 @@ class DeliverySheet:
 
     def _load_file(self):
         path = os.path.join(
-            os.path.abspath("source_files"), "2022_entrega_full.pdf"
+            os.path.abspath("source_files"), "2023_entrega_full.pdf"
         )
         pdf_reader = PdfFileReader(path, strict=True)
         self.pdf_writer.addPage(pdf_reader.getPage(0))
@@ -210,19 +209,18 @@ class DeliverySheet:
 
         self.dict_alimentos.update(
             {
-                f"2022Arroz blanco_{index}": alimento.alimento_1,
-                f"2022Alubia cocida_{index}": alimento.alimento_2,
-                f"2022Conserva de atún_{index}": alimento.alimento_3,
-                f"2022Pasta alimenticia tipo macarrón_{index}": alimento.alimento_4,
-                f"2022Tomate frito en conserva_{index}": alimento.alimento_5,
-                f"2022Galletas_{index}": alimento.alimento_6,
-                f"2022Macedonia de verduras en conserva_{index}": alimento.alimento_7,
-                f"2022Fruta en conserva_{index}": alimento.alimento_8,
-                f"2022Cacao soluble_{index}": alimento.alimento_9,
-                f"2022Tarritos infantiles con pollo_{index}": alimento.alimento_10,
-                f"2022Tarritos infantiles de fruta_{index}": alimento.alimento_11,
-                f"2022Leche entera UHT_{index}": alimento.alimento_12,
-                f"2022Aceite de oliva_{index}": alimento.alimento_13,
+                f"2023Arroz blanco_{index}": alimento.alimento_1,
+                f"2023Alubia cocida_{index}": alimento.alimento_2,
+                f"2023Conserva de atún_{index}": alimento.alimento_3,
+                f"2023Pasta alimenticia tipo macarrón_{index}": alimento.alimento_4,
+                f"2023Tomate frito en conserva_{index}": alimento.alimento_5,
+                f"2023Galletas_{index}": alimento.alimento_6,
+                f"2023Macedonia de verduras en conserva_{index}": alimento.alimento_7,
+                f"2023Fruta en conserva_{index}": alimento.alimento_8,
+                f"2023Cacao soluble_{index}": alimento.alimento_9,
+                f"2023Tarritos infantiles con pollo_{index}": alimento.alimento_10,
+                f"2023Tarritos infantiles de fruta_{index}": alimento.alimento_11,
+                f"2023Leche entera UHT_{index}": alimento.alimento_12,
                 f"dia_{index}": alimento.fecha_recogida.day,
                 f"mes_{index}": alimento.fecha_recogida.month,
                 f"ano_{index}": alimento.fecha_recogida.year,

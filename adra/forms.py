@@ -1,10 +1,11 @@
 from django import forms
 from django.contrib.auth.models import User
-from django.forms import DateInput, EmailInput, Form, ModelForm
+from django.forms import DateInput, EmailInput, Form, ModelForm, TextInput
 from jsignature.forms import JSignatureField
 from jsignature.widgets import JSignatureWidget
 
-from .models import Alimentos, AlmacenAlimentos, Hijo, Persona, Profile, AlimentosRepatir
+from .models import (Alimentos, AlimentosRepatir, AlmacenAlimentos, Hijo,
+                     Persona, Profile)
 
 
 class AlimentosFrom(ModelForm):
@@ -25,12 +26,12 @@ class AlimentosFrom(ModelForm):
             "alimento_10",
             "alimento_11",
             "alimento_12",
-            "alimento_13",
             "fecha_recogida",
             "signature",
         )
         widgets = {
             "fecha_recogida": DateInput(attrs={"type": "datetime-local"}),
+            "alimento_4": TextInput(attrs={"readonly": "readonly"}),
             "signature": JSignatureWidget(
                 jsignature_attrs={"color": "#405e9d"}
             ),
@@ -55,7 +56,6 @@ class AlmacenAlimentosFrom(ModelForm):
             "alimento_10",
             "alimento_11",
             "alimento_12",
-            "alimento_13",
             "alimento_1_caducidad",
             "alimento_2_caducidad",
             "alimento_3_caducidad",
@@ -68,7 +68,6 @@ class AlmacenAlimentosFrom(ModelForm):
             "alimento_10_caducidad",
             "alimento_11_caducidad",
             "alimento_12_caducidad",
-            "alimento_13_caducidad",
         )
         widgets = {
             "alimento_1_caducidad": DateInput(
@@ -167,14 +166,7 @@ class AlmacenAlimentosFrom(ModelForm):
                     "type": "date",
                 },
             ),
-            "alimento_13_caducidad": DateInput(
-                format=("%Y-%m-%d"),
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "Select Date",
-                    "type": "date",
-                },
-            ),
+            
         }
 
 
@@ -421,10 +413,7 @@ class AlimentosRepatrirForm(ModelForm):
             "alimento_12_4_6",
             "alimento_12_7_9",
 
-            "alimento_13",
-            "alimento_13_0_3",
-            "alimento_13_4_6",
-            "alimento_13_7_9",
+            
 
             "alimento_1_type",
             "alimento_2_type",
@@ -438,5 +427,5 @@ class AlimentosRepatrirForm(ModelForm):
             "alimento_10_type",
             "alimento_11_type",
             "alimento_12_type",
-            "alimento_13_type",
+             
         )

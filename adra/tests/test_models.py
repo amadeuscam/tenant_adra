@@ -1,8 +1,10 @@
 from datetime import date
+
 import pytest
 from django.contrib.auth.models import User
 from django_tenants.test.cases import TenantTestCase
-from adra.models import Persona, Hijo, AlmacenAlimentos
+
+from adra.models import AlmacenAlimentos, Hijo, Persona
 
 
 class TestAppModels(TenantTestCase):
@@ -53,7 +55,7 @@ class TestAppModels(TenantTestCase):
         almacen_alimentos = self.almacen_alimentos.create()
         assert "/almacen/" == almacen_alimentos.get_absolute_url()
         alimento_nombre, dias_hasta_caducidad = AlmacenAlimentos.caducidad(AlmacenAlimentos, number=2)
-        assert alimento_nombre == 'Alubia Cocida'
+        assert alimento_nombre == 'Garbanzos Cocidos'
         assert dias_hasta_caducidad == dias_hasta_caducidad
 
     def test_profile(self):

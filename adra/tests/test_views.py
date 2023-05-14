@@ -153,8 +153,8 @@ class TestViews(TenantTestCase):
         assert response.context_data["up"] == "update"
 
     def test_adauga_alimentos_persona_get(self):
-        self.almacen_alimentos.create(pk=1)
-        self.aliments_a_repatir.create(pk=1)
+        self.almacen_alimentos.create(pk=2)
+        self.aliments_a_repatir.create(pk=2)
         self.familiar.create()
 
         response = self.client.get(
@@ -163,21 +163,21 @@ class TestViews(TenantTestCase):
                 kwargs={"pk": self.beneficario_inst.pk},
             )
         )
-        for index in range(1, 14):
+        for index in range(1, 13):
             value = int(
                 re.findall(
                     r"\d+", str(response.context["form"][f"alimento_{index}"])
                 )[1]
             )
-            if index in [10, 11]:
+            if index in [11, 12]:
                 assert value == 3
             else:
                 assert value == 6
         assert response.status_code == 200
 
     def test_adauga_alimentos_persona_fullfill_unit(self):
-        self.almacen_alimentos.create(pk=1)
-        self.aliments_a_repatir.create(pk=1)
+        self.almacen_alimentos.create(pk=2)
+        self.aliments_a_repatir.create(pk=2)
         for d in range(3):
             self.familiar.create(
                 fecha_nacimiento=f"199{d}-01-27",
@@ -190,23 +190,23 @@ class TestViews(TenantTestCase):
                 kwargs={"pk": self.beneficario_inst.pk},
             )
         )
-        for index in range(1, 14):
+        for index in range(1, 12):
             value = int(
                 re.findall(
                     r"\d+", str(response.context["form"][f"alimento_{index}"])
                 )[1]
             )
             print(index, value)
-            if index in [10, 11]:
+            if index in [11, 12]:
                 assert value == 0
             else:
                 assert value == 12
         assert response.status_code == 200
 
     def test_adauga_alimentos_persona_fullfill_family(self):
-        self.almacen_alimentos.create(pk=1)
+        self.almacen_alimentos.create(pk=2)
         self.aliments_a_repatir.create(
-            pk=1,
+            pk=2,
             alimento_1_type="familia",
             alimento_1_0_3=3,
             alimento_1_4_6=5,
@@ -228,7 +228,7 @@ class TestViews(TenantTestCase):
                 kwargs={"pk": self.beneficario_inst.pk},
             )
         )
-        for index in range(1, 14):
+        for index in range(1, 13):
             value = int(
                 re.findall(
                     r"\d+",
@@ -236,7 +236,7 @@ class TestViews(TenantTestCase):
                 )[1]
             )
             print(index, value)
-            if index in [10, 11]:
+            if index in [11, 12]:
                 assert value == 0
             else:
                 if index == 1:
@@ -257,7 +257,7 @@ class TestViews(TenantTestCase):
                 kwargs={"pk": self.beneficario_inst.pk},
             )
         )
-        for index in range(1, 14):
+        for index in range(1, 13):
             value = int(
                 re.findall(
                     r"\d+",
@@ -265,7 +265,7 @@ class TestViews(TenantTestCase):
                 )[1]
             )
             print(index, value)
-            if index in [10, 11]:
+            if index in [11, 12]:
                 assert value == 0
             else:
                 if index == 1:
@@ -286,7 +286,7 @@ class TestViews(TenantTestCase):
                 kwargs={"pk": self.beneficario_inst.pk},
             )
         )
-        for index in range(1, 14):
+        for index in range(1, 13):
             value = int(
                 re.findall(
                     r"\d+",
@@ -294,7 +294,7 @@ class TestViews(TenantTestCase):
                 )[1]
             )
             print(index, value)
-            if index in [10, 11]:
+            if index in [11, 12]:
                 assert value == 0
             else:
                 if index == 1:
@@ -318,7 +318,7 @@ class TestViews(TenantTestCase):
         assert response_invalid.status_code == 200
 
     def test_adauga_alimentos_persona_post_without_signature(self):
-        self.almacen_alimentos.create(pk=1)
+        self.almacen_alimentos.create(pk=2)
         response_without_signature = self.client.post(
             reverse(
                 "adra:alimentos-create",
@@ -599,7 +599,7 @@ class TestViews(TenantTestCase):
         assert response_get.context["nbar"] == "buscar_av"
 
     def test_alimentos_update_beneficiario(self):
-        self.almacen_alimentos.create(pk=1)
+        self.almacen_alimentos.create(pk=2)
         alimento = self.alimentos.create(pk=1)
 
         alimentos_quantity_negative = 6
@@ -620,7 +620,6 @@ class TestViews(TenantTestCase):
                 "alimento_10": alimentos_quantity_negative,
                 "alimento_11": alimentos_quantity_negative,
                 "alimento_12": alimentos_quantity_negative,
-                "alimento_13": alimentos_quantity_negative,
                 "fecha_recogida": "2022-11-18",
             },
         )
@@ -639,7 +638,6 @@ class TestViews(TenantTestCase):
             assert alm.alimento_10 == 96
             assert alm.alimento_11 == 96
             assert alm.alimento_12 == 96
-            assert alm.alimento_13 == 96
 
         alimentos_quantity_positive = 2
         response_urc = self.client.post(
@@ -659,7 +657,6 @@ class TestViews(TenantTestCase):
                 "alimento_10": alimentos_quantity_positive,
                 "alimento_11": alimentos_quantity_positive,
                 "alimento_12": alimentos_quantity_positive,
-                "alimento_13": alimentos_quantity_positive,
                 "fecha_recogida": "2022-11-17",
             },
         )
@@ -678,7 +675,6 @@ class TestViews(TenantTestCase):
             assert alm.alimento_10 == 100
             assert alm.alimento_11 == 100
             assert alm.alimento_12 == 100
-            assert alm.alimento_13 == 100
 
     def test_generar_hoja_entrega_individual_sin_firma(self):
         self.almacen_alimentos.create(pk=1)
@@ -851,7 +847,7 @@ class TestViews(TenantTestCase):
         assert response.status_code == 200
 
     def test_configuracion_front(self):
-        self.aliments_a_repatir.create(pk=1)
+        self.aliments_a_repatir.create(pk=2)
         alm_repatir = self.aliments_a_repatir_json_post
         del alm_repatir["modificado_por"]
         alm_repatir["form_reparto"] = ""
@@ -920,7 +916,7 @@ class TestViews(TenantTestCase):
         assert response_post_alimentos_repartir.status_code == 302
         # for index, (key, value) in enumerate(start=1, alm_repatir.items()):
         del alm_repatir["form_reparto"]
-        for index in range(1, 14):
+        for index in range(1, 13):
             assert alm_repatir[f"alimento_{index}"] == 3
             assert alm_repatir[f"alimento_{index}_type"] == "unidad"
             assert alm_repatir[f"alimento_{index}_0_3"] == 3
