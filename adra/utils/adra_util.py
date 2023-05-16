@@ -98,6 +98,7 @@ class DeliverySheet:
             os.path.abspath("source_files"), "2023_entrega_full.pdf"
         )
         pdf_reader = PdfFileReader(path, strict=True)
+        print(pdf_reader.getFormTextFields())
         self.pdf_writer.addPage(pdf_reader.getPage(0))
         self.pdf_writer = self.set_appearances_writer()
         return self.pdf_writer
@@ -206,7 +207,8 @@ class DeliverySheet:
         else:
             if index == 1:
                 self.set_alta_date(alimento)
-
+        print(index)
+        print(alimento.alimento_1)
         self.dict_alimentos.update(
             {
                 f"2023Arroz blanco_{index}": alimento.alimento_1,

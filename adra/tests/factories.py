@@ -149,7 +149,7 @@ class AlimentosRepatirFactory(factory.django.DjangoModelFactory):
     alimento_3_0_3 = 3
     alimento_3_4_6 = 3
     alimento_3_7_9 = 3
-    alimento_4 = 3
+    alimento_4 = 0
     alimento_4_type = "unidad"
     alimento_4_0_3 = 3
     alimento_4_4_6 = 3

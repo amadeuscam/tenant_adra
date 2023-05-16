@@ -171,6 +171,8 @@ class TestViews(TenantTestCase):
             )
             if index in [11, 12]:
                 assert value == 3
+            elif index in [4]:
+                assert value == 0
             else:
                 assert value == 6
         assert response.status_code == 200
@@ -198,6 +200,8 @@ class TestViews(TenantTestCase):
             )
             print(index, value)
             if index in [11, 12]:
+                assert value == 0
+            elif index in [4]:
                 assert value == 0
             else:
                 assert value == 12
@@ -917,8 +921,11 @@ class TestViews(TenantTestCase):
         # for index, (key, value) in enumerate(start=1, alm_repatir.items()):
         del alm_repatir["form_reparto"]
         for index in range(1, 13):
-            assert alm_repatir[f"alimento_{index}"] == 3
-            assert alm_repatir[f"alimento_{index}_type"] == "unidad"
-            assert alm_repatir[f"alimento_{index}_0_3"] == 3
-            assert alm_repatir[f"alimento_{index}_4_6"] == 3
-            assert alm_repatir[f"alimento_{index}_7_9"] == 3
+            if index != 4:
+                assert alm_repatir[f"alimento_{index}"] == 3
+                assert alm_repatir[f"alimento_{index}_type"] == "unidad"
+                assert alm_repatir[f"alimento_{index}_0_3"] == 3
+                assert alm_repatir[f"alimento_{index}_4_6"] == 3
+                assert alm_repatir[f"alimento_{index}_7_9"] == 3
+            else:
+                assert alm_repatir[f"alimento_{index}"] == 0

@@ -190,7 +190,7 @@ class PersonaDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
 
 def adauga_alimentos_persona(request, pk):
     persona = get_object_or_404(Persona, pk=pk)
-    almacen = AlmacenAlimentos.objects.get(pk=2)
+    almacen = AlmacenAlimentos.objects.all().first()
 
     if request.method == "POST":
         print(request.POST)
@@ -225,7 +225,7 @@ def adauga_alimentos_persona(request, pk):
             return redirect(persona)
 
     else:
-        alm_repatir = AlimentosRepatir.objects.get(pk=2)
+        alm_repatir = AlimentosRepatir.objects.all().first()
 
         init_reparto_alimento = {}
         for index in range(1, 13):
@@ -268,6 +268,7 @@ def adauga_alimentos_persona(request, pk):
                     )
                 else:
                     print("ninguna es correcta")
+        init_reparto_alimento['alimento_4'] = 0
         print(init_reparto_alimento)  # no tocar, es para los test esto
         a_form = AlimentosFrom(initial=init_reparto_alimento)
     return render(request, "adra/alimentos_form.html", {"form": a_form})
@@ -296,7 +297,7 @@ class PersonaAlimentosUpdateView(LoginRequiredMixin, UpdateView):
         clean = form.changed_data
         # print(clean)
         # print(form)
-        almacen = AlmacenAlimentos.objects.get(pk=2)
+        almacen = AlmacenAlimentos.objects.all().first()
 
         if "alimento_1" in clean:
             valor_anterior_alimento_1 = form.initial["alimento_1"]
@@ -1141,7 +1142,8 @@ def configuracion(request):
         if "form_reparto" in request.POST.keys():
             pst = request.POST.copy()
             del pst["form_reparto"]
-            alm_repatir = AlimentosRepatir.objects.get(pk=2)
+            alm_repatir = AlimentosRepatir.objects.all().first()
+            
             form = AlimentosRepatrirForm(pst, instance=alm_repatir)
             # check whether it's valid:
             if form.is_valid():
@@ -1211,7 +1213,7 @@ def configuracion(request):
             }
         )
 
-        alm_repatir = AlimentosRepatir.objects.get(pk=2)
+        alm_repatir = AlimentosRepatir.objects.all().first()
         init_reparto_alimento = {}
         for index in range(1, 13):
             init_reparto_alimento[f"alimento_{index}"] = getattr(
