@@ -1,9 +1,10 @@
-import concurrent.futures
+import glob
+import io
 import os
-import queue  # imported for using queue.Empty exception
-import time
-from multiprocessing import Lock, Process, Queue, current_process
-from threading import Thread
+import subprocess  # imported for using queue.Empty exception
+from datetime import datetime
+from multiprocessing import Process
+from pathlib import Path
 
 import telegram
 from allauth.account.adapter import DefaultAccountAdapter
@@ -14,19 +15,20 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.messages.views import SuccessMessageMixin
+from django.core.files.storage import FileSystemStorage
 from django.db import connection
 from django.db.models import Q, Sum
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
-from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page, never_cache
 from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
                                   UpdateView)
 from django_tenants.utils import get_tenant_model
-from jsignature.utils import draw_signature
+from docx import Document
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Alignment, PatternFill
+from PyPDF2 import PdfFileMerger, PdfFileReader, PdfFileWriter
 from rest_framework import permissions, viewsets
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
@@ -131,7 +133,6 @@ class PersonaCreateView(LoginRequiredMixin, CreateView):
         # print(beneficario_global.count())
 
         if beneficario_global.count() > 0:
-
             for beneficario in beneficario_global:
                 # print(beneficario.delegacion_name)
 
@@ -268,7 +269,7 @@ def adauga_alimentos_persona(request, pk):
                     )
                 else:
                     print("ninguna es correcta")
-        init_reparto_alimento['alimento_4'] = 0
+        init_reparto_alimento["alimento_4"] = 0
         print(init_reparto_alimento)  # no tocar, es para los test esto
         a_form = AlimentosFrom(initial=init_reparto_alimento)
     return render(request, "adra/alimentos_form.html", {"form": a_form})
@@ -744,12 +745,14 @@ def buscar_fecha(request):
     alimento_11 = user_filter.qs.aggregate(Sum("alimento_11"))
     alimento_12 = user_filter.qs.aggregate(Sum("alimento_12"))
 
-    if 'download' in request.POST:
+    if "download" in request.POST:
         response = HttpResponse(
             content_type="application/vnd.openxmlformats-officedocument.\
             spreadsheetml.sheet",
         )
-        response["Content-Disposition"] = "attachment; filename=alimentos_repartidos.xlsx"  # noqa
+        response[
+            "Content-Disposition"
+        ] = "attachment; filename=alimentos_repartidos.xlsx"  # noqa
 
         workbook = Workbook()
         # Get active worksheet/tab
@@ -870,31 +873,65 @@ def generar_hoja_entrega(request, pk, mode):
     # print(request.tenant)
     # print(request.tenant.oar)
     tenant_info = request.tenant
-    # raise
     persona = Persona.objects.get(id=pk)
-    if mode == "sin":
-        pdf = DeliverySheet(persona, tenant_info).export_template_pdf()
-        response = HttpResponse(content_type="application/pdf")
-        response[
-            "Content-Disposition"
-        ] = f"attachment; filename={persona.numero_adra}.pdf"
-        pdf.write(response)
-        return response
 
     alimentos = persona.alimentos.all().order_by("fecha_recogida")
-
-    for arr in AdraUtils().split_list(alimentos, 7):
-        DeliverySheet(persona, tenant_info).add_signature(arr)
-
-    res = AdraUtils().zip_files("source_files/generated_files", True)
-
-    response = HttpResponse(res)
-    response["Content-Type"] = "application/x-zip-compressed"
+    pdf = DeliverySheet(persona, tenant_info).add_signature(alimentos)
+    response = HttpResponse(content_type="application/pdf")
     response[
         "Content-Disposition"
-    ] = f"attachment; filename={persona.numero_adra}.zip"
-
+    ] = f"attachment; filename={persona.numero_adra}.pdf"
+    pdf.write(response)
     return response
+
+
+def set_need_appearances_writer(writer):
+    from PyPDF2.generic import (BooleanObject, IndirectObject, NameObject,
+                                NumberObject, TextStringObject)
+
+    """
+    Helper para escribir el pdf
+    :param writer: el pdf
+    :return:
+    """
+    try:
+        catalog = writer._root_object
+        # get the AcroForm tree and add "/NeedAppearances attribute
+        if "/AcroForm" not in catalog:
+            writer._root_object.update(
+                {
+                    NameObject("/AcroForm"): IndirectObject(
+                        len(writer._objects), 0, writer
+                    )
+                }
+            )
+
+        need_appearances = NameObject("/NeedAppearances")
+        writer._root_object["/AcroForm"][need_appearances] = BooleanObject(
+            True
+        )
+        return writer
+
+    except Exception as e:
+        print("set_need_appearances_writer() catch : ", repr(e))
+        return writer
+
+
+def combine_word_documents(files):
+    merged_document = Document()
+    path = "source_files/generated_files/"
+    for index, file in enumerate(files):
+        file_fill = path + file
+        sub_doc = Document(file_fill)
+
+        # Don't add a page break if you've reached the last file.
+        if index < len(files) - 1:
+            sub_doc.add_page_break()
+
+        for element in sub_doc.element.body:
+            merged_document.element.body.append(element)
+
+    return merged_document
 
 
 def generate_files(**kwargs):
@@ -902,7 +939,8 @@ def generate_files(**kwargs):
         for beneficiar in kwargs["beneficarios"]:
             DeliverySheet(
                 beneficiar, kwargs["tenenat_info"]
-            ).export_template_pdf(True)
+            ).add_signature_all_beneficiarios()
+
     else:
         for beneficiar in kwargs["beneficarios"]:
             ValoracionSocial(beneficiar).get_valoracion(True)
@@ -912,6 +950,7 @@ def generate_files(**kwargs):
 def generar_hoja_entrega_global(request):
     tenant_info = request.tenant
     beneficiarios = Persona.objects.filter(active=True).exclude(covid=True)
+    AdraUtils().remove_files("source_files/generated_files")
 
     process = Process(
         target=generate_files,
@@ -925,18 +964,67 @@ def generar_hoja_entrega_global(request):
     print("Waiting for the new process to finish...")
     # wait for the task to complete
     process.join()
-    res = AdraUtils().zip_files("source_files/generated_files", True)
 
-    response = HttpResponse(res)
-    response["Content-Type"] = "application/x-zip-compressed"
-    response["Content-Disposition"] = f"attachment; filename=hoja_entrega.zip"
+    path = f"{str(Path.cwd())}/source_files/generated_files/"
+    cmd = ["pdftk *.pdf cat output output.pdf"]
+    # print(cmd)
 
-    return response
+    proc = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        cwd=path,
+        shell=True,
+    )
+
+    o, e = proc.communicate()
+
+    print("Output: " + o.decode("ascii"))
+    print("Error: " + e.decode("ascii"))
+    print("code: " + str(proc.returncode))
+
+    path = os.path.join(
+        os.path.abspath("source_files"), "generated_files/output.pdf"
+    )
+    reader = PdfFileReader(path, strict=True)
+
+    pdf_writer = PdfFileWriter()
+    set_need_appearances_writer(pdf_writer)
+    pages = reader.pages
+    for pag in pages:
+        pdf_writer.addPage(pag)
+
+    with open(
+        "source_files/generated_files/filled-out.pdf", "wb"
+    ) as output_stream:
+        pdf_writer.write(output_stream)
+
+    fs = FileSystemStorage(location="source_files/generated_files/")
+    filename = "filled-out.pdf"
+    current_date = datetime.today().strftime("%d-%m-%Y %H:%M:%S")
+    if fs.exists(filename):
+        with fs.open(filename) as pdf:
+            AdraUtils().remove_files("source_files/generated_files")
+            response = HttpResponse(pdf, content_type="application/pdf")
+            response[
+                "Content-Disposition"
+            ] = f'attachment; filename="todas_las_entregas_{current_date}.pdf"'
+            return response
+
+    else:
+        return HttpResponseNotFound(
+            "The requested pdf was not found in our server."
+        )
 
 
 @never_cache
 def valoracion_social_global(request):
-    beneficiarios = Persona.objects.filter(active=True).exclude(covid=True)
+    AdraUtils().remove_files("source_files/generated_files")
+    beneficiarios = (
+        Persona.objects.filter(active=True)
+        .exclude(covid=True)
+        .order_by("-numero_adra")
+    )
     process = Process(
         target=generate_files,
         kwargs={
@@ -948,14 +1036,16 @@ def valoracion_social_global(request):
     print("Waiting for the new process to finish...")
     # wait for the task to complete
     process.join()
-    res = AdraUtils().zip_files("source_files/generated_files", True)
+    entries = os.listdir("source_files/generated_files/")
+    merged_document = combine_word_documents(entries)
 
-    response = HttpResponse(res)
-    response["Content-Type"] = "application/x-zip-compressed"
-    response[
-        "Content-Disposition"
-    ] = f"attachment; filename=valoraciones_sociales.zip"  # noqa
-
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"  # noqa
+    )
+    current_date = datetime.today().strftime("%d-%m-%Y %H:%M:%S")
+    response["Content-Disposition"] = f"attachment; filename=hojas_valoracion_all_{current_date}.docx"
+    merged_document.save(response)
+    AdraUtils().remove_files("source_files/generated_files")
     return response
 
 
@@ -1072,13 +1162,11 @@ class CustomAllauthAdapter(DefaultAccountAdapter):
     """
 
     def send_mail(self, template_prefix, email, context):
-
         tenant_info = get_tenant_model().objects.get(
             schema_name=connection.get_schema()
         )
 
         if context.get("activate_url"):
-
             user = context.get("user")
 
             sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
@@ -1103,7 +1191,6 @@ class CustomAllauthAdapter(DefaultAccountAdapter):
             sg.send(message)
 
         elif context.get("password_reset_url"):
-
             user = context.get("user")
             sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
             message = Mail(
@@ -1143,7 +1230,7 @@ def configuracion(request):
             pst = request.POST.copy()
             del pst["form_reparto"]
             alm_repatir = AlimentosRepatir.objects.all().first()
-            
+
             form = AlimentosRepatrirForm(pst, instance=alm_repatir)
             # check whether it's valid:
             if form.is_valid():
@@ -1153,6 +1240,12 @@ def configuracion(request):
                 alm_rpt.save()
                 messages.success(
                     request, "La configuraciòn se ha guardado correctamente "
+                )
+                return redirect("adra:configuracion")
+            else:
+                messages.error(
+                    request,
+                    "Formulario Invalido,revisar los datos introducidos ",
                 )
                 return redirect("adra:configuracion")
 
@@ -1200,7 +1293,6 @@ def configuracion(request):
                 return redirect("adra:configuracion")
 
     else:
-
         delegaciones = Delegaciones.objects.get(pk=request.tenant.pk)
         delegacion_form = DelegacionForm(
             initial={
@@ -1244,3 +1336,35 @@ def configuracion(request):
                 "alimentos_repatir": alimentos_a_repatir_form,
             },
         )
+
+
+@login_required
+def dashboard(request):
+    beneficiar = Persona.objects.filter(active=True).exclude(covid=True)
+    familiares = Hijo.objects.filter(
+        persona__in=Persona.objects.filter(active=True).exclude(covid=True)
+    )
+    currentYear = datetime.now().year
+    beneficiars_year = Persona.objects.filter(
+        active=True, created_at__year=currentYear
+    )
+    last_five_benefiarios = Persona.objects.filter(active=True).order_by(
+        "-created_at"
+    )[:5]
+    current_entregas = Alimentos.objects.all().count()
+    ages = AgeCalculacion(beneficiar, familiares).calculate_age()
+
+    return render(
+        request,
+        "adra/dashboard.html",
+        {
+            "nbar": "dashboard",
+            "total_personas": ages["total_personas"],
+            "beneficiars_year": len(beneficiars_year),
+            "currentYear": currentYear,
+            "last_five_benefiarios": last_five_benefiarios,
+            "current_entregas": current_entregas,
+            # "delegacion_form": delegacion_form,
+            # "alimentos_repatir": alimentos_a_repatir_form,
+        },
+    )

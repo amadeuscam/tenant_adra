@@ -66,14 +66,22 @@
         <nav class="navbar-mobile">
             <div class="container-fluid">
                 <ul class="navbar-mobile__list list-unstyled">
+                    <li>
+                        <a href="{% url 'adra:dashboard' %}"
+                           class="{% if nbar == 'dashboard' %}text-primary{% endif %}">
+                            <i class="large material-icons" style="font-size: 14px;color: darkslategrey">dashboard</i>
+                             Dashboard
+                        </a>
+                    </li>
 
                     <li>
                         <a href="{% url 'adra:persona-home' %}"
                            class="{% if nbar == 'home' %}text-primary{% endif %}">
-                            <i class="large material-icons" style="font-size: 14px;color: darkslategrey">dashboard</i>
-                            Dashboard
+                            <i class="large material-icons" style="font-size: 14px;color: darkslategrey">home</i>
+                            Home
                         </a>
                     </li>
+                    
                     <li>
                         <a href="{% url 'adra:persona-create' %}"
                            class="{% if nbar == 'create' %}text-primary{% endif %}">
@@ -136,12 +144,23 @@
         <div class="menu-sidebar__content js-scrollbar1">
             <nav class="navbar-sidebar">
                 <ul class="list-unstyled navbar__list">
+
+                    <li class="has-sub {% if nbar == 'dashboard' %}active{% endif %} ">
+                         
+                        <a href="{% url 'adra:dashboard' %}"
+                        class="d-flex justify-content-start align-items-center ">
+                         <i class="large material-icons" style="font-size: 36px;color: darkslategrey">dashboard</i>
+                         <p>Dashboard</p>
+                     </a>
+
+                    </li>
+
                     <li class="has-sub {% if nbar == 'home' %}active{% endif %} ">
 
                         <a href="{% url 'adra:persona-home' %}"
                            class="d-flex justify-content-start align-items-center ">
-                            <i class="large material-icons" style="font-size: 36px;color: darkslategrey">dashboard</i>
-                            <p>Dashboard</p>
+                            <i class="large material-icons" style="font-size: 36px;color: darkslategrey">home</i>
+                            <p>Home</p>
                         </a>
 
 

@@ -56,9 +56,14 @@
             <a class="btn" data-toggle="tooltip" data-placement="top" title="Añadir familiares" role="button"
               href="{% url 'adra:hijo-create' persona.id %}">
               <i class="large material-icons" style="font-size: 36px;color: darkslategrey">group_add</i>
+            </a> 
+            
+            <a class="btn" data-toggle="tooltip" data-placement="top" title="Generar hoja de entrega" role="button"
+              href="{% url 'adra:pdf_form' persona.id 'con' %}">
+              <i class="large material-icons" style="font-size: 36px;color: darkslategrey">description</i>
             </a>
 
-            <div class="btn-group">
+            {% comment %} <div class="btn-group">
               <button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                 Generar hoja de entrega
               </button>
@@ -68,7 +73,7 @@
                   firma</a>
                 <a class="dropdown-item" href="{% url 'adra:pdf_form' persona.id 'con' %}">Con firma</a>
               </div>
-            </div>
+            </div> {% endcomment %}
             <a class="btn" data-toggle="tooltip" data-placement="top" title="Generar hoja de valoracion social"
               role="button" href="{% url 'adra:docx_form' persona.id %}">
               <i class="large material-icons" style="font-size: 36px;color: darkslategrey">file_download</i>

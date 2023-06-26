@@ -107,4 +107,5 @@ urlpatterns = [
     #     name="get_beneficiarios_activos",
     # ),
     path("configuracion/", views.configuracion, name="configuracion"),
+    path("dashboard/", views.dashboard, name="dashboard"),
 ]

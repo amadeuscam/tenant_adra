@@ -1,0 +1,132 @@
+<!-- {% extends "_base.html" %} -->
+{% load static %}
+{% load verbose_names %}
+{% block content %}
+<div class="jumbotron">
+    <div class="container">
+        <h1 class="display-3">Hola,
+            {% if user.last_name %}
+            {{ user.last_name | capfirst }}
+            {% else %}
+            {{ user.username | capfirst }}
+            {% endif %}!</h1>
+        <h4>Esta plataforma es la forma más eficaz de gestionar los beneficiarios, gestionar los documentos asociados a
+            ellos, recordatorios de las caducidades de alimentos  etc... esperamos que la disfruté .</h4>
+      
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 center-all-c text-justify" style="justify-content: space-evenly; align-items:start; height: 20.5vh;">
+        <table class="table">
+            <thead class="thead-dark">
+              <tr>
+                <th scope="col">Total beneficiarios</th>
+                <th scope="col">Beneficiarios añadidos en <span class="text-secondary">{{currentYear}}</span>  </th>
+                <th scope="col">Entregas hasta ahora </th>
+              </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center">{{ total_personas}}</td>
+                    <td class="text-center">{{ beneficiars_year }}</td>
+                    <td class="text-center">{{ current_entregas }}</td>
+                </tr>
+                <!-- {% for beneficiario in last_five_benefiarios %}
+                    <tr>
+                    
+                    <td> 
+                        <a href="{% url 'adra:personas_detail' beneficiario.id %}" class="mr-2">{{beneficiario.nombre_apellido}}</a>
+                    </td>
+                    <td>{{beneficiario.numero_adra}}</td>
+                    <td>{{beneficiario.created_at |timesince}}</td>
+                  </tr>
+                
+                {% endfor %}
+               -->
+               
+            </tbody>
+          </table>
+       
+       
+        <!-- <div class="  center-all-r">
+            <h2>Total beneficiarios <sup class="badge badge-info">{{ total_personas}}</sup></h2>
+        </div>
+        <div class="  center-all-r">
+            <h2>Beneficiarios añadidos en <span class="text-secondary">{{currentYear}}</span>  <sup class="badge badge-info">{{ beneficiars_year }}</sup></h2>
+        </div>
+        <div class="  center-all-r">
+            <h2>Entregas hasta ahora <sup class="badge badge-info">{{ current_entregas }}</sup></h2>
+        </div>
+        <div class="   mb-3 center-all-r">
+            <p><a class="btn btn-outline-dark " href="{% url 'adra:statistics-personas' %}" role="button">Mas  info »</a></p>
+        </div> -->
+    </div>
+    <div class="col-md-6">
+        <h2 class="center-all-r mb-3">Ultimos Beneficiarios añadidos</h2>
+        <table class="table">
+            <thead class="thead-dark">
+              <tr>
+                <th scope="col">Nombre</th>
+                <th scope="col">Numero beneficario</th>
+                <th scope="col">Hace</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for beneficiario in last_five_benefiarios %}
+                    <tr>
+                    
+                    <td> 
+                        <a href="{% url 'adra:personas_detail' beneficiario.id %}" class="mr-2">{{beneficiario.nombre_apellido}}</a>
+                    </td>
+                    <td>{{beneficiario.numero_adra}}</td>
+                    <td>{{beneficiario.created_at |timesince}}</td>
+                  </tr>
+                
+                {% endfor %}
+              
+               
+            </tbody>
+          </table>
+    </div>
+  
+</div>
+<hr>
+
+{% comment %} 
+<div class="row">
+    <div class="col-md-6">
+        <h2 class="center-all-r mb-3">Ultimos Beneficiarios añadidos</h2>
+        <table class="table">
+            <thead class="thead-dark">
+              <tr>
+                <th scope="col">Nombre</th>
+                <th scope="col">Numero beneficario</th>
+                <th scope="col">Hace</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for beneficiario in last_five_benefiarios %}
+                    <tr>
+                    
+                    <td> 
+                        <a href="{% url 'adra:personas_detail' beneficiario.id %}" class="mr-2">{{beneficiario.nombre_apellido}}</a>
+                    </td>
+                    <td>{{beneficiario.numero_adra}}</td>
+                    <td>{{beneficiario.created_at |timesince}}</td>
+                  </tr>
+                
+                {% endfor %}
+              
+               
+            </tbody>
+          </table>
+          
+         
+    </div>
+    <div class="col-md-6">
+
+    </div>
+</div> {% endcomment %}
+
+{% endblock %}
