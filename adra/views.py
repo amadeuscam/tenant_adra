@@ -917,9 +917,9 @@ def set_need_appearances_writer(writer):
         return writer
 
 
-def combine_word_documents(files):
+def combine_word_documents(files,path):
     merged_document = Document()
-    path = "source_files/generated_files/"
+    path = path
     for index, file in enumerate(files):
         file_fill = path + file
         sub_doc = Document(file_fill)
@@ -943,14 +943,28 @@ def generate_files(**kwargs):
 
     else:
         for beneficiar in kwargs["beneficarios"]:
-            ValoracionSocial(beneficiar).get_valoracion(True)
+            ValoracionSocial(beneficiar).get_valoracion(
+                kwargs["path_files"], True
+            )
+
+
+def check_path_or_create(path: str):
+    if not os.path.exists(path):
+        print("no existe,creando...")
+        os.makedirs(path)
+    else:
+        print("existe,skip...")
 
 
 @never_cache
 def generar_hoja_entrega_global(request):
     tenant_info = request.tenant
     beneficiarios = Persona.objects.filter(active=True).exclude(covid=True)
-    AdraUtils().remove_files("source_files/generated_files")
+    path_files = f"source_files/generated_files/{tenant_info.oar}/"
+
+    check_path_or_create(path_files)
+
+    AdraUtils().remove_files(path_files)
 
     process = Process(
         target=generate_files,
@@ -958,6 +972,7 @@ def generar_hoja_entrega_global(request):
             "beneficarios": list(beneficiarios),
             "tenenat_info": tenant_info,
             "type": "hoja_entrega",
+            "path_files": path_files,
         },
     )
     process.start()
@@ -965,7 +980,7 @@ def generar_hoja_entrega_global(request):
     # wait for the task to complete
     process.join()
 
-    path = f"{str(Path.cwd())}/source_files/generated_files/"
+    path = f"{str(Path.cwd())}/{path_files}"
     cmd = ["pdftk *.pdf cat output output.pdf"]
     # print(cmd)
 
@@ -984,7 +999,8 @@ def generar_hoja_entrega_global(request):
     print("code: " + str(proc.returncode))
 
     path = os.path.join(
-        os.path.abspath("source_files"), "generated_files/output.pdf"
+        os.path.abspath("source_files"),
+        f"generated_files/{tenant_info.oar}/output.pdf",
     )
     reader = PdfFileReader(path, strict=True)
 
@@ -994,17 +1010,15 @@ def generar_hoja_entrega_global(request):
     for pag in pages:
         pdf_writer.addPage(pag)
 
-    with open(
-        "source_files/generated_files/filled-out.pdf", "wb"
-    ) as output_stream:
+    with open(f"{path_files}/filled-out.pdf", "wb") as output_stream:
         pdf_writer.write(output_stream)
 
-    fs = FileSystemStorage(location="source_files/generated_files/")
+    fs = FileSystemStorage(location=f"{path_files}")
     filename = "filled-out.pdf"
     current_date = datetime.today().strftime("%d-%m-%Y %H:%M:%S")
     if fs.exists(filename):
         with fs.open(filename) as pdf:
-            AdraUtils().remove_files("source_files/generated_files")
+            AdraUtils().remove_files(f"{path_files}")
             response = HttpResponse(pdf, content_type="application/pdf")
             response[
                 "Content-Disposition"
@@ -1019,7 +1033,12 @@ def generar_hoja_entrega_global(request):
 
 @never_cache
 def valoracion_social_global(request):
-    AdraUtils().remove_files("source_files/generated_files")
+    tenant_info = request.tenant
+    path_files = f"source_files/generated_files/{tenant_info.oar}/"
+
+    check_path_or_create(path_files)
+    AdraUtils().remove_files(path_files)
+
     beneficiarios = (
         Persona.objects.filter(active=True)
         .exclude(covid=True)
@@ -1030,22 +1049,25 @@ def valoracion_social_global(request):
         kwargs={
             "beneficarios": list(beneficiarios),
             "type": "valoracion_social",
+            "path_files": path_files,
         },
     )
     process.start()
     print("Waiting for the new process to finish...")
     # wait for the task to complete
     process.join()
-    entries = os.listdir("source_files/generated_files/")
-    merged_document = combine_word_documents(entries)
+    entries = os.listdir(path_files)
+    merged_document = combine_word_documents(entries,path_files)
 
     response = HttpResponse(
         content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"  # noqa
     )
     current_date = datetime.today().strftime("%d-%m-%Y %H:%M:%S")
-    response["Content-Disposition"] = f"attachment; filename=hojas_valoracion_all_{current_date}.docx"
+    response[
+        "Content-Disposition"
+    ] = f"attachment; filename=hojas_valoracion_all_{current_date}.docx"
     merged_document.save(response)
-    AdraUtils().remove_files("source_files/generated_files")
+    AdraUtils().remove_files(path_files)
     return response
 
 

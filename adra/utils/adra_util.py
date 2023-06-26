@@ -187,6 +187,7 @@ class DeliverySheet:
 
     def add_signature_all_beneficiarios(self):
         self.set_num_adults_and_childrens()
+        # print(self.tenat_info.oar)
 
         alimentos = self.persona.alimentos.all().order_by("fecha_recogida")
 
@@ -201,7 +202,6 @@ class DeliverySheet:
         }
 
         if len(alimentos) != 0:
-
             for page, arr in enumerate(AdraUtils().split_list(alimentos, 7)):
                 if page > 0:
                     pdf_reader = self._load_file("2023_entrega_full_pag_2")
@@ -220,10 +220,9 @@ class DeliverySheet:
 
                 self.make_visible_data_and_block(page)
 
-             
             self.pdf_writer.write(
                 open(
-                    f"source_files/generated_files/{self.persona.numero_adra}.pdf",
+                    f"source_files/generated_files/{self.tenat_info.oar}/{self.persona.numero_adra}.pdf",
                     "wb",
                 )
             )
@@ -233,13 +232,10 @@ class DeliverySheet:
             self.make_visible_data_and_block(0)
             self.pdf_writer.write(
                 open(
-                    f"source_files/generated_files/{self.persona.numero_adra}.pdf",
+                    f"source_files/generated_files/{self.tenat_info.oar}/{self.persona.numero_adra}.pdf",
                     "wb",
                 )
             )
-        
-           
- 
 
     def set_num_adults_and_childrens(self):
         familiares = self.persona.hijo.all()
@@ -458,14 +454,14 @@ class ValoracionSocial:
         if self.persona.recibos:
             self.document.merge(h="x")
 
-    def get_valoracion(self, write_to_path: bool = False):
+    def get_valoracion(self, path: str = "", write_to_path: bool = False):
         self.add_beneficiario_info()
         self.add_familiares_info()
         self.documentacion_check()
         if write_to_path:
             self.document.write(
                 open(
-                    f"source_files/generated_files/{self.persona.numero_adra}.docx",
+                    f"{path}{self.persona.numero_adra}.docx",
                     "wb",
                 )
             )
