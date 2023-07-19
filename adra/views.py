@@ -917,7 +917,7 @@ def set_need_appearances_writer(writer):
         return writer
 
 
-def combine_word_documents(files,path):
+def combine_word_documents(files, path):
     merged_document = Document()
     path = path
     for index, file in enumerate(files):
@@ -966,19 +966,24 @@ def generar_hoja_entrega_global(request):
 
     AdraUtils().remove_files(path_files)
 
-    process = Process(
-        target=generate_files,
-        kwargs={
-            "beneficarios": list(beneficiarios),
-            "tenenat_info": tenant_info,
-            "type": "hoja_entrega",
-            "path_files": path_files,
-        },
-    )
-    process.start()
-    print("Waiting for the new process to finish...")
-    # wait for the task to complete
-    process.join()
+    # process = Process(
+    #     target=generate_files,
+    #     kwargs={
+    #         "beneficarios": list(beneficiarios),
+    #         "tenenat_info": tenant_info,
+    #         "type": "hoja_entrega",
+    #         "path_files": path_files,
+    #     },
+    # )
+    # process.start()
+    # print("Waiting for the new process to finish...")
+    # # wait for the task to complete
+    # process.join()
+
+    for beneficiar in beneficiarios:
+        DeliverySheet(
+            beneficiar, tenant_info
+        ).add_signature_all_beneficiarios()
 
     path = f"{str(Path.cwd())}/{path_files}"
     cmd = ["pdftk *.pdf cat output output.pdf"]
@@ -1044,20 +1049,23 @@ def valoracion_social_global(request):
         .exclude(covid=True)
         .order_by("-numero_adra")
     )
-    process = Process(
-        target=generate_files,
-        kwargs={
-            "beneficarios": list(beneficiarios),
-            "type": "valoracion_social",
-            "path_files": path_files,
-        },
-    )
-    process.start()
-    print("Waiting for the new process to finish...")
-    # wait for the task to complete
-    process.join()
+    for beneficiar in beneficiarios:
+        ValoracionSocial(beneficiar).get_valoracion(path_files, True)
+
+    # process = Process(
+    #     target=generate_files,
+    #     kwargs={
+    #         "beneficarios": list(beneficiarios),
+    #         "type": "valoracion_social",
+    #         "path_files": path_files,
+    #     },
+    # )
+    # process.start()
+    # print("Waiting for the new process to finish...")
+    # # wait for the task to complete
+    # process.join()
     entries = os.listdir(path_files)
-    merged_document = combine_word_documents(entries,path_files)
+    merged_document = combine_word_documents(entries, path_files)
 
     response = HttpResponse(
         content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"  # noqa
