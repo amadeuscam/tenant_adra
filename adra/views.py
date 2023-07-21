@@ -917,12 +917,11 @@ def set_need_appearances_writer(writer):
         return writer
 
 
-def combine_word_documents(files, path):
+def combine_word_documents(files):
     merged_document = Document()
-    path = path
+   
     for index, file in enumerate(files):
-        file_fill = path + file
-        sub_doc = Document(file_fill)
+        sub_doc = Document(file)
 
         # Don't add a page break if you've reached the last file.
         if index < len(files) - 1:
@@ -933,139 +932,52 @@ def combine_word_documents(files, path):
 
     return merged_document
 
-
-def generate_files(**kwargs):
-    if kwargs["type"] == "hoja_entrega":
-        for beneficiar in kwargs["beneficarios"]:
-            DeliverySheet(
-                beneficiar, kwargs["tenenat_info"]
-            ).add_signature_all_beneficiarios()
-
-    else:
-        for beneficiar in kwargs["beneficarios"]:
-            ValoracionSocial(beneficiar).get_valoracion(
-                kwargs["path_files"], True
-            )
-
-
-def check_path_or_create(path: str):
-    if not os.path.exists(path):
-        print("no existe,creando...")
-        os.makedirs(path)
-    else:
-        print("existe,skip...")
-
-
 @never_cache
 def generar_hoja_entrega_global(request):
     tenant_info = request.tenant
     beneficiarios = Persona.objects.filter(active=True).exclude(covid=True)
-    path_files = f"source_files/generated_files/{tenant_info.oar}/"
-
-    check_path_or_create(path_files)
-
-    AdraUtils().remove_files(path_files)
-
-    # process = Process(
-    #     target=generate_files,
-    #     kwargs={
-    #         "beneficarios": list(beneficiarios),
-    #         "tenenat_info": tenant_info,
-    #         "type": "hoja_entrega",
-    #         "path_files": path_files,
-    #     },
-    # )
-    # process.start()
-    # print("Waiting for the new process to finish...")
-    # # wait for the task to complete
-    # process.join()
-
-    for beneficiar in beneficiarios:
-        DeliverySheet(
-            beneficiar, tenant_info
-        ).add_signature_all_beneficiarios()
-
-    path = f"{str(Path.cwd())}/{path_files}"
-    cmd = ["pdftk *.pdf cat output output.pdf"]
-    # print(cmd)
-
-    proc = subprocess.Popen(
-        cmd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        cwd=path,
-        shell=True,
-    )
-
-    o, e = proc.communicate()
-
-    print("Output: " + o.decode("ascii"))
-    print("Error: " + e.decode("ascii"))
-    print("code: " + str(proc.returncode))
-
-    path = os.path.join(
-        os.path.abspath("source_files"),
-        f"generated_files/{tenant_info.oar}/output.pdf",
-    )
-    reader = PdfFileReader(path, strict=True)
-
     pdf_writer = PdfFileWriter()
     set_need_appearances_writer(pdf_writer)
-    pages = reader.pages
-    for pag in pages:
-        pdf_writer.addPage(pag)
+    res_pdf = io.BytesIO()
+    for beneficiar in beneficiarios:
+        buf = io.BytesIO()
+        dss = DeliverySheet(
+            beneficiar, tenant_info
+        ).add_signature_all_beneficiarios()
+        dss.write(buf)
+        buf.seek(0)
 
-    with open(f"{path_files}/filled-out.pdf", "wb") as output_stream:
-        pdf_writer.write(output_stream)
+        reader = PdfFileReader(stream=buf)
+        for pag in range(0, reader.getNumPages()):
+            pdf_writer.addPage(reader.getPage(pag))
 
-    fs = FileSystemStorage(location=f"{path_files}")
-    filename = "filled-out.pdf"
+    pdf_writer.write(res_pdf)
+    response = HttpResponse(res_pdf.getvalue(),content_type="application/pdf")
     current_date = datetime.today().strftime("%d-%m-%Y %H:%M:%S")
-    if fs.exists(filename):
-        with fs.open(filename) as pdf:
-            AdraUtils().remove_files(f"{path_files}")
-            response = HttpResponse(pdf, content_type="application/pdf")
-            response[
-                "Content-Disposition"
-            ] = f'attachment; filename="todas_las_entregas_{current_date}.pdf"'
-            return response
-
-    else:
-        return HttpResponseNotFound(
-            "The requested pdf was not found in our server."
-        )
+    response[
+        "Content-Disposition"
+    ] = f'attachment; filename="todas_las_entregas_{current_date}.pdf"'
+    return response
 
 
 @never_cache
 def valoracion_social_global(request):
-    tenant_info = request.tenant
-    path_files = f"source_files/generated_files/{tenant_info.oar}/"
-
-    check_path_or_create(path_files)
-    AdraUtils().remove_files(path_files)
-
     beneficiarios = (
         Persona.objects.filter(active=True)
         .exclude(covid=True)
         .order_by("-numero_adra")
     )
-    for beneficiar in beneficiarios:
-        ValoracionSocial(beneficiar).get_valoracion(path_files, True)
 
-    # process = Process(
-    #     target=generate_files,
-    #     kwargs={
-    #         "beneficarios": list(beneficiarios),
-    #         "type": "valoracion_social",
-    #         "path_files": path_files,
-    #     },
-    # )
-    # process.start()
-    # print("Waiting for the new process to finish...")
-    # # wait for the task to complete
-    # process.join()
-    entries = os.listdir(path_files)
-    merged_document = combine_word_documents(entries, path_files)
+    
+    val_lst = []
+    for beneficiar in beneficiarios:
+        valoracion_social_bt = io.BytesIO()
+        val =  ValoracionSocial(beneficiar).get_valoracion()
+        val.write(valoracion_social_bt)
+        valoracion_social_bt.seek(0)
+        val_lst.append(valoracion_social_bt)
+
+    merged_document = combine_word_documents(val_lst)
 
     response = HttpResponse(
         content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"  # noqa
@@ -1075,7 +987,6 @@ def valoracion_social_global(request):
         "Content-Disposition"
     ] = f"attachment; filename=hojas_valoracion_all_{current_date}.docx"
     merged_document.save(response)
-    AdraUtils().remove_files(path_files)
     return response
 
 
