@@ -936,7 +936,7 @@ def combine_word_documents(files):
 @never_cache
 def generar_hoja_entrega_global(request):
     tenant_info = request.tenant
-    beneficiarios = Persona.objects.filter(active=True).exclude(covid=True)[:5]
+    beneficiarios = Persona.objects.filter(active=True).exclude(covid=True)
     pdf_writer = PdfFileWriter()
     set_need_appearances_writer(pdf_writer)
     res_pdf = io.BytesIO()
