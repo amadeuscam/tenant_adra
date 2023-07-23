@@ -919,7 +919,7 @@ def set_need_appearances_writer(writer):
 
 def combine_word_documents(files):
     merged_document = Document()
-   
+
     for index, file in enumerate(files):
         sub_doc = Document(file)
 
@@ -932,10 +932,11 @@ def combine_word_documents(files):
 
     return merged_document
 
+
 @never_cache
 def generar_hoja_entrega_global(request):
     tenant_info = request.tenant
-    beneficiarios = Persona.objects.filter(active=True).exclude(covid=True)
+    beneficiarios = Persona.objects.filter(active=True).exclude(covid=True)[:5]
     pdf_writer = PdfFileWriter()
     set_need_appearances_writer(pdf_writer)
     res_pdf = io.BytesIO()
@@ -952,7 +953,7 @@ def generar_hoja_entrega_global(request):
             pdf_writer.addPage(reader.getPage(pag))
 
     pdf_writer.write(res_pdf)
-    response = HttpResponse(res_pdf.getvalue(),content_type="application/pdf")
+    response = HttpResponse(res_pdf.getvalue(), content_type="application/pdf")
     current_date = datetime.today().strftime("%d-%m-%Y %H:%M:%S")
     response[
         "Content-Disposition"
@@ -968,11 +969,10 @@ def valoracion_social_global(request):
         .order_by("-numero_adra")
     )
 
-    
     val_lst = []
     for beneficiar in beneficiarios:
         valoracion_social_bt = io.BytesIO()
-        val =  ValoracionSocial(beneficiar).get_valoracion()
+        val = ValoracionSocial(beneficiar).get_valoracion()
         val.write(valoracion_social_bt)
         valoracion_social_bt.seek(0)
         val_lst.append(valoracion_social_bt)

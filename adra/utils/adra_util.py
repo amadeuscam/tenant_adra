@@ -102,7 +102,7 @@ class DeliverySheet:
         ]
         self.dict_alimentos = {}
         self.pdf_reader = None
-        self.set_appearances_writer()
+        # self.set_appearances_writer()
 
     def _load_file(self, name):
         path = os.path.join(os.path.abspath("source_files"), f"{name}.pdf")
@@ -117,36 +117,31 @@ class DeliverySheet:
     def make_visible_data_and_block(self, page_arg):
         page = self.pdf_writer.getPage(page_arg)
         data_dict = self.general_data
+
+        self.pdf_writer.updatePageFormFieldValues(page, fields=data_dict)
         # print(data_dict)
 
-        writer_annot = None
-        for j in range(0, len(page["/Annots"])):
-            writer_annot = page["/Annots"][j].getObject()
-            # print(writer_annot)
+        # writer_annot = None
+        # for j in range(0, len(page["/Annots"])):
+        #     writer_annot = page["/Annots"][j].getObject()
+        #     # print(writer_annot)
 
-            for field in data_dict:
-                # print(writer_annot.get('/T'))
-                # print(field)
-                # print(data_dict[field])
-                if writer_annot.get("/T") == field:
-                    writer_annot.update(
-                        {NameObject("/V"): TextStringObject(data_dict[field])}
-                    )
-            writer_annot.update({NameObject("/Ff"): NumberObject(0)})
-
-    def export_template_pdf(self, write_to_path: bool = False):
-        self.set_num_adults_and_childrens()
-        pdf = self._load_file("2023_entrega_full")
-        self.make_visible_data_and_block()
-        if write_to_path:
-            pdf.write(
-                open(
-                    f"source_files/generated_files/{self.persona.numero_adra}.pdf",
-                    "wb",
-                )
-            )
-        else:
-            return pdf
+        #     for field in data_dict:
+        #         # print(writer_annot.get('/T'))
+        #         # print(field)
+        #         # print(data_dict[field])
+        #         writer_annot.update(
+        #             {
+        #                 NameObject("/T"): create_string_object(
+        #                     f"{writer_annot['/T']}_page{j}"
+        #                 )
+        #             }
+        #         )
+        #         if writer_annot.get("/T") == field:
+        #             writer_annot.update(
+        #                 {NameObject("/V"): TextStringObject(data_dict[field])}
+        #             )
+        #             writer_annot.update({NameObject("/Ff"): NumberObject(1)})
 
     def add_signature(self, alimentos):
         self.set_num_adults_and_childrens()
@@ -187,7 +182,6 @@ class DeliverySheet:
 
     def add_signature_all_beneficiarios(self):
         self.set_num_adults_and_childrens()
-        # print(self.tenat_info.oar)
 
         alimentos = self.persona.alimentos.all().order_by("fecha_recogida")
 
@@ -219,11 +213,14 @@ class DeliverySheet:
 
                 self.make_visible_data_and_block(page)
 
+            self.set_need_appearances_writer(self.pdf_writer)
             return self.pdf_writer
         else:
             pdf_reader = self._load_file("2023_entrega_full")
             self.pdf_writer.addPage(pdf_reader.pages[0])
+            self.set_need_appearances_writer(self.pdf_writer)
             self.make_visible_data_and_block(0)
+
             return self.pdf_writer
 
     def set_num_adults_and_childrens(self):
