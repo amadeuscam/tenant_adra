@@ -740,22 +740,25 @@ class RecuntoBeneficiarios:
         print(age_calc)
         self.document.merge(
 
-            m02=f"{age_calc['total_per_mujer_02']}",
-            m315=f"{age_calc['total_per_mujer_03']}",
-            m1664=f"{age_calc['total_per_mujer_16']}",
-            m65=f"{age_calc['total_per_mujer_65']}",
+            mujerdos=f"{age_calc['total_per_mujer_02']}",
+            mujerquince=f"{age_calc['total_per_mujer_03']}",
+            mujersesentacuatro=f"{age_calc['total_per_mujer_16']}",
+            mujermassesentacinco=f"{age_calc['total_per_mujer_65']}",
             mtotal=f"{age_calc['total_mujeres']}",
 
-            h02=f"{age_calc['total_per_hombre_02']}",
-            h315=f"{age_calc['total_per_hombre_03']}",
-            h1664=f"{age_calc['total_per_hombre_16']}",
-            h65=f"{age_calc['total_per_hombre_65']}",
+            hombredos=f"{age_calc['total_per_hombre_02']}",
+            hombrequince=f"{age_calc['total_per_hombre_03']}",
+            hombresesentacuatro=f"{age_calc['total_per_hombre_16']}",
+            hombresmassesentacinco=f"{age_calc['total_per_hombre_65']}",
             htotal=f"{age_calc['total_hombres']}",
 
-            t02=f"{age_calc['total_02']}",
-            t315=f"{age_calc['total_03']}",
-            t1664=f"{age_calc['total_16']}",
-            t65=f"{age_calc['total_65']}",
+            totaldos=f"{age_calc['total_02']}",
+            totalquince=f"{age_calc['total_03']}",
+            totalsesentacuatro=f"{age_calc['total_16']}",
+            totalmassesentacinco=f"{age_calc['total_65']}",
+
+            totalbeneficiarios=f"{age_calc['total_beneficiarios']}",
+           
 
 
 

@@ -9,9 +9,9 @@ services:
     restart: always
     image: postgres:12
     environment:
-      POSTGRES_DB: $DATABASE_NAME
-      POSTGRES_USER: $MYSQL_USER
-      POSTGRES_PASSWORD: $MYSQL_PASSWORD
+      POSTGRES_DB: $SQL_DATABASE
+      POSTGRES_USER: $SQL_USER
+      POSTGRES_PASSWORD: $SQL_PASSWORD
     volumes:
       - persistent:/var/lib/postgresql/data/
     networks:
