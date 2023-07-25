@@ -721,3 +721,49 @@ class UploadExcelUsers:
                             )
 
         return self.beneficarios_fraudulentos
+
+
+class RecuntoBeneficiarios:
+    def __init__(self) -> None:
+        self.template = os.path.join(
+            os.path.abspath("source_files"), "mod_2023.docx"
+        )
+        self.document = MailMerge(self.template)
+
+    def getRecuentoFile(self):
+        beneficiar = Persona.objects.filter(active=True).exclude(covid=True)
+
+        familiares = Hijo.objects.filter(
+            persona__in=Persona.objects.filter(active=True).exclude(covid=True)
+        )
+        age_calc = AgeCalculacion(beneficiar, familiares).calculate_age()
+        print(age_calc)
+        self.document.merge(
+
+            mujerdos=f"{age_calc['total_per_mujer_02']}",
+            mujerquince=f"{age_calc['total_per_mujer_03']}",
+            mujersesentacuatro=f"{age_calc['total_per_mujer_16']}",
+            mujermassesentacinco=f"{age_calc['total_per_mujer_65']}",
+            mtotal=f"{age_calc['total_mujeres']}",
+
+            hombredos=f"{age_calc['total_per_hombre_02']}",
+            hombrequince=f"{age_calc['total_per_hombre_03']}",
+            hombresesentacuatro=f"{age_calc['total_per_hombre_16']}",
+            hombresmassesentacinco=f"{age_calc['total_per_hombre_65']}",
+            htotal=f"{age_calc['total_hombres']}",
+
+            totaldos=f"{age_calc['total_02']}",
+            totalquince=f"{age_calc['total_03']}",
+            totalsesentacuatro=f"{age_calc['total_16']}",
+            totalmassesentacinco=f"{age_calc['total_65']}",
+
+            totalbeneficiarios=f"{age_calc['total_beneficiarios']}",
+           
+
+
+
+            total=f"{age_calc['total_personas']}",
+            discap=f"{age_calc['discapacidad']}"
+        )
+
+        return self.document

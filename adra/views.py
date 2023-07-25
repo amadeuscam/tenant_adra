@@ -34,7 +34,8 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
 from adra.utils.adra_util import (AdraUtils, AgeCalculacion, DeliverySheet,
-                                  UploadExcelUsers, ValoracionSocial)
+                                  RecuntoBeneficiarios, UploadExcelUsers,
+                                  ValoracionSocial)
 from delegaciones.models import BeneficiariosGlobales, Delegaciones
 
 from .filters import AlimentosFilters
@@ -1309,3 +1310,21 @@ def dashboard(request):
             # "alimentos_repatir": alimentos_a_repatir_form,
         },
     )
+
+@login_required
+def generar_recuento_beneficiaros(request):
+    res_pdf = io.BytesIO()
+    val = RecuntoBeneficiarios().getRecuentoFile()
+    val.write(res_pdf)
+    res_pdf.seek(0)
+     
+    response = HttpResponse(
+        res_pdf.getvalue(),
+        content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"  # noqa
+    )
+    response[
+        "Content-Disposition"
+    ] = f"attachment; filename=recuento_beneficiarios.docx"
+    # response['Content-Length'] = res_pdf.tell()
+
+    return response
