@@ -1,3 +1,4 @@
+from crispy_forms.helper import FormHelper
 from django import forms
 from django.contrib.auth.models import User
 from django.forms import DateInput, EmailInput, Form, ModelForm, TextInput
@@ -33,7 +34,7 @@ class AlimentosFrom(ModelForm):
             "fecha_recogida": DateInput(attrs={"type": "datetime-local"}),
             "alimento_4": TextInput(attrs={"readonly": "readonly"}),
             "signature": JSignatureWidget(
-                jsignature_attrs={"color": "#405e9d"}
+                jsignature_attrs={"color": "#405e9d","decor-color":"transparent"}
             ),
         }
 
@@ -429,3 +430,8 @@ class AlimentosRepatrirForm(ModelForm):
             "alimento_12_type",
              
         )
+
+    def __init__(self, *args, **kwargs):
+        super(AlimentosRepatrirForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_show_labels = False
