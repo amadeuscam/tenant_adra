@@ -1,7 +1,7 @@
 #!/bin/bash
 
 docker kill $(docker ps -q)
-sudo  kill -9 `sudo lsof -t -i:80`
+sudo  kill -9 `sudo  lsof -t -i:80`
 sudo  kill -9 `sudo lsof -t -i:8080`
 
 docker stop $(docker ps -a -q)
