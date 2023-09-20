@@ -22,8 +22,13 @@ from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views.decorators.cache import cache_page, never_cache
-from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
-                                  UpdateView)
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    UpdateView,
+)
 from django_tenants.utils import get_tenant_model
 from docx import Document
 from openpyxl import Workbook, load_workbook
@@ -33,19 +38,39 @@ from rest_framework import permissions, viewsets
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
-from adra.utils.adra_util import (AdraUtils, AgeCalculacion, DeliverySheet,
-                                  RecuntoBeneficiarios, UploadExcelUsers,
-                                  ValoracionSocial)
+from adra.utils.adra_util import (
+    AdraUtils,
+    AgeCalculacion,
+    DeliverySheet,
+    RecuntoBeneficiarios,
+    UploadExcelUsers,
+    ValoracionSocial,
+)
 from delegaciones.models import BeneficiariosGlobales, Delegaciones
 
 from .filters import AlimentosFilters
-from .forms import (AlimentosFrom, AlimentosRepatrirForm, AlmacenAlimentosFrom,
-                    DelegacionForm, HijoForm, PersonaForm, ProfileEditForm,
-                    UserEditForm)
-from .models import (Alimentos, AlimentosRepatir, AlmacenAlimentos, Hijo,
-                     Persona)
-from .serializers import (AlacenAlimentosSerializer, PersonaSerializer,
-                          UserSerializer)
+from .forms import (
+    AlimentosFrom,
+    AlimentosRepatrirForm,
+    AlmacenAlimentosFrom,
+    DelegacionForm,
+    HijoForm,
+    PersonaForm,
+    ProfileEditForm,
+    UserEditForm,
+)
+from .models import (
+    Alimentos,
+    AlimentosRepatir,
+    AlmacenAlimentos,
+    Hijo,
+    Persona,
+)
+from .serializers import (
+    AlacenAlimentosSerializer,
+    PersonaSerializer,
+    UserSerializer,
+)
 
 
 @login_required
@@ -249,13 +274,6 @@ def adauga_alimentos_persona(request, pk):
                     * persona.numero_beneficiarios
                 )
             else:
-                print("familiares")
-                print("index", index)
-                print(
-                    "persona.numero_beneficiarios",
-                    persona.numero_beneficiarios,
-                )
-                print(getattr(alm_repatir, f"alimento_{index}_0_3"))
                 if 0 <= persona.numero_beneficiarios <= 3:
                     init_reparto_alimento[f"alimento_{index}"] = getattr(
                         alm_repatir, f"alimento_{index}_0_3"
@@ -642,7 +660,7 @@ def export_users_csv(request):
 
     response = HttpResponse(
         content_type="application/vnd.openxmlformats-officedocument.\
-            spreadsheetml.sheet",
+            spreadsheetml.sheet"
     )
     response["Content-Disposition"] = "attachment; filename=beneficiarios.xlsx"
 
@@ -749,7 +767,7 @@ def buscar_fecha(request):
     if "download" in request.POST:
         response = HttpResponse(
             content_type="application/vnd.openxmlformats-officedocument.\
-            spreadsheetml.sheet",
+            spreadsheetml.sheet"
         )
         response[
             "Content-Disposition"
@@ -887,8 +905,13 @@ def generar_hoja_entrega(request, pk, mode):
 
 
 def set_need_appearances_writer(writer):
-    from PyPDF2.generic import (BooleanObject, IndirectObject, NameObject,
-                                NumberObject, TextStringObject)
+    from PyPDF2.generic import (
+        BooleanObject,
+        IndirectObject,
+        NameObject,
+        NumberObject,
+        TextStringObject,
+    )
 
     """
     Helper para escribir el pdf
@@ -1311,16 +1334,17 @@ def dashboard(request):
         },
     )
 
+
 @login_required
 def generar_recuento_beneficiaros(request):
     res_pdf = io.BytesIO()
     val = RecuntoBeneficiarios().getRecuentoFile()
     val.write(res_pdf)
     res_pdf.seek(0)
-     
+
     response = HttpResponse(
         res_pdf.getvalue(),
-        content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"  # noqa
+        content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",  # noqa
     )
     response[
         "Content-Disposition"

@@ -1,22 +1,37 @@
+import os
 from datetime import date
 
 import factory
+from functools import partial
+from typing import Any, Dict
+
+
+from factory import Factory
+from factory.base import StubObject
+
 from django.contrib.auth import get_user_model
 from faker import Factory as FakerFactory
 from faker import Faker
 
-from adra.models import (Alimentos, AlimentosRepatir, AlmacenAlimentos, Hijo,
-                         Persona, Profile)
+from adra.models import (
+    Alimentos,
+    AlimentosRepatir,
+    AlmacenAlimentos,
+    Hijo,
+    Persona,
+    Profile,
+)
 from delegaciones.models import BeneficiariosGlobales
 
-# fake = Faker()
+faker = Faker("es_ES")
 # faker = FakerFactory.create()
+from django.contrib.auth.models import User
 
 
 class PersonaFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Persona
-        django_get_or_create = ('nombre_apellido',)
+        django_get_or_create = ("nombre_apellido",)
 
     nombre_apellido = "Maria Fernandez"
     dni = "x00000000q"
@@ -46,16 +61,17 @@ class PersonaFactory(factory.django.DjangoModelFactory):
     codigo_postal = 28850
 
 
-class HijoFactory(factory.django.DjangoModelFactory):
+class FamiliarFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Hijo
-        django_get_or_create = ('nombre_apellido',)
-
-    nombre_apellido = "Mercedes Fernandez"
+        django_get_or_create = ("id",)
+        
+    id = 10
+    nombre_apellido = faker.name()
     parentesco = "hija"
-    dni = "x00000000w"
+    dni = faker.nie()
     otros_documentos = ""
-    fecha_nacimiento = date(2020, 0o1, 27)
+    fecha_nacimiento = date(2018, 0o1, 27)
     active = True
     discapacidad = False
     sexo = "mujer"
@@ -95,7 +111,9 @@ class AlmacenAlimentosFactory(factory.django.DjangoModelFactory):
 class AlimentosFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Alimentos
+        django_get_or_create = ("id",)
 
+    id = 10
     alimento_1 = 2
     alimento_2 = 2
     alimento_3 = 2
@@ -118,32 +136,32 @@ class BeneficiarioGlobalFactory(factory.django.DjangoModelFactory):
 
     delegacion_name = "adra torrejon"
     delegacion_code = 1
-    documentacion_beneficiario = "x0000000q"
+    documentacion_beneficiario = faker.nie()
     ciudad = "Madrid"
     provincia = "Madrid"
-    telefono = 000000000
-    nombre_beneficiario = "sdasW32dasdas"
+    telefono = int(faker.phone_number().split("+34")[1].replace(" ", ""))
+    nombre_beneficiario = faker.name()
 
 
 class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = get_user_model()
+        model = User
 
 
 class AlimentosRepatirFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = AlimentosRepatir
-        
+
     alimento_1 = 3
     alimento_1_type = "unidad"
-    alimento_1_0_3 = 3
-    alimento_1_4_6 = 3
-    alimento_1_7_9 = 3
+    alimento_1_0_3 = 2
+    alimento_1_4_6 = 5
+    alimento_1_7_9 = 7
     alimento_2 = 3
     alimento_2_type = "unidad"
-    alimento_2_0_3 = 3
-    alimento_2_4_6 = 3
-    alimento_2_7_9 = 3
+    alimento_2_0_3 = 2
+    alimento_2_4_6 = 5
+    alimento_2_7_9 = 7
     alimento_3 = 3
     alimento_3_type = "unidad"
     alimento_3_0_3 = 3
@@ -194,4 +212,19 @@ class AlimentosRepatirFactory(factory.django.DjangoModelFactory):
     alimento_12_0_3 = 3
     alimento_12_4_6 = 3
     alimento_12_7_9 = 3
-    modificado_por = factory.SubFactory(UserFactory)
+
+
+def generate_dict_factory(factory: Factory):
+    def convert_dict_from_stub(stub: StubObject) -> Dict[str, Any]:
+        stub_dict = stub.__dict__
+        for key, value in stub_dict.items():
+            if isinstance(value, StubObject):
+                stub_dict[key] = convert_dict_from_stub(value)
+        return stub_dict
+
+    def dict_factory(factory, **kwargs):
+        stub = factory.stub(**kwargs)
+        stub_dict = convert_dict_from_stub(stub)
+        return stub_dict
+
+    return partial(dict_factory, factory)

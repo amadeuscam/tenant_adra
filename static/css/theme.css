@@ -14738,8 +14738,3 @@ section {
     flex-direction: column;
 }
 
-.jSignature {
-    border: 7px dashed black !important;
-    margin:  2em 0 !important;
-
-}

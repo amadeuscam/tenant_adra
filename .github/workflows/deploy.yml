@@ -55,7 +55,7 @@ jobs:
 
         run: |
           python manage.py collectstatic --noinput
-          # pytest -vv
+          pytest -vv
 
       - name: docker login
         env:
