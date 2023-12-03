@@ -94,6 +94,10 @@ class AlmacenAlimentosFactory(factory.django.DjangoModelFactory):
     alimento_10 = 100
     alimento_11 = 100
     alimento_12 = 100
+    alimento_13 = 100
+    alimento_14 = 100
+    alimento_15 = 100
+    alimento_16 = 100
     alimento_1_caducidad = date(2020, 0o1, 27)
     alimento_2_caducidad = date(2022, 0o1, 27)
     alimento_3_caducidad = date(2020, 0o1, 27)
@@ -106,6 +110,10 @@ class AlmacenAlimentosFactory(factory.django.DjangoModelFactory):
     alimento_10_caducidad = date(2020, 0o1, 27)
     alimento_11_caducidad = date(2020, 0o1, 27)
     alimento_12_caducidad = date(2020, 0o1, 27)
+    alimento_13_caducidad = date(2020, 0o1, 27)
+    alimento_14_caducidad = date(2020, 0o1, 27)
+    alimento_15_caducidad = date(2020, 0o1, 27)
+    alimento_16_caducidad = date(2020, 0o1, 27)
 
 
 class AlimentosFactory(factory.django.DjangoModelFactory):
@@ -126,6 +134,10 @@ class AlimentosFactory(factory.django.DjangoModelFactory):
     alimento_10 = 2
     alimento_11 = 2
     alimento_12 = 2
+    alimento_13 = 2
+    alimento_14 = 2
+    alimento_15 = 2
+    alimento_16 = 2
     fecha_recogida = date(2022, 0o1, 27)
     persona = factory.SubFactory(PersonaFactory)
 
@@ -212,6 +224,26 @@ class AlimentosRepatirFactory(factory.django.DjangoModelFactory):
     alimento_12_0_3 = 3
     alimento_12_4_6 = 3
     alimento_12_7_9 = 3
+    alimento_13 = 3
+    alimento_13_type = "unidad"
+    alimento_13_0_3 = 3
+    alimento_13_4_6 = 3
+    alimento_13_7_9 = 3
+    alimento_14 = 3
+    alimento_14_type = "unidad"
+    alimento_14_0_3 = 3
+    alimento_14_4_6 = 3
+    alimento_14_7_9 = 3
+    alimento_15 = 3
+    alimento_15_type = "unidad"
+    alimento_15_0_3 = 3
+    alimento_15_4_6 = 3
+    alimento_15_7_9 = 3
+    alimento_16 = 3
+    alimento_16_type = "unidad"
+    alimento_16_0_3 = 3
+    alimento_16_4_6 = 3
+    alimento_16_7_9 = 3
 
 
 def generate_dict_factory(factory: Factory):

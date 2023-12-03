@@ -245,13 +245,13 @@ class TestViews(TenantTestCase):
                 "adra:alimentos-create", kwargs={"pk": self.beneficario.pk}
             )
         )
-        for index in range(1, 13):
+        for index in range(1, 17):
             value = int(
                 re.findall(
                     r"\d+", str(response.context["form"][f"alimento_{index}"])
                 )[1]
             )
-            if index in [11, 12]:
+            if index in [12, 13]:
                 assert value == 3
             elif index in [4]:
                 assert value == 0
@@ -265,13 +265,13 @@ class TestViews(TenantTestCase):
                 "adra:alimentos-create", kwargs={"pk": self.beneficario.pk}
             )
         )
-        for index in range(1, 12):
+        for index in range(1, 17):
             value = int(
                 re.findall(
                     r"\d+", str(response.context["form"][f"alimento_{index}"])
                 )[1]
             )
-            if index in [4, 11, 12]:
+            if index in [4, 12, 13]:
                 assert value == 0
             else:
                 assert value == 6
@@ -299,20 +299,20 @@ class TestViews(TenantTestCase):
             )
         )
 
-        for index in range(1, 13):
+        for index in range(1, 17):
             value = int(
                 re.findall(
                     r"\d+", str(response.context["form"][f"alimento_{index}"])
                 )[1]
             )
-            if index in [11, 12]:
+            if index in [12, 13]:
                 assert value == 0
             elif index == 4:
                 assert value == 0
             else:
                 if index in [1, 2]:
                     assert value == 2
-                if index not in [1, 2, 11, 12]:
+                if index not in [1, 2, 12, 13]:
                     assert value == 9
 
         assert response.status_code == 200
@@ -331,19 +331,19 @@ class TestViews(TenantTestCase):
             )
         )
 
-        for index in range(1, 13):
+        for index in range(1, 17):
             value = int(
                 re.findall(
                     r"\d+", str(response.context["form"][f"alimento_{index}"])
                 )[1]
             )
-            if index in [11, 12, 4]:
+            if index in [12, 13, 4]:
                 assert value == 0
 
             else:
                 if index in [1, 2]:
                     assert value == 5
-                if index not in [1, 2, 11, 12]:
+                if index not in [1, 2, 12, 13]:
                     assert value == 12
 
         assert response.status_code == 200
@@ -362,18 +362,18 @@ class TestViews(TenantTestCase):
             )
         )
 
-        for index in range(1, 13):
+        for index in range(1, 17):
             value = int(
                 re.findall(
                     r"\d+", str(response.context["form"][f"alimento_{index}"])
                 )[1]
             )
-            if index in [11, 12, 4]:
+            if index in [12, 13, 4]:
                 assert value == 0
             else:
                 if index in [1, 2]:
                     assert value == 7
-                if index not in [1, 2, 11, 12]:
+                if index not in [1, 2, 12, 13]:
                     assert value == 21
 
         assert response.status_code == 200
@@ -592,6 +592,10 @@ class TestViews(TenantTestCase):
                 "alimento_10": alimentos_quantity_negative,
                 "alimento_11": alimentos_quantity_negative,
                 "alimento_12": alimentos_quantity_negative,
+                "alimento_13": alimentos_quantity_negative,
+                "alimento_14": alimentos_quantity_negative,
+                "alimento_15": alimentos_quantity_negative,
+                "alimento_16": alimentos_quantity_negative,
                 "fecha_recogida": "2022-11-18",
             },
         )
@@ -610,6 +614,10 @@ class TestViews(TenantTestCase):
             assert alm.alimento_10 == 96
             assert alm.alimento_11 == 96
             assert alm.alimento_12 == 96
+            assert alm.alimento_13 == 96
+            assert alm.alimento_14 == 96
+            assert alm.alimento_15 == 96
+            assert alm.alimento_16 == 96
 
         alimentos_quantity_positive = 2
 
@@ -631,6 +639,10 @@ class TestViews(TenantTestCase):
                 "alimento_10": alimentos_quantity_positive,
                 "alimento_11": alimentos_quantity_positive,
                 "alimento_12": alimentos_quantity_positive,
+                "alimento_13": alimentos_quantity_positive,
+                "alimento_14": alimentos_quantity_positive,
+                "alimento_15": alimentos_quantity_positive,
+                "alimento_16": alimentos_quantity_positive,
                 "fecha_recogida": "2022-11-17",
             },
         )
@@ -649,6 +661,10 @@ class TestViews(TenantTestCase):
             assert alm.alimento_10 == 100
             assert alm.alimento_11 == 100
             assert alm.alimento_12 == 100
+            assert alm.alimento_13 == 100
+            assert alm.alimento_14 == 100
+            assert alm.alimento_15 == 100
+            assert alm.alimento_16 == 100
 
     def test_generar_hoja_entrega_individual_sin_firma(self):
         self.familiar_factory.create_batch(
