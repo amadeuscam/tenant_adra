@@ -27,7 +27,6 @@ services:
       - "5050:80"
 
   web:
-    container_name: adra_tenant_app
     restart: always
     build:
       context: .
