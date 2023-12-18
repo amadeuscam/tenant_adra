@@ -224,10 +224,6 @@ def adauga_alimentos_persona(request, pk):
         a_form = AlimentosFrom(request.POST)
         if a_form.is_valid():
             alimentos = a_form.save(commit=False)
-            # signature = a_form.cleaned_data.get("signature")
-            # if signature:
-            #     # as an image
-            #     signature_picture = draw_signature(signature)
 
             almacen.alimento_1 -= alimentos.alimento_1
             almacen.alimento_2 -= alimentos.alimento_2
@@ -241,6 +237,10 @@ def adauga_alimentos_persona(request, pk):
             almacen.alimento_10 -= alimentos.alimento_10
             almacen.alimento_11 -= alimentos.alimento_11
             almacen.alimento_12 -= alimentos.alimento_12
+            almacen.alimento_13 -= alimentos.alimento_13
+            almacen.alimento_14 -= alimentos.alimento_14
+            almacen.alimento_15 -= alimentos.alimento_15
+            almacen.alimento_16 -= alimentos.alimento_16
 
             alimentos.persona = persona
             alimentos.modificado_por = request.user
@@ -255,18 +255,18 @@ def adauga_alimentos_persona(request, pk):
         alm_repatir = AlimentosRepatir.objects.all().first()
 
         init_reparto_alimento = {}
-        for index in range(1, 13):
+        for index in range(1, 17):
             if getattr(alm_repatir, f"alimento_{index}_type") == "unidad":
                 babys = len(
                     [fam for fam in persona.hijo.all() if fam.age <= 3]
                 )
-                if babys > 0 and index in [11, 12]:
+                if babys > 0 and index in [12, 13]:
                     init_reparto_alimento[f"alimento_{index}"] = (
                         getattr(alm_repatir, f"alimento_{index}") * babys
                     )
                     continue
                 else:
-                    if index in [11, 12]:
+                    if index in [12, 13]:
                         init_reparto_alimento[f"alimento_{index}"] = 0
                         continue
                 init_reparto_alimento[f"alimento_{index}"] = (
@@ -309,6 +309,10 @@ class PersonaAlimentosUpdateView(LoginRequiredMixin, UpdateView):
         "alimento_10",
         "alimento_11",
         "alimento_12",
+        "alimento_13",
+        "alimento_14",
+        "alimento_15",
+        "alimento_16",
         "fecha_recogida",
         "signature",
     ]
@@ -474,6 +478,60 @@ class PersonaAlimentosUpdateView(LoginRequiredMixin, UpdateView):
                     form.instance.alimento_12 - valor_anterior_alimento_12
                 )
                 almacen.alimento_12 += restante
+                
+        if "alimento_13" in clean:
+            valor_anterior_alimento_13 = form.initial["alimento_13"]
+            if form.instance.alimento_13 > valor_anterior_alimento_13:
+                restante = abs(
+                    form.instance.alimento_13 - valor_anterior_alimento_13
+                )
+                almacen.alimento_13 -= restante
+            else:
+                restante = abs(
+                    form.instance.alimento_13 - valor_anterior_alimento_13
+                )
+                almacen.alimento_13 += restante
+
+        if "alimento_14" in clean:
+            valor_anterior_alimento_14 = form.initial["alimento_14"]
+            if form.instance.alimento_14 > valor_anterior_alimento_14:
+                restante = abs(
+                    form.instance.alimento_14 - valor_anterior_alimento_14
+                )
+                almacen.alimento_14 -= restante
+            else:
+                restante = abs(
+                    form.instance.alimento_14 - valor_anterior_alimento_14
+                )
+                almacen.alimento_14 += restante
+
+
+        if "alimento_15" in clean:
+            valor_anterior_alimento_15 = form.initial["alimento_15"]
+            if form.instance.alimento_15 > valor_anterior_alimento_15:
+                restante = abs(
+                    form.instance.alimento_15 - valor_anterior_alimento_15
+                )
+                almacen.alimento_15 -= restante
+            else:
+                restante = abs(
+                    form.instance.alimento_15 - valor_anterior_alimento_15
+                )
+                almacen.alimento_15 += restante
+                
+        if "alimento_16" in clean:
+            valor_anterior_alimento_16 = form.initial["alimento_16"]
+            if form.instance.alimento_16 > valor_anterior_alimento_16:
+                restante = abs(
+                    form.instance.alimento_16 - valor_anterior_alimento_16
+                )
+                almacen.alimento_16 -= restante
+            else:
+                restante = abs(
+                    form.instance.alimento_16 - valor_anterior_alimento_16
+                )
+                almacen.alimento_16 += restante
+                
 
         almacen.save()
         form.instance.modificado_por = self.request.user
@@ -763,6 +821,10 @@ def buscar_fecha(request):
     alimento_10 = user_filter.qs.aggregate(Sum("alimento_10"))
     alimento_11 = user_filter.qs.aggregate(Sum("alimento_11"))
     alimento_12 = user_filter.qs.aggregate(Sum("alimento_12"))
+    alimento_13 = user_filter.qs.aggregate(Sum("alimento_13"))
+    alimento_14 = user_filter.qs.aggregate(Sum("alimento_14"))
+    alimento_15 = user_filter.qs.aggregate(Sum("alimento_15"))
+    alimento_16 = user_filter.qs.aggregate(Sum("alimento_16"))
 
     if "download" in request.POST:
         response = HttpResponse(
@@ -793,6 +855,10 @@ def buscar_fecha(request):
             settings.ALIMENTOS_METADATA["alimento_10"]["name"],
             settings.ALIMENTOS_METADATA["alimento_11"]["name"],
             settings.ALIMENTOS_METADATA["alimento_12"]["name"],
+            settings.ALIMENTOS_METADATA["alimento_13"]["name"],
+            settings.ALIMENTOS_METADATA["alimento_14"]["name"],
+            settings.ALIMENTOS_METADATA["alimento_15"]["name"],
+            settings.ALIMENTOS_METADATA["alimento_16"]["name"],
             "Fecha Recogida",
             "Beneficiario",
         ]
@@ -824,6 +890,10 @@ def buscar_fecha(request):
                 alimento.alimento_10,
                 alimento.alimento_11,
                 alimento.alimento_12,
+                alimento.alimento_13,
+                alimento.alimento_14,
+                alimento.alimento_15,
+                alimento.alimento_16,
                 alimento.fecha_recogida.strftime("%d/%m/%Y"),
                 alimento.persona.nombre_apellido,
             ]
@@ -873,6 +943,10 @@ def buscar_fecha(request):
             "alimento_10": alimento_10,
             "alimento_11": alimento_11,
             "alimento_12": alimento_12,
+            "alimento_13": alimento_13,
+            "alimento_14": alimento_14,
+            "alimento_15": alimento_15,
+            "alimento_16": alimento_16,
             "nbar": "buscar_av",
         },
     )
@@ -1272,7 +1346,7 @@ def configuracion(request):
 
         alm_repatir = AlimentosRepatir.objects.all().first()
         init_reparto_alimento = {}
-        for index in range(1, 13):
+        for index in range(1, 17):
             init_reparto_alimento[f"alimento_{index}"] = getattr(
                 alm_repatir, f"alimento_{index}"
             )

@@ -63,27 +63,27 @@ class DeliverySheet:
             "Teléfono": f"{self.persona.telefono}",
             "Domicilio": f"{self.persona.domicilio}",
             "Localidad": f"{self.persona.ciudad}",
-            "Localidad_alta_1": f"{tenat_info.ciudad}",
-            "Localidad_alta_8": f"{tenat_info.ciudad}",
+            "Localidad_alta_1_1": f"{tenat_info.ciudad}",
+            "Localidad_alta_1_0": f"{tenat_info.ciudad}",
             "CP": f"{self.persona.codigo_postal}",
             "numarAdra": f"{self.persona.numero_adra}",
         }
         self.firma_alimentos = {
-            f"firm_1": {"x_start": 214, "y_start": 74},
-            f"firm_2": {"x_start": 270, "y_start": 74},
-            f"firm_3": {"x_start": 327, "y_start": 74},
-            f"firm_4": {"x_start": 384, "y_start": 74},
-            f"firm_5": {"x_start": 441, "y_start": 74},
-            f"firm_6": {"x_start": 498, "y_start": 74},
-            f"firm_7": {"x_start": 555, "y_start": 74},
-            f"firm_8": {"x_start": 214, "y_start": 74},
-            f"firm_9": {"x_start": 270, "y_start": 74},
-            f"firm_10": {"x_start": 327, "y_start": 74},
-            f"firm_11": {"x_start": 384, "y_start": 74},
-            f"firm_12": {"x_start": 441, "y_start": 74},
-            f"firm_13": {"x_start": 498, "y_start": 74},
-            f"firm_14": {"x_start": 555, "y_start": 74},
-            f"firm_alta": {"x_start": 676, "y_start": 103},
+            f"firm_1": {"x_start": 214, "y_start": 40},
+            f"firm_2": {"x_start": 270, "y_start": 40},
+            f"firm_3": {"x_start": 327, "y_start": 40},
+            f"firm_4": {"x_start": 384, "y_start": 40},
+            f"firm_5": {"x_start": 441, "y_start": 40},
+            f"firm_6": {"x_start": 498, "y_start": 40},
+            f"firm_7": {"x_start": 555, "y_start": 40},
+            f"firm_8": {"x_start": 214, "y_start": 40},
+            f"firm_9": {"x_start": 270, "y_start": 40},
+            f"firm_10": {"x_start": 327, "y_start": 40},
+            f"firm_11": {"x_start": 384, "y_start": 40},
+            f"firm_12": {"x_start": 441, "y_start": 40},
+            f"firm_13": {"x_start": 498, "y_start": 40},
+            f"firm_14": {"x_start": 555, "y_start": 40},
+            f"firm_alta": {"x_start": 676, "y_start": 98},
         }
 
         self.meses = [
@@ -102,81 +102,41 @@ class DeliverySheet:
         ]
         self.dict_alimentos = {}
         self.pdf_reader = None
-        # self.set_appearances_writer()
+      
 
     def _load_file(self, name):
         path = os.path.join(os.path.abspath("source_files"), f"{name}.pdf")
         return PdfFileReader(path, strict=True)
-        # print(pdf_reader.getFormTextFields())
-
-        # return self.pdf_writer
-
+        
     def set_appearances_writer(self):
         return self.set_need_appearances_writer(self.pdf_writer)
 
     def make_visible_data_and_block(self, page_arg):
-        page = self.pdf_writer.getPage(page_arg)
-        data_dict = self.general_data
-
-        self.pdf_writer.updatePageFormFieldValues(page, fields=data_dict)
-        # print(data_dict)
-
-        # writer_annot = None
-        # for j in range(0, len(page["/Annots"])):
-        #     writer_annot = page["/Annots"][j].getObject()
-        #     # print(writer_annot)
-
-        #     for field in data_dict:
-        #         # print(writer_annot.get('/T'))
-        #         # print(field)
-        #         # print(data_dict[field])
-        #         writer_annot.update(
-        #             {
-        #                 NameObject("/T"): create_string_object(
-        #                     f"{writer_annot['/T']}_page{j}"
-        #                 )
-        #             }
-        #         )
-        #         if writer_annot.get("/T") == field:
-        #             writer_annot.update(
-        #                 {NameObject("/V"): TextStringObject(data_dict[field])}
-        #             )
-        #             writer_annot.update({NameObject("/Ff"): NumberObject(1)})
+        page = copy(self.pdf_writer.getPage(page_arg))
+        self.pdf_writer.updatePageFormFieldValues(page, fields=self.general_data)
+        
 
     def add_signature(self, alimentos):
         self.set_num_adults_and_childrens()
-        map_alm = {
-            "1": 8,
-            "2": 9,
-            "3": 10,
-            "4": 11,
-            "5": 12,
-            "6": 13,
-            "7": 14,
-        }
-
+        
         if len(alimentos) > 0:
             for page, arr in enumerate(AdraUtils().split_list(alimentos, 7)):
                 if page > 0:
-                    pdf_reader = self._load_file("2023_entrega_full_pag_2")
+                    pdf_reader = self._load_file("2024_entregas_full_pag_2")
                     self.pdf_writer.addPage(pdf_reader.pages[0])
                 else:
-                    pdf_reader = self._load_file("2023_entrega_full")
+                    pdf_reader = self._load_file("2024_entregas_full")
                     self.pdf_writer.addPage(pdf_reader.pages[0])
 
                 for for_index, alimento in enumerate(arr, 1):
-                    if page > 0:
-                        self.fill_fields(
-                            for_index, map_alm[str(for_index)], alimento, page
-                        )
-                    else:
-                        self.fill_fields(for_index, for_index, alimento, page)
+                    self.fill_fields(for_index, for_index, alimento, page)
 
                 self.make_visible_data_and_block(page)
         else:
-            pdf_reader = self._load_file("2023_entrega_full")
+            pdf_reader = self._load_file("2024_entregas_full")
             self.pdf_writer.addPage(pdf_reader.pages[0])
             self.make_visible_data_and_block(0)
+
         self.set_appearances_writer()
         return self.pdf_writer
 
@@ -184,39 +144,27 @@ class DeliverySheet:
         self.set_num_adults_and_childrens()
 
         alimentos = self.persona.alimentos.all().order_by("fecha_recogida")
-
-        map_alm = {
-            "1": 8,
-            "2": 9,
-            "3": 10,
-            "4": 11,
-            "5": 12,
-            "6": 13,
-            "7": 14,
-        }
+ 
         if len(alimentos) != 0:
             for page, arr in enumerate(AdraUtils().split_list(alimentos, 7)):
                 if page > 0:
-                    pdf_reader = self._load_file("2023_entrega_full_pag_2")
-                    self.pdf_writer.addPage(pdf_reader.pages[0])
+                    pdf_reader = self._load_file("2024_entregas_full_pag_2")
+                    self.pdf_writer.addPage( pdf_reader.pages[0])
                 else:
-                    pdf_reader = self._load_file("2023_entrega_full")
+                    pdf_reader = self._load_file("2024_entregas_full")
                     self.pdf_writer.addPage(pdf_reader.pages[0])
 
                 for for_index, alimento in enumerate(arr, 1):
-                    if page > 0:
-                        self.fill_fields(
-                            for_index, map_alm[str(for_index)], alimento, page
-                        )
-                    else:
-                        self.fill_fields(for_index, for_index, alimento, page)
+                    self.fill_fields(for_index, for_index, alimento, page)
 
                 self.make_visible_data_and_block(page)
+
+               
 
             self.set_need_appearances_writer(self.pdf_writer)
             return self.pdf_writer
         else:
-            pdf_reader = self._load_file("2023_entrega_full")
+            pdf_reader = self._load_file("2024_entregas_full")
             self.pdf_writer.addPage(pdf_reader.pages[0])
             self.set_need_appearances_writer(self.pdf_writer)
             self.make_visible_data_and_block(0)
@@ -238,25 +186,25 @@ class DeliverySheet:
             {
                 "TOTAL MIEMBROS UNIDAD FAMILIAR": f"{mayores + menores + 1}",
                 "Niños 02 ambos inclusive": f"{menores}",
+                "N Miembros de otras edades": f"{mayores + 1}",
             }
         )
 
-    def set_alta_date(self, index, alimento):
+    def set_alta_date(self, index, alimento,page):
         # print(alimento.fecha_recogida)
         self.dict_alimentos.update(
             {
-                f"dia_alta_{index}": alimento.fecha_recogida.day,
-                f"mes_alta_{index}": self.meses[
+                f"dia_alta_{index}_{page}": alimento.fecha_recogida.day,
+                f"mes_alta_{index}_{page}": self.meses[
                     alimento.fecha_recogida.month - 1
                 ],
-                f"ano_alta_{index}": alimento.fecha_recogida.year,
+                f"ano_alta_{index}_{page}": alimento.fecha_recogida.year,
             }
         )
 
     def fill_fields(self, index, alm_index, alimento, page):
         if alimento.signature:
-            # print(alm_index)
-            if alm_index in [1, 8]:
+            if alm_index == 1:
                 self.add_image_pdf(
                     self.pdf_writer.getPage(page),
                     self.firma_alimentos,
@@ -270,7 +218,7 @@ class DeliverySheet:
                     alm_index,
                     alimento,
                 )
-                self.set_alta_date(alm_index, alimento)
+                self.set_alta_date(alm_index, alimento,page)
             else:
                 self.add_image_pdf(
                     self.pdf_writer.getPage(page),
@@ -279,28 +227,30 @@ class DeliverySheet:
                     alimento,
                 )
         else:
-            if alm_index in [1, 8]:
-                # print(alm_index)
-                self.set_alta_date(alm_index, alimento)
+            self.set_alta_date(alm_index, alimento,page)
         # print(index)
-        # print(alimento.alimento_1)
+        # print(page)
         self.dict_alimentos.update(
             {
-                f"2023Arroz blanco_{alm_index}": alimento.alimento_1,
-                f"2023Garbanzos cocidos_{alm_index}": alimento.alimento_2,
-                f"2023Conserva de atún_{alm_index}": alimento.alimento_3,
-                f"2023Conserva de carne_{alm_index}": alimento.alimento_4,
-                f"2023Pasta alimenticia espagueti_{alm_index}": alimento.alimento_5,
-                f"2023Pasta alimenticia fideo_{alm_index}": alimento.alimento_6,
-                f"2023Tomate frito en conserva_{alm_index}": alimento.alimento_7,
-                f"2023Galletas_{alm_index}": alimento.alimento_8,
-                f"2023Macedonia de verduras en conserva_{alm_index}": alimento.alimento_9,
-                f"2023Cacao soluble_{alm_index}": alimento.alimento_10,
-                f"2023Tarritos infantiles pollo_{alm_index}": alimento.alimento_11,
-                f"2023Tarritos infantiles fruta_{alm_index}": alimento.alimento_12,
-                f"dia_{alm_index}": alimento.fecha_recogida.day,
-                f"mes_{alm_index}": alimento.fecha_recogida.month,
-                f"ano_{alm_index}": alimento.fecha_recogida.year,
+                f"2023Arroz blanco_{alm_index}_{page}": alimento.alimento_1,
+                f"2023Garbanzos cocidos_{alm_index}_{page}": alimento.alimento_2,
+                f"2023Conserva de atún_{alm_index}_{page}": alimento.alimento_3,
+                f"2023Conserva de carne_{alm_index}_{page}": alimento.alimento_4,
+                f"2023Pasta alimenticia espagueti_{alm_index}_{page}": alimento.alimento_5,
+                f"2023Pasta alimenticia fideo_{alm_index}_{page}": alimento.alimento_6,
+                f"2023Tomate frito en conserva APIS_{alm_index}_{page}": alimento.alimento_7,
+                f"2023Tomate frito en conserva ACICO_{alm_index}_{page}": alimento.alimento_8,
+                f"2023Galletas_{alm_index}_{page}": alimento.alimento_9,
+                f"2023Macedonia de verduras en conserva_{alm_index}_{page}": alimento.alimento_10,
+                f"2023Cacao soluble_{alm_index}_{page}": alimento.alimento_11,
+                f"2023Tarritos infantiles pollo_{alm_index}_{page}": alimento.alimento_12,
+                f"2023Tarritos infantiles fruta_{alm_index}_{page}": alimento.alimento_13,
+                f"2023Alubias cocidas_{alm_index}_{page}": alimento.alimento_14,
+                f"2023Conserva de sardina_{alm_index}_{page}": alimento.alimento_15,
+                f"2023Fruta en conserva_{alm_index}_{page}": alimento.alimento_16,
+                f"dia_{alm_index}_{page}": alimento.fecha_recogida.day,
+                f"mes_{alm_index}_{page}": alimento.fecha_recogida.month,
+                f"ano_{alm_index}_{page}": alimento.fecha_recogida.year,
             }
         )
 
@@ -359,7 +309,7 @@ class DeliverySheet:
                 # anchor="c",
                 # showBoundary=True,
             )
-            can.showPage()
+            # can.showPage()
         else:
             can.drawImage(
                 draw_signature(alimento.signature, as_file=True),
@@ -373,9 +323,9 @@ class DeliverySheet:
                 # anchorAtXY=True,
                 # showBoundary=True
             )
-            can.showPage()
+            # can.showPage()
 
-        can.showPage()
+        # can.showPage()
         can.save()
 
         # move to the beginning of the StringIO buffer

@@ -152,6 +152,46 @@ Almacen
                         </div>
 
                     </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+
+                        <span style="width:45%"> {% get_verbose_field_name alimento "alimento_13" %}</span>
+                        <span style="width:45%"> Caduca en <span
+                                style="color:red">{% proxima_caducidad alimento  13 %}</span> dias </span>
+                        <div style="width:10%" class="d-flex justify-content-between align-items-center">
+                            Unidades <span class="badge badge-primary text-right"> {{ alimento.alimento_13 }} </span>
+                        </div>
+
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+
+                        <span style="width:45%"> {% get_verbose_field_name alimento "alimento_14" %}</span>
+                        <span style="width:45%"> Caduca en <span
+                                style="color:red">{% proxima_caducidad alimento  14 %}</span> dias </span>
+                        <div style="width:10%" class="d-flex justify-content-between align-items-center">
+                            Unidades <span class="badge badge-primary text-right"> {{ alimento.alimento_14 }} </span>
+                        </div>
+
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+
+                        <span style="width:45%"> {% get_verbose_field_name alimento "alimento_15" %}</span>
+                        <span style="width:45%"> Caduca en <span
+                                style="color:red">{% proxima_caducidad alimento  15 %}</span> dias </span>
+                        <div style="width:10%" class="d-flex justify-content-between align-items-center">
+                            Unidades <span class="badge badge-primary text-right"> {{ alimento.alimento_15 }} </span>
+                        </div>
+
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+
+                        <span style="width:45%"> {% get_verbose_field_name alimento "alimento_16" %}</span>
+                        <span style="width:45%"> Caduca en <span
+                                style="color:red">{% proxima_caducidad alimento  16 %}</span> dias </span>
+                        <div style="width:10%" class="d-flex justify-content-between align-items-center">
+                            Unidades <span class="badge badge-primary text-right"> {{ alimento.alimento_16 }} </span>
+                        </div>
+
+                    </li>
                     {% empty %}
                     <p>Almacen vacio</p>
                     {% endfor %}

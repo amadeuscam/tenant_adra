@@ -27,6 +27,10 @@ class AlimentosFrom(ModelForm):
             "alimento_10",
             "alimento_11",
             "alimento_12",
+            "alimento_13",
+            "alimento_14",
+            "alimento_15",
+            "alimento_16",
             "fecha_recogida",
             "signature",
         )
@@ -57,6 +61,10 @@ class AlmacenAlimentosFrom(ModelForm):
             "alimento_10",
             "alimento_11",
             "alimento_12",
+            "alimento_13",
+            "alimento_14",
+            "alimento_15",
+            "alimento_16",
             "alimento_1_caducidad",
             "alimento_2_caducidad",
             "alimento_3_caducidad",
@@ -69,6 +77,10 @@ class AlmacenAlimentosFrom(ModelForm):
             "alimento_10_caducidad",
             "alimento_11_caducidad",
             "alimento_12_caducidad",
+            "alimento_13_caducidad",
+            "alimento_14_caducidad",
+            "alimento_15_caducidad",
+            "alimento_16_caducidad",
         )
         widgets = {
             "alimento_1_caducidad": DateInput(
@@ -160,6 +172,42 @@ class AlmacenAlimentosFrom(ModelForm):
                 },
             ),
             "alimento_12_caducidad": DateInput(
+                format=("%Y-%m-%d"),
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Select Date",
+                    "type": "date",
+                },
+            ),
+            
+            "alimento_13_caducidad": DateInput(
+                format=("%Y-%m-%d"),
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Select Date",
+                    "type": "date",
+                },
+            ),
+
+            "alimento_14_caducidad": DateInput(
+                format=("%Y-%m-%d"),
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Select Date",
+                    "type": "date",
+                },
+            ),
+
+            "alimento_15_caducidad": DateInput(
+                format=("%Y-%m-%d"),
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Select Date",
+                    "type": "date",
+                },
+            ),
+
+            "alimento_16_caducidad": DateInput(
                 format=("%Y-%m-%d"),
                 attrs={
                     "class": "form-control",
@@ -414,6 +462,28 @@ class AlimentosRepatrirForm(ModelForm):
             "alimento_12_4_6",
             "alimento_12_7_9",
 
+            "alimento_13",
+            "alimento_13_0_3",
+            "alimento_13_4_6",
+            "alimento_13_7_9",
+
+
+            "alimento_14",
+            "alimento_14_0_3",
+            "alimento_14_4_6",
+            "alimento_14_7_9",
+
+
+            "alimento_15",
+            "alimento_15_0_3",
+            "alimento_15_4_6",
+            "alimento_15_7_9",
+
+            "alimento_16",
+            "alimento_16_0_3",
+            "alimento_16_4_6",
+            "alimento_16_7_9",
+
             
 
             "alimento_1_type",
@@ -428,6 +498,10 @@ class AlimentosRepatrirForm(ModelForm):
             "alimento_10_type",
             "alimento_11_type",
             "alimento_12_type",
+            "alimento_13_type",
+            "alimento_14_type",
+            "alimento_15_type",
+            "alimento_16_type",
              
         )
 

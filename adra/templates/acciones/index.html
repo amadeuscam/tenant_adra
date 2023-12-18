@@ -305,6 +305,42 @@
                         <td>{{ alimentos_repatir.alimento_12_7_9 |as_crispy_field }}</td>
                     </tr>
 
+                     <tr>
+                        <th scope="row">{{ alimentos_repatir.alimento_13.label }}</th>
+                        <td>{{ alimentos_repatir.alimento_13_type |as_crispy_field }}</td>
+                        <td>{{ alimentos_repatir.alimento_13|as_crispy_field }}</td>
+                        <td>{{ alimentos_repatir.alimento_13_0_3 |as_crispy_field }}</td>
+                        <td>{{ alimentos_repatir.alimento_13_4_6 |as_crispy_field }}</td>
+                        <td>{{ alimentos_repatir.alimento_13_7_9 |as_crispy_field }}</td>
+                    </tr>
+
+                     <tr>
+                        <th scope="row">{{ alimentos_repatir.alimento_14.label }}</th>
+                        <td>{{ alimentos_repatir.alimento_14_type |as_crispy_field }}</td>
+                        <td>{{ alimentos_repatir.alimento_14|as_crispy_field }}</td>
+                        <td>{{ alimentos_repatir.alimento_14_0_3 |as_crispy_field }}</td>
+                        <td>{{ alimentos_repatir.alimento_14_4_6 |as_crispy_field }}</td>
+                        <td>{{ alimentos_repatir.alimento_14_7_9 |as_crispy_field }}</td>
+                    </tr>
+
+                     <tr>
+                        <th scope="row">{{ alimentos_repatir.alimento_15.label }}</th>
+                        <td>{{ alimentos_repatir.alimento_15_type |as_crispy_field }}</td>
+                        <td>{{ alimentos_repatir.alimento_15|as_crispy_field }}</td>
+                        <td>{{ alimentos_repatir.alimento_15_0_3 |as_crispy_field }}</td>
+                        <td>{{ alimentos_repatir.alimento_15_4_6 |as_crispy_field }}</td>
+                        <td>{{ alimentos_repatir.alimento_15_7_9 |as_crispy_field }}</td>
+                    </tr>
+
+                     <tr>
+                        <th scope="row">{{ alimentos_repatir.alimento_16.label }}</th>
+                        <td>{{ alimentos_repatir.alimento_16_type |as_crispy_field }}</td>
+                        <td>{{ alimentos_repatir.alimento_16|as_crispy_field }}</td>
+                        <td>{{ alimentos_repatir.alimento_16_0_3 |as_crispy_field }}</td>
+                        <td>{{ alimentos_repatir.alimento_16_4_6 |as_crispy_field }}</td>
+                        <td>{{ alimentos_repatir.alimento_16_7_9 |as_crispy_field }}</td>
+                    </tr>
+
 
 
 
@@ -326,7 +362,7 @@
     <script src="{% static 'js/vue/vue3.js' %}"></script>
     <script src="{% static 'js/axios/axios.0.27.js' %}"></script>
     <script>
-        for (let j = 0; j < 14; j++) {
+        for (let j = 0; j < 17; j++) {
             $(`#id_alimento_${j}_type option:selected`).each(function () {
                 if ($(this).text() === "Familia") {
                     $(`#collapsealimento${j}`).collapse('show')
@@ -433,6 +469,26 @@
         $("#id_alimento_12_type").change(function () {
             $("#id_alimento_12_type option:selected").each(function () {
                showFields($(this).text(),"Familia",12)
+            });
+        });
+        $("#id_alimento_13_type").change(function () {
+            $("#id_alimento_13_type option:selected").each(function () {
+               showFields($(this).text(),"Familia",13)
+            });
+        });
+        $("#id_alimento_14_type").change(function () {
+            $("#id_alimento_14_type option:selected").each(function () {
+               showFields($(this).text(),"Familia",14)
+            });
+        });
+        $("#id_alimento_15_type").change(function () {
+            $("#id_alimento_15_type option:selected").each(function () {
+               showFields($(this).text(),"Familia",15)
+            });
+        });
+        $("#id_alimento_16_type").change(function () {
+            $("#id_alimento_16_type option:selected").each(function () {
+               showFields($(this).text(),"Familia",16)
             });
         });
 

@@ -211,6 +211,26 @@ class Alimentos(models.Model):
         verbose_name=settings.ALIMENTOS_METADATA["alimento_12"]["name"]
     )
 
+    alimento_13 = models.IntegerField(
+        default=None,
+        verbose_name=settings.ALIMENTOS_METADATA["alimento_13"]["name"]
+    )
+
+    alimento_14 = models.IntegerField(
+        default=None,
+        verbose_name=settings.ALIMENTOS_METADATA["alimento_14"]["name"]
+    )
+
+    alimento_15 = models.IntegerField(
+        default=None,
+        verbose_name=settings.ALIMENTOS_METADATA["alimento_15"]["name"]
+    )
+
+    alimento_16 = models.IntegerField(
+        default=None,
+        verbose_name=settings.ALIMENTOS_METADATA["alimento_16"]["name"]
+    )
+
     modificado_por = models.ForeignKey(
         User, on_delete=models.DO_NOTHING, null=True
     )
@@ -281,6 +301,26 @@ class AlmacenAlimentos(models.Model):
     alimento_12 = models.IntegerField(
         default=None,
         verbose_name=settings.ALIMENTOS_METADATA["alimento_12"]["name"]
+    )
+    
+    alimento_13 = models.IntegerField(
+        default=None,
+        verbose_name=settings.ALIMENTOS_METADATA["alimento_13"]["name"]
+    )
+
+    alimento_14 = models.IntegerField(
+        default=None,
+        verbose_name=settings.ALIMENTOS_METADATA["alimento_14"]["name"]
+    )
+
+    alimento_15 = models.IntegerField(
+        default=None,
+        verbose_name=settings.ALIMENTOS_METADATA["alimento_15"]["name"]
+    )
+
+    alimento_16 = models.IntegerField(
+        default=None,
+        verbose_name=settings.ALIMENTOS_METADATA["alimento_16"]["name"]
     )
 
     modificado_por = models.ForeignKey(
@@ -360,6 +400,30 @@ class AlmacenAlimentos(models.Model):
         blank=True,
         default=None,
         verbose_name=settings.ALIMENTOS_METADATA["alimento_12"]["name"],
+    )
+    alimento_13_caducidad = models.DateField(
+        auto_now_add=False,
+        blank=True,
+        default=None,
+        verbose_name=settings.ALIMENTOS_METADATA["alimento_13"]["name"],
+    )
+    alimento_14_caducidad = models.DateField(
+        auto_now_add=False,
+        blank=True,
+        default=None,
+        verbose_name=settings.ALIMENTOS_METADATA["alimento_14"]["name"],
+    )
+    alimento_15_caducidad = models.DateField(
+        auto_now_add=False,
+        blank=True,
+        default=None,
+        verbose_name=settings.ALIMENTOS_METADATA["alimento_15"]["name"],
+    )
+    alimento_16_caducidad = models.DateField(
+        auto_now_add=False,
+        blank=True,
+        default=None,
+        verbose_name=settings.ALIMENTOS_METADATA["alimento_16"]["name"],
     )
 
     class Meta:
@@ -529,6 +593,50 @@ class AlimentosRepatir(models.Model):
     alimento_12_4_6 = models.IntegerField(
         default=0, verbose_name="Rango 4-6 familia")
     alimento_12_7_9 = models.IntegerField(
+        default=0, verbose_name="Rango 7-9 familia")
+    
+    alimento_13 = models.IntegerField(
+        default=0, verbose_name=settings.ALIMENTOS_METADATA["alimento_13"]["name"])
+    alimento_13_type = models.CharField(
+        choices=TIPO, max_length=20, default="unidad", verbose_name='Entrega')
+    alimento_13_0_3 = models.IntegerField(
+        default=0, verbose_name="Rango 0-3 familia")
+    alimento_13_4_6 = models.IntegerField(
+        default=0, verbose_name="Rango 4-6 familia")
+    alimento_13_7_9 = models.IntegerField(
+        default=0, verbose_name="Rango 7-9 familia")
+    
+    alimento_14 = models.IntegerField(
+        default=0, verbose_name=settings.ALIMENTOS_METADATA["alimento_14"]["name"])
+    alimento_14_type = models.CharField(
+        choices=TIPO, max_length=20, default="unidad", verbose_name='Entrega')
+    alimento_14_0_3 = models.IntegerField(
+        default=0, verbose_name="Rango 0-3 familia")
+    alimento_14_4_6 = models.IntegerField(
+        default=0, verbose_name="Rango 4-6 familia")
+    alimento_14_7_9 = models.IntegerField(
+        default=0, verbose_name="Rango 7-9 familia")
+    
+    alimento_15 = models.IntegerField(
+        default=0, verbose_name=settings.ALIMENTOS_METADATA["alimento_15"]["name"])
+    alimento_15_type = models.CharField(
+        choices=TIPO, max_length=20, default="unidad", verbose_name='Entrega')
+    alimento_15_0_3 = models.IntegerField(
+        default=0, verbose_name="Rango 0-3 familia")
+    alimento_15_4_6 = models.IntegerField(
+        default=0, verbose_name="Rango 4-6 familia")
+    alimento_15_7_9 = models.IntegerField(
+        default=0, verbose_name="Rango 7-9 familia")
+    
+    alimento_16 = models.IntegerField(
+        default=0, verbose_name=settings.ALIMENTOS_METADATA["alimento_16"]["name"])
+    alimento_16_type = models.CharField(
+        choices=TIPO, max_length=20, default="unidad", verbose_name='Entrega')
+    alimento_16_0_3 = models.IntegerField(
+        default=0, verbose_name="Rango 0-3 familia")
+    alimento_16_4_6 = models.IntegerField(
+        default=0, verbose_name="Rango 4-6 familia")
+    alimento_16_7_9 = models.IntegerField(
         default=0, verbose_name="Rango 7-9 familia")
 
     modificado_por = models.ForeignKey(User, on_delete=models.DO_NOTHING)
