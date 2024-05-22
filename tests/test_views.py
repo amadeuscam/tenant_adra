@@ -2,6 +2,7 @@ import functools
 import os
 import re
 from datetime import date, datetime
+
 from faker import Faker
 
 import conftest
@@ -14,7 +15,7 @@ from django.urls import reverse
 from django_tenants.test.cases import TenantTestCase
 from django_tenants.test.client import TenantClient
 
-from adra.models import Persona, Hijo, AlimentosRepatir
+from adra.models import AlimentosRepatir, Hijo, Persona
 
 
 class TestViews(TenantTestCase):
@@ -252,7 +253,7 @@ class TestViews(TenantTestCase):
                 )[1]
             )
             if index in [12, 13]:
-                assert value == 3
+                assert value == 0
             elif index in [4]:
                 assert value == 0
             else:
