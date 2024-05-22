@@ -1,0 +1,78 @@
+version: "3.8"
+
+services:
+  web:
+    image: amadeuscam/adra-tenant:web
+    command: gunicorn adra_project.wsgi --threads=2 --bind  0.0.0.0:8000
+    hostname: web
+    volumes:
+      - static:/staticfiles
+    env_file:
+      - ./.env.prod
+    expose:
+      - 8000
+    depends_on:
+      - db
+      - redis
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.web.rule=Host( `repartoalimentos.com`, `madrid-arganda.repartoalimentos.com`, `madrid-torrejon.repartoalimentos.com` )
+      - traefik.http.routers.web.tls=true
+      - traefik.http.routers.web.tls.certresolver=letsencrypt
+
+  db:
+    image: postgres:13-alpine
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data/
+    expose:
+      - 5432
+    env_file:
+      - ./.env.prod
+
+  traefik:
+    image: traefik:v2.2.1
+    command:
+      - "--api=true"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "$PWD/traefik/traefik.prod.toml:/etc/traefik/traefik.toml"
+      - "$PWD/traefik/acme.json:/acme.json"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`dashboard-django-traefik.repartoalimentos.com`)"
+      - "traefik.http.routers.dashboard.tls=true"
+      - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.middlewares=auth"
+      # - "traefik.http.middlewares.grafana_auth.basicauth.removeheader=true"
+      - "traefik.http.middlewares.auth.basicauth.users=luciancati:masina"
+
+  celery:
+    restart: always
+    image: amadeuscam/adra-tenant:web
+    command: celery --app=adra_project worker -l info
+    env_file:
+      - ./.env.prod
+    depends_on:
+      - redis
+
+  celery-beat:
+    restart: always
+    image: amadeuscam/adra-tenant:web
+    command: celery --app=adra_project beat -l info
+    env_file:
+      - ./.env.prod
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:alpine
+    ports:
+      - '6379:6379'
+
+volumes:
+  static:
+  postgres_data_prod:
