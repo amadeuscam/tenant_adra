@@ -33,10 +33,11 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = '/static/'
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, 'static'),
+# ]
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 sentry_sdk.init(
     dsn=f"{os.environ.get('SENTRY_SDK_URL')}",
